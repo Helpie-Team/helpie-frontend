@@ -1,0 +1,197 @@
+import { SocialAuthRequest, SocialSignupRequest, AuthResult } from '../types/auth/auth';
+import { ApiError, AxiosErrorResponse } from '../types/axios';
+import apiClient from '../axios/instance';
+import { clearTokens } from '../../lib/utils/token';
+
+/**
+ * 소셜 로그인 (Google, Kakao)
+ */
+export async function socialLogin(request: SocialAuthRequest): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post(`/auth/social-login/${request.socialType}/signin`, {
+      code: request.code,
+      redirectUri: request.redirectUri,
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    
+    
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        // 서버에서 응답을 받았지만 에러 상태
+        const errorData = axiosError.response.data;
+        
+        // socialAccessToken이 있으면 회원가입 플로우로 처리
+        if (errorData.data?.socialAccessToken) {
+          return {
+            success: true,
+            data: {
+              code: errorData.code,
+              data: {
+                socialAccessToken: errorData.data.socialAccessToken,
+                socialType: errorData.data.socialType,
+                profile: errorData.data.profile,
+              },
+              fieldErrors: null,
+              message: errorData.message,
+              timestamp: new Date().toISOString(),
+            }
+          }
+        }
+        
+        return {
+          success: false,
+          message: errorData.message || '로그인에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+/**
+ * 소셜 회원가입 (Google, Kakao)
+ */
+export async function socialSignup(request: SocialSignupRequest): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post(`/auth/social-login/${request.socialType}/signup`, {
+      socialAccessToken: request.socialAccessToken,
+      username: request.username,
+
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    
+    
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        return {
+          success: false,
+          message: errorData.message || '회원가입에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '회원가입 요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+// 기존 Google 전용 함수들은 socialLogin과 socialSignup으로 대체됨
+
+
+/**
+ * 로그아웃
+ */
+export async function logout(): Promise<void> {
+  try {
+    await apiClient.post('/auth/logout');
+  } catch (error) {
+  } finally {
+    // 클라이언트에서 토큰 제거 (쿠키와 localStorage 모두)
+    clearTokens();
+  }
+}
+
+
+/**
+ * 토큰 갱신
+ */
+export async function refreshToken(): Promise<AuthResult> {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      return {
+        success: false,
+        message: '리프레시 토큰이 없습니다.',
+      };
+    }
+
+    const response = await apiClient.post('/auth/refresh', { refreshToken });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    
+    
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        return {
+          success: false,
+          message: errorData.message || '토큰 갱신에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '토큰 갱신 요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
