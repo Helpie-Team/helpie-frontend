@@ -5,6 +5,14 @@ import { clearTokens } from '../../lib/utils/token';
 
 /**
  * 소셜 로그인 (Google, Kakao)
+ * @param: request - SocialAuthRequest
+ * @returns: AuthResult
+ * @returns: {
+ *   success: boolean;
+ *   data: SocialAuthResponse;
+ *   message: string;
+ *   error: string;
+ * }
  */
 export async function socialLogin(request: SocialAuthRequest): Promise<AuthResult> {
   try {
@@ -75,13 +83,21 @@ export async function socialLogin(request: SocialAuthRequest): Promise<AuthResul
 
 /**
  * 소셜 회원가입 (Google, Kakao)
+ * @param: request - SocialSignupRequest
+ * @returns: AuthResult
+ * @returns: {
+ *   success: boolean;
+ *   data: SocialSignupResponse;
+ *   message: string;
+ *   error: string;
+ * }
  */
 export async function socialSignup(request: SocialSignupRequest): Promise<AuthResult> {
   try {
     const response = await apiClient.post(`/auth/social-login/${request.socialType}/signup`, {
       socialAccessToken: request.socialAccessToken,
+      email: request.email,
       username: request.username,
-
     });
     
     return {
@@ -124,11 +140,11 @@ export async function socialSignup(request: SocialSignupRequest): Promise<AuthRe
   }
 }
 
-// 기존 Google 전용 함수들은 socialLogin과 socialSignup으로 대체됨
 
 
 /**
  * 로그아웃
+ * @returns: void
  */
 export async function logout(): Promise<void> {
   try {
@@ -143,6 +159,13 @@ export async function logout(): Promise<void> {
 
 /**
  * 토큰 갱신
+ * @returns: AuthResult
+ * @returns: {
+ *   success: boolean;
+ *   data: RefreshTokenResponse;
+ *   message: string;
+ *   error: string;
+ * }
  */
 export async function refreshToken(): Promise<AuthResult> {
   try {
@@ -193,5 +216,35 @@ export async function refreshToken(): Promise<AuthResult> {
       message: '알 수 없는 오류가 발생했습니다.',
       error: 'Unknown error',
     };
+  }
+}
+
+
+/**
+ * 별명 중복 체크
+ * @param: username - string
+ * @returns: boolean
+ * @returns: {
+ *   success: boolean;
+ *   data: {
+ *     available: boolean;
+ *     message: string;
+ *   };
+ *   message: string;
+ *   error: string;
+ * }
+ */
+export async function checkUsername(username: string): Promise<boolean> {
+  try {
+    const response = await apiClient.get('/auth/username-check', { 
+      params: { username } 
+    });
+    
+    // 응답 구조: { statusCode, message, result }
+    // result가 false면 사용 가능 (중복 없음), true면 중복
+    return !response.data.result;
+  } catch (err) {
+    console.error('별명 중복 체크 오류:', err);
+    return false;
   }
 }

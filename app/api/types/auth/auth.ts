@@ -9,6 +9,7 @@ export interface SocialAuthRequest {
 export interface SocialSignupRequest {
   socialAccessToken: string;
   username: string;
+  email: string;
   socialType: 'GOOGLE' | 'KAKAO';
 }
 
