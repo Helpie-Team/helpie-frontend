@@ -3,6 +3,7 @@
 import { useModalStore } from '../../../lib/stores/modalStore';
 import GoogleLoginButton from '../../domain/auth/GoogleLoginButton';
 import KakaoLoginButton from '../../domain/auth/KakaoLoginButton';
+import { Input } from '../Input';
 
 export default function Modal() {
   const { isOpen, modalType, closeModal, switchModal } = useModalStore();
@@ -26,7 +27,6 @@ export default function Modal() {
   };
 
   const handleEmailSignup = () => {
-    // 이메일 회원가입 로직
     console.log('이메일 회원가입');
   };
 
@@ -55,20 +55,30 @@ export default function Modal() {
           <GoogleLoginButton socialType="GOOGLE" />
           <KakaoLoginButton socialType="KAKAO" />
           </div>
+
+          {/* 이메일 로그인 입력창 */}
+          <div className="flex flex-col gap-2">
+          {modalType === 'login' && (
+            <Input
+              type="email"
+              placeholder="example@email.com"
+            />
+          )}
           <button 
             onClick={handleEmailSignup}
             className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center hover:bg-gray-50 transition-colors"
           >
             
             <div className="w-6 h-6 bg-gray-200 rounded-full mr-3"></div>
-            <span className="text-black font-medium">E-mail로 이용하기</span>
+            <span className="text-black font-medium">E-mail로 {modalType === 'login' ? '로그인' : '이용하기'}</span>
           </button>
+        </div>
         </div>
         
         {/* 하단 링크들 */}
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-4">
-            {modalType === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}
+            {modalType === 'login' ? '로그인에 문제가 있으신가요?' : '이미 계정이 있으신가요?'}
           </p>
           <div className="flex justify-center space-x-4">
             <button 
@@ -79,7 +89,7 @@ export default function Modal() {
             </button>
             <span className="text-gray-300">|</span>
             <button className="text-black hover:text-gray-700 font-medium text-sm">
-              문의하기
+              {modalType === 'login' ? '계정찾기' : '문의하기'}
             </button>
           </div>
         </div>
