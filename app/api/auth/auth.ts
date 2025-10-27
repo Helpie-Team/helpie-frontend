@@ -32,10 +32,10 @@ export async function socialLogin(request: SocialAuthRequest): Promise<AuthResul
       const axiosError = error as ApiError<AxiosErrorResponse>;
       
       if (axiosError.response) {
-        // 서버에서 응답을 받았지만 에러 상태
+        
         const errorData = axiosError.response.data;
         
-        // socialAccessToken이 있으면 회원가입 플로우로 처리
+        
         if (errorData.data?.socialAccessToken) {
           return {
             success: true,
@@ -151,7 +151,6 @@ export async function logout(): Promise<void> {
     await apiClient.post('/auth/logout');
   } catch (error) {
   } finally {
-    // 클라이언트에서 토큰 제거 (쿠키와 localStorage 모두)
     clearTokens();
   }
 }

@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios';
 import { Profile } from './auth/auth';
 
-// Axios 에러 응답 타입
 export interface AxiosErrorResponse {
   code?: string;
   data: {
@@ -20,10 +19,8 @@ export interface AxiosErrorResponse {
   statusCode?: number;
 }
 
-// Axios 에러 타입 (제네릭으로 응답 데이터 타입 지정 가능)
 export type ApiError<T = AxiosErrorResponse> = AxiosError<T>;
 
-// API 응답 타입
 export interface ApiResponse<T = AxiosErrorResponse> {
   success: boolean;
   message?: string;
@@ -31,7 +28,6 @@ export interface ApiResponse<T = AxiosErrorResponse> {
   error?: string;
 }
 
-// 토큰 갱신 응답 타입
 export interface TokenRefreshResponse {
   accessToken: string;
   refreshToken: string;
