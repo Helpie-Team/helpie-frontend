@@ -41,6 +41,7 @@ export const passwordSchema = z
 // 소셜 회원가입 폼 스키마 (email은 소셜 로그인에서 받아오므로 폼에서 제외)
 export const signupSchema = z.object({
   username: usernameSchema,
+  email: emailSchema,
 });
 
 // 소셜 로그인 요청 스키마
