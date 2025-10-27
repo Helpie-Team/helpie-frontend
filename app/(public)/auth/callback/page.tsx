@@ -40,21 +40,16 @@ export default function SocialCallback() {
 
         if (result.success) {
           if (result.data) {
-            // socialAccessToken이 있으면 회원가입 폼 표시
+            
             if (result.data.data?.socialAccessToken) {
               let email = '';
-              
-              // socialType에 따라 이메일 추출 방식 다르게 처리
               if (result.data.data.profile) {
                 if (isGoogleProfile(result.data.data.profile)) {
-                  // Google의 경우
                   email = result.data.data.profile.rawData.email || result.data.data.user?.email || '';
                 } else if (isKakaoProfile(result.data.data.profile)) {
-                  // Kakao의 경우
                   email = result.data.data.profile.rawData.kakao_account.email || result.data.data.user?.email || '';
                 }
               } else {
-                // 프로필이 없는 경우 user 객체에서 이메일 추출
                 email = result.data.data.user?.email || '';
               }
               
@@ -64,17 +59,15 @@ export default function SocialCallback() {
               setMessage('회원가입 정보를 입력해주세요.');
               openSignupForm(result.data.data.socialAccessToken);
             } else {
-              // 기존 사용자 로그인
               setStatus('success');
               setMessage('로그인 성공! 메인 페이지로 이동합니다...');
               
-              // 토큰을 쿠키와 localStorage에 저장
+              
               if (result.data?.accessToken && result.data?.refreshToken) {
                 setTokens(result.data.accessToken, result.data.refreshToken);
-                localStorage.setItem('user', JSON.stringify(result.data.data?.user));
               }
               
-              // 메인 페이지로 리다이렉트
+              
               setTimeout(() => {
                 window.location.href = '/';
               }, 100);
@@ -95,7 +88,6 @@ export default function SocialCallback() {
     handleLogin();
   }, [code, state, openSignupForm]);
 
-  // 회원가입 폼이 표시되는 경우
   if (status === 'signup' && userEmail && socialToken) {
     return <ModalForm email={userEmail} socialAccessToken={socialToken} socialType={state as 'GOOGLE' | 'KAKAO'} />;
   }
