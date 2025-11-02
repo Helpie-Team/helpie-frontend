@@ -1,4 +1,7 @@
 import React, { useState, forwardRef } from 'react';
+import Image from 'next/image';
+import ShowIcon from '@/public/icons/show_icon.svg';
+import HideIcon from '@/public/icons/hide_icon.svg';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -19,11 +22,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
 }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPasswordField = props.type === 'password';
-
+  const inputType = isPasswordField && showPassword ? 'text' : props.type;
+  
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-500 mb-2">
           {label}
         </label>
       )}
@@ -31,7 +35,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       <div className="relative">
         <input
           ref={ref}
-          type={isPasswordField && showPassword ? 'text' : props.type}
+          {...props}
+          type={inputType}
           maxLength={props.maxLength || (props.type === 'email' ? 100 : props.type === 'password' ? 12 : undefined)}
           className={`
             w-full px-4 py-3 border rounded-xl
@@ -41,21 +46,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
             ${className}
           `}
-          {...props}
         />
+        {icon && !(showPasswordToggle && isPasswordField) && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            {icon}
+          </div>
+        )}
         {showPasswordToggle && isPasswordField && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-6 h-6 hover:opacity-70"
           >
-            {showPassword ? '👁️' : '👁️‍🗨️'}
+            <Image
+              src={showPassword ? ShowIcon.src : HideIcon.src}
+              alt={showPassword ? 'Hide password' : 'Show password'}
+              width={24}
+              height={24}
+            />
           </button>
-        )}
-        {icon && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            {icon}
-          </div>
         )}
       </div>
       
