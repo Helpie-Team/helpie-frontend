@@ -1,4 +1,4 @@
-// 인증 관련 타입 정의
+
 
 export interface SocialAuthRequest {
   code: string;
@@ -9,10 +9,10 @@ export interface SocialAuthRequest {
 export interface SocialSignupRequest {
   socialAccessToken: string;
   username: string;
+  email: string;
   socialType: 'GOOGLE' | 'KAKAO';
 }
 
-// Google 프로필 rawData 구조
 export interface GoogleProfileRawData {
   email: string;
   email_verified: boolean;
@@ -23,7 +23,6 @@ export interface GoogleProfileRawData {
   sub: string;
 }
 
-// Kakao 프로필 rawData 구조
 export interface KakaoProfileRawData {
   connected_at: string;
   id: number;
@@ -40,14 +39,12 @@ export interface KakaoProfileRawData {
   };
 }
 
-// 프로필 정보 (Google과 Kakao 모두 지원)
 export interface Profile {
   code: string;
   rawData: GoogleProfileRawData | KakaoProfileRawData;
   socialType: string;
 }
 
-// 백엔드 응답 구조
 export interface BackendAuthResponse {
   code?: string;
   data?: {
@@ -84,7 +81,6 @@ export interface AuthError {
 
 export type AuthResult = AuthResponse | AuthError;
 
-// 타입 가드 함수들
 export function isGoogleProfile(profile: Profile): profile is Profile & { rawData: GoogleProfileRawData } {
   return profile.socialType === 'GOOGLE';
 }

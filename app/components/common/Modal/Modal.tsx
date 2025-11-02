@@ -3,12 +3,27 @@
 import { useModalStore } from '../../../lib/stores/modalStore';
 import GoogleLoginButton from '../../domain/auth/GoogleLoginButton';
 import KakaoLoginButton from '../../domain/auth/KakaoLoginButton';
+import EmailModalForm from '../../domain/auth/modal-form/signup/email/EmailModalForm';
+import EmailSigninModalForm from '../../domain/auth/modal-form/signin/EmailSigninModalForm';
+import KakaoIcon from '@/public/icons/kakao_icon.svg';
+import GoogleIcon from '@/public/icons/google_icon.png';
+import EmailIcon from '@/public/icons/email_icon.svg';
+import Image from 'next/image';
 
 export default function Modal() {
-  const { isOpen, modalType, closeModal, switchModal } = useModalStore();
+  const { isOpen, modalType, closeModal, switchModal, openModal } = useModalStore();
 
   if (!isOpen || !modalType) {
     return null;
+  }
+
+  if (modalType === 'email-signup') {
+    return <EmailModalForm />;
+  }
+
+  // 이메일 로그인 모달이 열려있으면 EmailSigninModalForm을 렌더링
+  if (modalType === 'email-login') {
+    return <EmailSigninModalForm />;
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -25,14 +40,17 @@ export default function Modal() {
     switchModal();
   };
 
-  const handleEmailSignup = () => {
-    // 이메일 회원가입 로직
-    console.log('이메일 회원가입');
+  const handleEmailButtonClick = () => {
+    if (modalType === 'login') {
+      openModal('email-login');
+    } else {
+      openModal('email-signup');
+    }
   };
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 "
       onClick={handleBackdropClick}
     >
       <div className="bg-white rounded-[30px] p-8 w-full max-w-md mx-4 ">
@@ -52,23 +70,26 @@ export default function Modal() {
         {/* 로그인 버튼들 */}
         <div className="flex flex-col gap-7 space-y-4 mb-8">
           <div className='flex flex-col gap-2'>
-          <GoogleLoginButton socialType="GOOGLE" />
-          <KakaoLoginButton socialType="KAKAO" />
+          <GoogleLoginButton socialType="GOOGLE" icon={GoogleIcon.src} />
+          <KakaoLoginButton socialType="KAKAO" icon={KakaoIcon.src} />
           </div>
+
+          {/* 이메일 버튼 */}
+          <div className="flex flex-col gap-2">
           <button 
-            onClick={handleEmailSignup}
-            className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center hover:bg-gray-50 transition-colors"
+            onClick={handleEmailButtonClick}
+            className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
           >
-            
-            <div className="w-6 h-6 bg-gray-200 rounded-full mr-3"></div>
-            <span className="text-black font-medium">E-mail로 이용하기</span>
+            <Image src={EmailIcon} alt="Email" width={24} height={24} />
+            <span className="text-black font-medium">E-mail로 {modalType === 'login' ? '로그인' : '이용하기'}</span>
           </button>
+        </div>
         </div>
         
         {/* 하단 링크들 */}
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-4">
-            {modalType === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}
+            {modalType === 'login' ? '로그인에 문제가 있으신가요?' : '이미 계정이 있으신가요?'}
           </p>
           <div className="flex justify-center space-x-4">
             <button 
@@ -79,7 +100,7 @@ export default function Modal() {
             </button>
             <span className="text-gray-300">|</span>
             <button className="text-black hover:text-gray-700 font-medium text-sm">
-              문의하기
+              {modalType === 'login' ? '계정찾기' : '문의하기'}
             </button>
           </div>
         </div>
