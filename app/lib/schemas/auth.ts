@@ -12,8 +12,11 @@ export const emailSchema = z
   .refine(
     (value) => {
       const parts = value.split('@');
-      const username = parts[0];
-      const domain = parts[1];
+      if (parts.length < 2) {
+        return false;
+      }
+      const username = parts[0] || '';
+      const domain = parts[1] || '';
       return username.length <= 30 && domain.length <= 70;
     },
     {
@@ -59,7 +62,25 @@ export const socialSignupSchema = z.object({
   socialType: z.enum(['GOOGLE', 'KAKAO']),
 });
 
+// 이메일 회원가입 폼 스키마
+export const emailSignupSchema = z.object({
+  password: passwordSchema,
+  confirmPassword: z.string(),
+  username: usernameSchema,
+}).refine((data) => data.password === data.confirmPassword, {
+  message: '비밀번호가 일치하지 않습니다.',
+  path: ['confirmPassword'],
+});
+
+// 이메일 로그인 폼 스키마
+export const emailLoginSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+});
+
 // 타입 추출
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type SocialLoginRequest = z.infer<typeof socialLoginSchema>;
 export type SocialSignupRequest = z.infer<typeof socialSignupSchema>;
+export type EmailSignupFormData = z.infer<typeof emailSignupSchema>;
+export type EmailLoginFormData = z.infer<typeof emailLoginSchema>;
