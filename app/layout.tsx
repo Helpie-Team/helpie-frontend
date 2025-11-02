@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
+import localFont from 'next/font/local';
 import './globals.css';
 import Header from './components/common/Header/Header';
 import { QueryProvider } from './lib/query/QueryProvider';
+
+const pretendard = localFont({
+  src: './fonts/PretendardVariable.woff2',
+  variable: '--font-pretendard',
+  weight: '100 900',
+});
 
 export const metadata: Metadata = {
   title: 'Helpie',
@@ -15,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`antialiased`}>
+      <body className={`${pretendard.variable} font-pretendard antialiased`}>
         <QueryProvider>
           <Header />
           {children}
