@@ -42,6 +42,10 @@ const config: Config = {
         'caption1-b': ['12px', { lineHeight: '1.5', fontWeight: '500' }],
         'caption1-regular': ['12px', { lineHeight: '1.5', fontWeight: '400' }],
       },
+      boxShadow: {
+        'shadow-1': '0 2px 10px -1px rgba(0, 0, 0, 0.4)',
+        'icon': '0 0 2px 1px rgba(0, 0, 0, 0.4)',
+      },
       colors: {
         gray: '#FCFCFC',
         key: {
