@@ -146,10 +146,13 @@ export async function socialSignup(request: SocialSignupRequest): Promise<AuthRe
  * 로그아웃
  * @returns: void
  */
-export async function logout(): Promise<void> {
+export async function logout(refreshToken: string): Promise<void> {
   try {
-    await apiClient.post('/auth/logout');
+    await apiClient.post('/auth/signout', {
+      refreshToken: refreshToken,
+    });
   } catch (error) {
+    console.error('로그아웃 오류:', error);
   } finally {
     clearTokens();
   }
@@ -239,11 +242,240 @@ export async function checkUsername(username: string): Promise<boolean> {
       params: { username } 
     });
     
-    // 응답 구조: { statusCode, message, result }
-    // result가 false면 사용 가능 (중복 없음), true면 중복
     return !response.data.result;
   } catch (err) {
     console.error('별명 중복 체크 오류:', err);
     return false;
   }
 }
+
+/**
+ * 이메일 인증번호 검증
+ * @param: email - string
+ * @param: authNumber - number (인증번호)
+ * @returns: AuthResult
+ */
+export async function verifyEmailCode(email: string, authNumber: number): Promise<AuthResult> {
+  try {
+    const response = await apiClient.get('/auth/mail-check', {
+      params: {
+        mail: email,
+        authNumber: authNumber,
+      }
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        if (axiosError.response.status === 401) {
+          return {
+            success: false,
+            message: errorData.message || '유효하지 않은 인증번호입니다.',
+            error: errorData.code || 'EMAIL_001',
+          };
+        }
+        
+        return {
+          success: false,
+          message: errorData.message || '인증번호 검증에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+/**
+ * 이메일 로그인
+ * @param: email - string
+ * @param: password - string
+ * @returns: AuthResult
+ */
+export async function emailLogin(email: string, password: string): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post('/auth/signin', { 
+      email,
+      password,
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        
+        return {
+          success: false,
+          message: errorData.message || '로그인에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+/**
+ * 이메일 회원가입
+ * @param: email - string
+ * @param: username - string
+ * @param: password - string
+ * @returns: AuthResult
+ */
+export async function emailSignup(email: string, username: string, password: string): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post('/auth/signup', {
+      email,
+      username,
+      password,
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        
+        return {
+          success: false,
+          message: errorData.message || '회원가입에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '회원가입 요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+/**
+ * 이메일 인증번호 전송
+ * @param: email - string
+ * @returns: AuthResult
+ * @returns: {
+ *   success: boolean;
+ *   data: { statusCode: number; message: string; result: string };
+ *   message: string;
+ *   error: string;
+ * }
+ */
+export async function sendEmailVerificationCode(email: string): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post('/auth/mail', {}, {
+      params: { mail: email }
+    });
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        if (axiosError.response.status === 409) {
+          return {
+            success: false,
+            message: errorData.message || '이미 사용중인 이메일입니다.',
+            error: errorData.code || 'USER_002',
+          };
+        }
+        
+        return {
+          success: false,
+          message: errorData.message || '인증번호 전송에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
