@@ -2,12 +2,14 @@
 
 import { getEnvConfig } from '../../../lib/types/env';
 import { useModalStore } from '../../../lib/stores/modalStore';
+import Image from 'next/image';
 
 interface GoogleLoginButtonProps {
   socialType: 'GOOGLE' | 'KAKAO';
+  icon: string;
 }
 
-const GoogleLoginButton = ({ socialType = 'GOOGLE' }: GoogleLoginButtonProps) => {
+const GoogleLoginButton = ({ socialType = 'GOOGLE', icon }: GoogleLoginButtonProps) => {
   const { modalType } = useModalStore();
   const handleLogin = () => {
     const envConfig = getEnvConfig();
@@ -28,8 +30,8 @@ const GoogleLoginButton = ({ socialType = 'GOOGLE' }: GoogleLoginButtonProps) =>
 
   return (
           <button onClick={handleLogin}
-           className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center hover:bg-gray-50 transition-colors">
-            <div className="w-6 h-6 bg-gray-200 rounded-full mr-3"></div>
+           className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+            <Image src={icon} alt="Google" width={20} height={20} />
             <span className="text-black font-medium">Google로 {modalType === 'login' ? '로그인' : '이용하기'}</span>
           </button>
   );
