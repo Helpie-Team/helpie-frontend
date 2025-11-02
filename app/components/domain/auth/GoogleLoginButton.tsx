@@ -1,6 +1,6 @@
 'use client';
 
-import { getEnvConfig } from '../../../lib/types/env';
+import { getEnvConfig } from '../../../../env';
 import { useModalStore } from '../../../lib/stores/modalStore';
 import Image from 'next/image';
 

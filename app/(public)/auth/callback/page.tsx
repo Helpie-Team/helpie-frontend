@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { socialLogin } from '../../../api/auth/auth';
-import { getEnvConfig } from '../../../lib/types/env';
+import { getEnvConfig } from '../../../../env';
 import { useModalStore } from '../../../lib/stores/modalStore';
 import ModalForm from '../../../components/domain/auth/modal-form/signup/sns/ModalForm';
 import { isGoogleProfile, isKakaoProfile } from '../../../api/types/auth/auth';
