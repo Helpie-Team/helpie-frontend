@@ -68,6 +68,7 @@ const config: Config = {
           600: '#666463',
           700: '#262525',
           black: '#000000',
+          filter: '#E6E4E4'
         },
       },
 
