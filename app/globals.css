@@ -1,2 +1,77 @@
-@import 'tailwindcss';
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Breakpoints */
+  --breakpoint-sm: 768px; /* mobile */
+  --breakpoint-md: 1480px; /* tablet */
+
+  /* Colors */
+  --color-gray: #FCFCFC;
+
+  --color-key-100: #FF4D00;
+  --color-key-200: #FCA27C;
+  --color-key-300: #F7EDE9;
+
+  --color-state-error: #FF2222;
+  --color-state-success: #5CBE39;
+
+  --color-grayScale-white: #FFFFFF;
+  --color-grayScale-bg: #E6E6E6;
+  --color-grayScale-100: #F0F0F0;
+  --color-grayScale-200: #E6E6E6;
+  --color-grayScale-300: #CCCBCB;
+  --color-grayScale-400: #B3B2B1;
+  --color-grayScale-500: #8C8B8B;
+  --color-grayScale-600: #666463;
+  --color-grayScale-700: #262525;
+  --color-grayScale-black: #000000;
+  --color-grayScale-filter: #E6E4E4;
+
+  /* Font sizes with line-height and font-weight */
+  --font-size-h1-sb: 24px / 1.4 700;
+  --font-size-h2-sb: 20px / 1.4 600;
+  --font-size-h2: 20px / 1.4 500;
+  --font-size-h2-regular: 20px / 1.4 400;
+  --font-size-h3-sb: 18px / 1.4 600;
+  --font-size-h3: 18px / 1.4 500;
+  --font-size-h3-regular: 18px / 1.4 400;
+  --font-size-body1-sb: 16px / 1.5 600;
+  --font-size-body1: 16px / 1.5 500;
+  --font-size-body1-regular: 16px / 1.5 400;
+  --font-size-body2-sb: 15px / 1.5 600;
+  --font-size-body2: 15px / 1.5 500;
+  --font-size-body2-regular: 15px / 1.5 400;
+  --font-size-body3-sb: 14px / 1.5 600;
+  --font-size-body3: 14px / 1.5 500;
+  --font-size-body3-regular: 14px / 1.5 400;
+  --font-size-caption1-sb: 12px / 1.5 600;
+  --font-size-caption1-b: 12px / 1.5 500;
+  --font-size-caption1-regular: 12px / 1.5 400;
+
+  /* Box shadows */
+  --shadow-shadow-1: 0 2px 10px -1px rgba(0, 0, 0, 0.4);
+  --shadow-icon: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+
+/* font */
+@layer utilities {
+  .text-h1-sb { font: var(--font-size-h1-sb); }
+  .text-h2-sb { font: var(--font-size-h2-sb); }
+  .text-h2 { font: var(--font-size-h2); }
+  .text-h2-regular { font: var(--font-size-h2-regular); }
+  .text-h3-sb { font: var(--font-size-h3-sb); }
+  .text-h3 { font: var(--font-size-h3); }
+  .text-h3-regular { font: var(--font-size-h3-regular); }
+  .text-body1-sb { font: var(--font-size-body1-sb); }
+  .text-body1 { font: var(--font-size-body1); }
+  .text-body1-regular { font: var(--font-size-body1-regular); }
+  .text-body2-sb { font: var(--font-size-body2-sb); }
+  .text-body2 { font: var(--font-size-body2); }
+  .text-body2-regular { font: var(--font-size-body2-regular); }
+  .text-body3-sb { font: var(--font-size-body3-sb); }
+  .text-body3 { font: var(--font-size-body3); }
+  .text-body3-regular { font: var(--font-size-body3-regular); }
+  .text-caption1-sb { font: var(--font-size-caption1-sb); }
+  .text-caption1-b { font: var(--font-size-caption1-b); }
+  .text-caption1-regular { font: var(--font-size-caption1-regular); }
+}
