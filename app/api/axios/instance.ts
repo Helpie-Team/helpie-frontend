@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
-import { getEnvConfig } from '../../lib/types/env';
+import { getEnvConfig } from '../../../env';
 
 const apiClient = axios.create({
   baseURL: getEnvConfig().API_BASE_URL,

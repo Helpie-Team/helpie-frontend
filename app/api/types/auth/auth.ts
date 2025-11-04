@@ -88,3 +88,29 @@ export function isGoogleProfile(profile: Profile): profile is Profile & { rawDat
 export function isKakaoProfile(profile: Profile): profile is Profile & { rawData: KakaoProfileRawData } {
   return profile.socialType === 'KAKAO';
 }
+
+export interface UserInfo {
+  id: number;
+  username: string;
+  authorities: string[];
+  accountNonExpired: boolean;
+  accountNonLocked: boolean;
+  credentialsNonExpired: boolean;
+  enabled: boolean;
+  userRoles: string[];
+}
+
+export interface UserInfoResponse {
+  statusCode: number;
+  message: string;
+  result: {
+    id: number;
+    username: string;
+    authorities: string[];
+  };
+  accountNonExpired: boolean;
+  accountNonLocked: boolean;
+  credentialsNonExpired: boolean;
+  enabled: boolean;
+  userRoles: string[];
+}

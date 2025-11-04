@@ -1,4 +1,4 @@
-import { SocialAuthRequest, SocialSignupRequest, AuthResult } from '../types/auth/auth';
+import { SocialAuthRequest, SocialSignupRequest, AuthResult, UserInfoResponse } from '../types/auth/auth';
 import { ApiError, AxiosErrorResponse } from '../types/axios';
 import apiClient from '../axios/instance';
 import { clearTokens } from '../../lib/utils/token';
@@ -479,3 +479,54 @@ export async function sendEmailVerificationCode(email: string): Promise<AuthResu
   }
 }
 
+/**
+ * 사용자 정보 조회 (액세스 토큰 필요)
+ * @returns: AuthResult<UserInfoResponse>
+ * @returns: {
+ *   success: boolean;
+ *   data: UserInfoResponse;
+ *   message: string;
+ *   error: string;
+ * }
+ */
+export async function getUserInfo(): Promise<AuthResult> {
+  try {
+    const response = await apiClient.get<UserInfoResponse>('/auth/authorization-guide');
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        return {
+          success: false,
+          message: errorData.message || '사용자 정보 조회에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
