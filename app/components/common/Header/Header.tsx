@@ -6,9 +6,14 @@ import React from 'react';
 import { navItems } from '.';
 import Modal from '../Modal/Modal';
 import { useModalStore } from '../../../lib/stores/modalStore';
+import { useUserInfo } from '../../../hooks/auth';
+import { isAuthenticated } from '../../../lib/utils/token';
+import HamBurgerMenu from '@/public/icons/hamburger_icon.svg';
 
 const Header = () => {
   const { openModal } = useModalStore();
+  const { userInfo, isLoading } = useUserInfo();
+  const isLoggedIn = isAuthenticated() && !!userInfo;
 
   const handleLoginClick = () => {
     openModal('login');
@@ -17,6 +22,7 @@ const Header = () => {
   const handleSignupClick = () => {
     openModal('signup');
   };
+
   return (
     <>
       <header className="flex flex-row justify-center ">
@@ -35,14 +41,65 @@ const Header = () => {
 
                 <Link href={item.logo.link}>{item.logo.text}</Link>
               </div>
-              <div className="flex flex-row items-center gap-3">
-                <li className="cursor-pointer" onClick={handleLoginClick}>
-                  {item.signin}
-                </li>
-                <li className="cursor-pointer" onClick={handleSignupClick}>
-                  {item.signup}
-                </li>
-              </div>
+              
+              {!isLoading && (
+                <>
+                  {isLoggedIn ? (
+                    <div className="flex flex-row items-center gap-4">
+                      {/* 언어 선택기 */}
+                      <div className="flex flex-row items-center gap-1 cursor-pointer">
+                        <span className="text-sm">KR</span>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 4.5L6 7.5L9 4.5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      
+                      {/* 채팅 */}
+                      <span className="cursor-pointer text-sm">채팅</span>
+                      
+                      {/* 알림 */}
+                      <span className="cursor-pointer text-sm">알림</span>
+                      
+                      {/* 햄버거 메뉴 */}
+                      <button className="cursor-pointer p-1">
+                        <Image src={HamBurgerMenu} alt="hamburger_icon" width={24} height={24} />
+                      </button>
+                      
+                      {/* 프로필 아바타 */}
+                      <div className="w-[38px] h-[38px] rounded-full bg-gray-200 flex items-center justify-center cursor-pointer overflow-hidden">
+                        {userInfo?.result?.username ? (
+                          <span className="text-sm font-medium text-gray-600">
+                            {userInfo.result.username.charAt(0).toUpperCase()}
+                          </span>
+                        ) : (
+                          <span className="text-sm font-medium text-gray-600">U</span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-row items-center gap-3">
+                      <li className="cursor-pointer" onClick={handleLoginClick}>
+                        {item.signin}
+                      </li>
+                      <li className="cursor-pointer" onClick={handleSignupClick}>
+                        {item.signup}
+                      </li>
+                    </div>
+                  )}
+                </>
+              )}
             </ul>
           </nav>
         ))}
