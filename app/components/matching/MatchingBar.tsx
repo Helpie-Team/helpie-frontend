@@ -2,8 +2,8 @@ import React from "react"
 import Image from "next/image"
 export default function MatchingBar() {
   return(
-  <div className="flex flex-col items-center h-[136px] my-8 gap-6">
-    <div className="flex items-center justify-between  w-[1000px] h-11 mb-4">
+  <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200">
+    <div className="flex items-center justify-between  w-[1000px] h-11 ">
       <div className="w-[531px] h-[43px] flex items-center gap-2 text-[32px] font-semibold leading-none text-black">
         <div className="flex items-center gap-2">
           <p>전체</p>

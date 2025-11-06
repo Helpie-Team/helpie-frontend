@@ -29,6 +29,7 @@
 
   /* Font sizes with line-height and font-weight */
   --font-size-h1-sb: 24px / 1.4 700;
+  --font-size-h1: 24px / 1.4 600;
   --font-size-h2-sb: 20px / 1.4 600;
   --font-size-h2: 20px / 1.4 500;
   --font-size-h2-regular: 20px / 1.4 400;
@@ -55,23 +56,104 @@
 
 /* font */
 @layer utilities {
-  .text-h1-sb { font: var(--font-size-h1-sb); }
-  .text-h2-sb { font: var(--font-size-h2-sb); }
-  .text-h2 { font: var(--font-size-h2); }
-  .text-h2-regular { font: var(--font-size-h2-regular); }
-  .text-h3-sb { font: var(--font-size-h3-sb); }
-  .text-h3 { font: var(--font-size-h3); }
-  .text-h3-regular { font: var(--font-size-h3-regular); }
-  .text-body1-sb { font: var(--font-size-body1-sb); }
-  .text-body1 { font: var(--font-size-body1); }
-  .text-body1-regular { font: var(--font-size-body1-regular); }
-  .text-body2-sb { font: var(--font-size-body2-sb); }
-  .text-body2 { font: var(--font-size-body2); }
-  .text-body2-regular { font: var(--font-size-body2-regular); }
-  .text-body3-sb { font: var(--font-size-body3-sb); }
-  .text-body3 { font: var(--font-size-body3); }
-  .text-body3-regular { font: var(--font-size-body3-regular); }
-  .text-caption1-sb { font: var(--font-size-caption1-sb); }
-  .text-caption1-b { font: var(--font-size-caption1-b); }
-  .text-caption1-regular { font: var(--font-size-caption1-regular); }
+  .text-h1-sb {
+    font-size: 24px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+  .text-h1 {
+    font-size: 24px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  .text-h2-sb {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  .text-h2 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .text-h2-regular {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  .text-h3-sb {
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  .text-h3 {
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .text-h3-regular {
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  .text-body1-sb {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .text-body1 {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .text-body1-regular {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .text-body2-sb {
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .text-body2 {
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .text-body2-regular {
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .text-body3-sb {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .text-body3 {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .text-body3-regular {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .text-caption1-sb {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .text-caption1-b {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+  .text-caption1-regular {
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
 }
