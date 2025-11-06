@@ -185,7 +185,7 @@ export function EmailSignupForm({ onSuccess }: EmailSignupFormProps) {
       <button
         type="submit"
         disabled={!canSubmit}
-        className={`w-full py-4 rounded-xl font-medium text-lg transition-colors ${
+        className={`w-full py-4 rounded-3xl font-medium text-lg transition-colors ${
           canSubmit
             ? 'bg-black text-white hover:bg-gray-800'
             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
