@@ -26,6 +26,8 @@
   --color-grayScale-700: #262525;
   --color-grayScale-black: #000000;
   --color-grayScale-filter: #E6E4E4;
+  --color-grayScale-light: #E5E2E1;
+  --color-grayScale-title: #1A1A1A;
 
   /* Font sizes with line-height and font-weight */
   --font-size-h1-sb: 24px / 1.4 700;
