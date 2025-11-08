@@ -1,6 +1,10 @@
+"use client";
 import React from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
+
 export default function MatchingBar() {
+   const router = useRouter();
   return(
   <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200">
     <div className="flex items-center justify-between  w-[1000px] h-11 ">
@@ -17,7 +21,7 @@ export default function MatchingBar() {
         </div>
         <p>소모임</p>
       </div>
-      <button className="flex items-center justify-center w-[119px] h-[43px] px-4 py-3 rounded-[55px] bg-grayScale-700 text-grayScale-white text-body1-sb whitespace-nowrap">소모임 만들기</button>
+      <button className="flex items-center justify-center w-[119px] h-[43px] px-4 py-3 rounded-[55px] bg-grayScale-700 text-grayScale-white text-body1-sb whitespace-nowrap" onClick={()=>{router.push('/matching/create')}}>소모임 만들기</button>
     </div>
 
     {/* 검색 입력창 */}
