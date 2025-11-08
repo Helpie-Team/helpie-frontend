@@ -35,6 +35,11 @@
 
 /* font */
 @layer utilities {
+  .text-head{
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
   .text-h1-sb {
     font-size: 24px;
     line-height: 1.4;
