@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
 import { MatchingInput, CATEGORY_OPTIONS } from '@/app/components/matching/MatchingInput';
+import { DateTimePicker } from '@/app/components/matching/DateTimePicker';
 
 export default function Page() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function Page() {
     name: '',
     description: '',
     location: '',
+    meetingDate: undefined as Date | undefined,
+    meetingTime: '',
     maxParticipants: 0,
     categories: [] as string[],
     tags: [] as string[],
@@ -30,12 +33,14 @@ export default function Page() {
     formData.name.length > 0 && formData.name.length <= 13 &&
     formData.description.length >= 20 && formData.description.length <= 500 &&
     formData.location.length > 0 &&
+    formData.meetingDate !== undefined &&
+    formData.meetingTime.length > 0 &&
     formData.maxParticipants >= 3 &&
     formData.categories.length >= 1 &&
     formData.tags.length > 0;
 
   return (
-    <div className="flex flex-col items-center justify-center w-[1000px] gap-8 pt-8 pb-90">
+    <div className="flex flex-col items-center justify-center w-[1000px] mx-auto gap-8 pt-8 pb-90">
       <div className="w-full h-[149px] flex flex-col gap-6 border-b border-grayScale-100 ">
         <button type="button" onClick={() => router.push('/matching')}>
           <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
@@ -96,7 +101,15 @@ export default function Page() {
           placeholder="도시를 검색하세요."
         />
 
-        {/* 모임 일시 - shadcn으로 구현 예정 */}
+        {/* 모임 일시 */}
+        <DateTimePicker
+          label="모임 일시"
+          required
+          dateValue={formData.meetingDate}
+          timeValue={formData.meetingTime}
+          onDateChange={(date) => setFormData({ ...formData, meetingDate: date })}
+          onTimeChange={(time) => setFormData({ ...formData, meetingTime: time })}
+        />
 
         {/* 모임인원 */}
         <MatchingInput

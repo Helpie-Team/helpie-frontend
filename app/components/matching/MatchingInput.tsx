@@ -277,7 +277,7 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-body3-sb text-grayScale-400 ">사진추가</p>
+      <p className="text-body3-sb text-black ">사진추가</p>
       <div className="flex gap-4">
         {images.map((image, index) => (
           <div key={index} className="relative w-32 h-32">
@@ -292,8 +292,8 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
           </div>
         ))}
         {images.length < maxImages && (
-          <label className="w-43 h-43 border-1  border-grayScale-200 rounded-lg flex flex-col items-center justify-center cursor-pointer gap-5 ">
-            <div className="w-12 h-12 bg-primary-100 rounded-full border border-key-200 flex items-center justify-center">
+          <label className="w-43 h-43 border border-grayScale-200 rounded-lg flex flex-col items-center justify-center cursor-pointer gap-5 ">
+            <div className="w-12 h-12 bg-key-300 rounded-full border border-key-100 flex items-center justify-center">
               <Image src={plus} alt="사진 추가 아이콘" width={14} height={14} />
             </div>
             <span className="text-body1 text-grayScale-500">사진 업로드 하기</span>
