@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import plus from '@/public/icons/plus.png';
 
 // 공통 스타일
-const INPUT_CLASS = "w-full px-4 py-3 border border-grayScale-200 text-body1 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-grayScale-300";
+const INPUT_CLASS = "w-full px-4 py-3 border border-grayScale-200 text-body1 rounded-xl focus:outline-none  placeholder:text-grayScale-300";
 
 export const CATEGORY_OPTIONS = [
   { id: 'culture', label: '문화 · 취미' },
@@ -33,7 +34,6 @@ interface MatchingInputProps {
   maxLength?: number;
   minLength?: number;
   showCharCount?: boolean;
-  selectedLocations?: string[];
   max?: number;
   selectedTags?: string[];
   tags?: string[];
@@ -63,7 +63,7 @@ export const MatchingInput: React.FC<MatchingInputProps> = (props) => {
   return (
     <div className="flex flex-col gap-2">
       {label && (
-        <label className="block text-body2-medium text-grayScale-900">
+        <label className="block text-body3-sb text-grayScale-900">
           {required && <span className="text-key-100 mr-1">*</span>}
           {label}
         </label>
@@ -117,23 +117,19 @@ const TextareaInput: React.FC<MatchingInputProps> = ({
 );
 
 // 지역 검색 입력
-const SearchInput: React.FC<MatchingInputProps> = ({ onChange, placeholder, selectedLocations = [] }) => {
-  const [inputValue, setInputValue] = useState('');
+const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredCities, setFilteredCities] = useState(CITY_OPTIONS);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
+    const inputValue = e.target.value;
+    onChange?.(inputValue);
     setIsOpen(true);
-    setFilteredCities(CITY_OPTIONS.filter(city => city.toLowerCase().includes(value.toLowerCase())));
+    setFilteredCities(CITY_OPTIONS.filter(city => city.toLowerCase().includes(inputValue.toLowerCase())));
   };
 
   const handleSelectCity = (city: string) => {
-    if (!selectedLocations.includes(city)) {
-      onChange?.([...selectedLocations, city]);
-    }
-    setInputValue('');
+    onChange?.(city);
     setIsOpen(false);
     setFilteredCities(CITY_OPTIONS);
   };
@@ -142,7 +138,7 @@ const SearchInput: React.FC<MatchingInputProps> = ({ onChange, placeholder, sele
     <div className="relative">
       <input
         type="text"
-        value={inputValue}
+        value={value}
         onChange={handleInputChange}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
@@ -151,7 +147,7 @@ const SearchInput: React.FC<MatchingInputProps> = ({ onChange, placeholder, sele
       />
 
       {/* 드롭다운 */}
-      {isOpen && inputValue && filteredCities.length > 0 && (
+      {isOpen && value && filteredCities.length > 0 && (
         <div className="absolute z-10 w-full mt-2 bg-white border border-grayScale-300 rounded-xl shadow-lg max-h-60 overflow-y-auto">
           {filteredCities.map((city, index) => (
             <button
@@ -238,27 +234,26 @@ const TagInputComponent: React.FC<MatchingInputProps> = ({ tags = [], onChange, 
 
   return (
     <div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onCompositionStart={() => setIsComposing(true)}
-        onCompositionEnd={() => setIsComposing(false)}
-        placeholder={placeholder}
-        disabled={tags.length >= maxTags}
-        className={`${INPUT_CLASS} disabled:bg-grayScale-100`}
-      />
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3">
-          {tags.map((tag, index) => (
-            <div key={index} className="flex items-center gap-2 px-1.5 py-1 bg-key-100 text-white rounded-md">
-              <span className="text-body2-medium">#{tag}</span>
-              <button type="button" onClick={() => removeTag(index)} className="text-white hover:opacity-80 font-bold text-lg leading-none">×</button>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Input 창처럼 보이는 wrapper */}
+      <div className="w-full px-4 py-3 border border-grayScale-200 rounded-xl focus-within:outline-none flex flex-wrap items-center gap-2">
+        {tags.map((tag, index) => (
+          <div key={index} className="flex items-center gap-1 px-2 py-1 bg-key-100 text-white rounded-md">
+            <span className="text-body2-medium"># {tag}</span>
+            <button type="button" onClick={() => removeTag(index)} className="text-white hover:opacity-80 font-bold text-lg leading-none">×</button>
+          </div>
+        ))}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          placeholder={tags.length === 0 ? placeholder : ''}
+          disabled={tags.length >= maxTags}
+          className="flex-1 outline-none border-none text-body1 placeholder:text-grayScale-300 disabled:bg-transparent min-w-[120px]"
+        />
+      </div>
       <p className="text-body3-regular text-grayScale-600 mt-2">
         {tags.length > 0 && `(${tags.length}/${maxTags})`}
       </p>
@@ -281,8 +276,8 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
   };
 
   return (
-    <div>
-      <p className="text-body2-regular text-grayScale-900 mb-3">사진추가</p>
+    <div className="flex flex-col gap-3">
+      <p className="text-body3-sb text-grayScale-400 ">사진추가</p>
       <div className="flex gap-4">
         {images.map((image, index) => (
           <div key={index} className="relative w-32 h-32">
@@ -297,16 +292,16 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
           </div>
         ))}
         {images.length < maxImages && (
-          <label className="w-32 h-32 border-2 border-dashed border-grayScale-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary-500">
-            <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-primary-500 text-2xl">+</span>
+          <label className="w-43 h-43 border-1  border-grayScale-200 rounded-lg flex flex-col items-center justify-center cursor-pointer gap-5 ">
+            <div className="w-12 h-12 bg-primary-100 rounded-full border border-key-200 flex items-center justify-center">
+              <Image src={plus} alt="사진 추가 아이콘" width={14} height={14} />
             </div>
-            <span className="text-caption1-regular text-grayScale-600">사진 업로드 하기</span>
+            <span className="text-body1 text-grayScale-500">사진 업로드 하기</span>
             <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" multiple={maxImages > 1} />
           </label>
         )}
       </div>
-      <p className="text-caption1-regular text-grayScale-600 mt-2">최대 {maxImages}장 업로드 가능</p>
+      <p className="text-caption1-regular text-grayScale-600 mt-2">최대 3장 업로드 가능</p>
     </div>
   );
 };

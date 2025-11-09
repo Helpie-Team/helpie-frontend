@@ -13,8 +13,8 @@ export default function Page() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    locations: [] as string[],
-    maxParticipants: 3,
+    location: '',
+    maxParticipants: 0,
     categories: [] as string[],
     tags: [] as string[],
     images: [] as File[],
@@ -29,7 +29,7 @@ export default function Page() {
   const isFormValid =
     formData.name.length > 0 && formData.name.length <= 13 &&
     formData.description.length >= 20 && formData.description.length <= 500 &&
-    formData.locations.length > 0 &&
+    formData.location.length > 0 &&
     formData.maxParticipants >= 3 &&
     formData.categories.length >= 1 &&
     formData.tags.length > 0;
@@ -91,8 +91,8 @@ export default function Page() {
           type="search"
           label="지역 설정"
           required
-          selectedLocations={formData.locations}
-          onChange={(locations) => setFormData({ ...formData, locations: locations as string[] })}
+          value={formData.location}
+          onChange={(location) => setFormData({ ...formData, location: location as string })}
           placeholder="도시를 검색하세요."
         />
 
