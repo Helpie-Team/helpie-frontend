@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Share2, MapPin, Users, Tag, Eye, Clock } from "lucide-react";
 import noImage from "@/public/images/noImage.png";
 import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
+import ShareModal from '@/app/components/matching/modal/ShareModal';
 
 interface JoinModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface JoinModalProps {
 export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
   const [isJoined, setIsJoined] = useState(false); //api 연동때 수정 예정- 참여하기 버튼 누르면 JoinConfirm 모달과 함께 isJoined true로 변경됨.
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -69,7 +71,10 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
             </button>
             <h2 className="text-h2">모임요약</h2>
           </div>
-          <button className="hover:bg-gray-100 p-2 rounded-full transition-colors">
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="hover:bg-gray-100 p-2 rounded-full transition-colors"
+          >
             <Share2 className="w-6 h-6" />
           </button>
         </div>
@@ -154,12 +159,20 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
             참여하기
           </button>
         )}
-      </div>   
+      </div>
+
+      {/* 참여 확인 모달 */}
       <JoinConfirm
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              onConfirm={handleConfirm}
-            />
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirm}
+      />
+
+      {/* 공유 모달 */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
     </div>
   );
 }
