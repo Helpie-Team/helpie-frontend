@@ -3,6 +3,7 @@ import { create } from 'zustand';
 interface InterestState {
   selectedInterests: string[];
   toggleInterest: (interest: string) => void;
+  setInterests: (interests: string[]) => void;
   clearInterests: () => void;
 }
 
@@ -16,6 +17,10 @@ export const useInterestStore = create<InterestState>((set, get) => ({
     } else {
       set({ selectedInterests: [...selectedInterests, interest] });
     }
+  },
+
+  setInterests: (interests) => {
+    set({ selectedInterests: interests });
   },
   
   clearInterests: () => {

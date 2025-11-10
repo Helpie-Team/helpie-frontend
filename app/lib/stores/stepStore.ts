@@ -6,11 +6,14 @@ interface StepState {
   totalSteps: number;
   isCompleted: boolean;
   profileData: BasicInfoResponseData | null;
+  hasBasicInfo: boolean;
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
   reset: () => void;
   setCompleted: (profileData: BasicInfoResponseData) => void;
+  setProfileData: (profileData: BasicInfoResponseData | null) => void;
+  setHasBasicInfo: (hasBasicInfo: boolean) => void;
 }
 
 export const useStepStore = create<StepState>((set, get) => ({
@@ -18,6 +21,7 @@ export const useStepStore = create<StepState>((set, get) => ({
   totalSteps: 5,
   isCompleted: false,
   profileData: null,
+  hasBasicInfo: false,
   
   setStep: (step) => {
     const { totalSteps } = get();
@@ -41,11 +45,19 @@ export const useStepStore = create<StepState>((set, get) => ({
   },
   
   reset: () => {
-    set({ currentStep: 1, isCompleted: false, profileData: null });
+    set({ currentStep: 1, isCompleted: false, profileData: null, hasBasicInfo: false });
   },
   
   setCompleted: (profileData) => {
-    set({ isCompleted: true, profileData });
+    set({ isCompleted: true, profileData, hasBasicInfo: true });
+  },
+
+  setProfileData: (profileData) => {
+    set({ profileData });
+  },
+
+  setHasBasicInfo: (hasBasicInfo) => {
+    set({ hasBasicInfo });
   },
 }));
 
