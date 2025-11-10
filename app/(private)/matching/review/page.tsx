@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
 import picture from '@/public/icons/picture.png';
+import {Checkbox} from "@/components/ui/checkbox";
+import {Label} from "@/components/ui/label";
+
 export default function Page() {
   const router = useRouter();
 
@@ -84,8 +87,9 @@ export default function Page() {
             </div>
           </div>
         </div>
-        
-        <br />
+
+        <hr className="border-t border-grayScale-100" />
+
         {/* 별점 섹션 */}
         <div className="flex flex-col gap-4">
           <h2 className="text-h2">참여하신 모임은 어떠셨나요?</h2>
@@ -165,37 +169,19 @@ export default function Page() {
         </div>
 
         {/* 익명 작성 체크박스 */}
-        <label htmlFor="anonymous" className="flex items-center gap-3 cursor-pointer">
-          <div className="relative flex items-center justify-center w-6 h-6">
-            <input
-              type="checkbox"
-              id="anonymous"
-              checked={isAnonymous}
-              onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="peer absolute w-6 h-6 opacity-0 cursor-pointer z-10"
-            />
-            <div className="w-4 h-4 border-2 border-grayScale-300 rounded bg-white peer-checked:bg-black peer-checked:border-grayScale-900 transition-colors flex items-center justify-center">
-              {isAnonymous && (
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={3}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              )}
-            </div>
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id="terms-2"
+            checked={isAnonymous}
+            onCheckedChange={(checked) => setIsAnonymous(checked === true)}
+            className="bg-white border border-grayScale-300 text-white data-[state=checked]:bg-[#414141] data-[state=checked]:border-[#414141]"
+          />
+          <div className="grid gap-2">
+            <Label htmlFor="terms-2" className="text-body2-regular text-grayScale-600 cursor-pointer">
+              닉네임 비공개로 작성
+            </Label>
           </div>
-          <span className="text-body2-regular text-grayScale-600">
-            닉네임 비공개로 작성
-          </span>
-        </label>
+        </div>
       </form>
     </div>
   );
