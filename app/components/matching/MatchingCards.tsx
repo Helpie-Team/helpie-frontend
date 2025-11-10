@@ -2,12 +2,31 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import heart from "@/public/icons/heart.png";     
-import noHeart from "@/public/icons/noHeart.png"; 
-import noImage from "@/public/images/noImage.png"; 
+import heart from "@/public/icons/heart.png";
+import noHeart from "@/public/icons/noHeart.png";
+import noImage from "@/public/images/noImage.png";
 import fire from "@/public/icons/fire.png";
+import JoinModal from "./modal/JoinModal";
+
 export default function MatchingCards() {
   const [liked, setLiked] = useState<boolean[]>(Array(9).fill(false));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+
+  const handleCardClick = (index: number) => {
+    setSelectedCardIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCardIndex(null);
+  };
+
+  const handleConfirmJoin = () => {
+    console.log(`소모임 ${selectedCardIndex}에 참여합니다.`);
+    // 여기에 실제 참여 로직 추가
+  };
 
   return (
     <div className="w-[768px] gap-8 flex flex-col">
@@ -17,7 +36,8 @@ export default function MatchingCards() {
         {[...Array(9)].map((_, index) => (
           <div
             key={index}
-            className="w-[180px] h-[232px] rounded-2xl flex flex-col "
+            className="w-[180px] h-[232px] rounded-2xl flex flex-col cursor-pointer"
+            onClick={() => handleCardClick(index)}
           >
             <div className="relative w-full">
               <Image
@@ -39,13 +59,14 @@ export default function MatchingCards() {
               <button
                 type="button"
                 aria-pressed={liked[index]}
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   setLiked(prev => {
                     const next = [...prev];
                     next[index] = !next[index];
                     return next;
-                  })
-                }
+                  });
+                }}
                 className="absolute bottom-1 right-2 w-[32px] h-[32px] z-10  flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
               >
                 <Image
@@ -68,6 +89,12 @@ export default function MatchingCards() {
           </div>
         ))}
       </div>
+
+      <JoinModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmJoin}
+      />
     </div>
   );
 }
