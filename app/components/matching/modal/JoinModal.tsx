@@ -5,15 +5,16 @@ import arrow_left from '@/public/icons/arrow_left.png';
 import Image from "next/image";
 import { Share2, MapPin, Users, Tag, Eye, Clock } from "lucide-react";
 import noImage from "@/public/images/noImage.png";
+import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
 
 interface JoinModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm?: () => void;
 }
 
-export default function JoinModal({ isOpen, onClose, onConfirm }: JoinModalProps) {
-  const [isJoined, setIsJoined] = useState(false);
+export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
+  const [isJoined, setIsJoined] = useState(false); //api 연동때 수정 예정- 참여하기 버튼 누르면 JoinConfirm 모달과 함께 isJoined true로 변경됨.
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -25,9 +26,7 @@ export default function JoinModal({ isOpen, onClose, onConfirm }: JoinModalProps
 
   const handleConfirm = () => {
     setIsJoined(true); 
-    if (onConfirm) {
-      onConfirm();
-    }
+    setIsModalOpen(true);
   };
 
   const handleCancel = () => {
@@ -60,12 +59,12 @@ export default function JoinModal({ isOpen, onClose, onConfirm }: JoinModalProps
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="hover:bg-gray-100 p-2 rounded-full transition-colors">
+            <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
               <Image
                 src={arrow_left}
                 alt="뒤로 가기"
-                width={24}
-                height={24}
+                width={30}
+                height={30}
               />
             </button>
             <h2 className="text-h2">모임요약</h2>
@@ -155,7 +154,12 @@ export default function JoinModal({ isOpen, onClose, onConfirm }: JoinModalProps
             참여하기
           </button>
         )}
-      </div>
+      </div>   
+      <JoinConfirm
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onConfirm={handleConfirm}
+            />
     </div>
   );
 }
