@@ -150,7 +150,7 @@ const LanguageSelector = () => (
         strokeLinejoin="round"
       />
     </svg>
-    <span className="text-grayScale-500">English</span>
+    
   </button>
 );
 
