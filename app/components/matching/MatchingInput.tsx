@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import plus from '@/public/icons/plus.png';
+
+import picture  from '@/public/icons/picture.png';
 
 // 공통 스타일
 const INPUT_CLASS = "w-full px-4 py-3 border border-grayScale-200 text-body1 rounded-xl focus:outline-none  placeholder:text-grayScale-300";
@@ -292,13 +293,11 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
           </div>
         ))}
         {images.length < maxImages && (
-          <label className="w-43 h-43 border border-grayScale-200 rounded-lg flex flex-col items-center justify-center cursor-pointer gap-5 ">
-            <div className="w-12 h-12 bg-key-300 rounded-full border border-key-100 flex items-center justify-center">
-              <Image src={plus} alt="사진 추가 아이콘" width={14} height={14} />
-            </div>
+        <label className="w-43 h-43 border border-grayScale-200 rounded-lg flex flex-col items-center justify-center cursor-pointer gap-5 ">
+            <Image src={picture} alt="사진 추가 아이콘" width={24} height={24} />
             <span className="text-body1 text-grayScale-500">사진 업로드 하기</span>
             <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" multiple={maxImages > 1} />
-          </label>
+         </label>
         )}
       </div>
       <p className="text-caption1-regular text-grayScale-600 mt-2">최대 3장 업로드 가능</p>
