@@ -234,13 +234,13 @@ const ChatBot = () => {
       {isOpen && (
         <div
           ref={chatContainerRef}
-          className="fixed bottom-20 right-6 flex h-[520px] w-[320px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_16px_40px_rgba(0,0,0,0.15)]"
+          className="chatbot-panel fixed bottom-20 right-6 flex h-[520px] w-[320px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_16px_40px_rgba(0,0,0,0.15)]"
         >
           <ChatBotHeader onBack={handleBackChatBot} onReset={handleResetChatBot} />
 
           <div
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto bg-white px-4 pb-6 pt-8"
+            className="chatbot-messages flex-1 overflow-y-auto bg-white px-4 pb-6 pt-8"
           >
             <div className="flex flex-col gap-4">
               <WelcomeMessage />
@@ -294,14 +294,14 @@ const ChatBotLauncher = ({
     type="button"
     title="ChatBot"
     onClick={onToggle}
-    className="fixed bottom-2 right-6 rounded-full border border-grayScale-200 transition-opacity duration-300 hover:cursor-pointer hover:opacity-80"
+    className={`chatbot-button-bounce ${isOpen ? '' : 'chatbot-launcher'} fixed bottom-2 right-6 rounded-full transition-opacity duration-300 hover:cursor-pointer hover:opacity-80`}
   >
     {isOpen ? (
       <div className="flex size-[60px] items-center justify-center rounded-[0.8rem] bg-grayScale-100">
         <Image src={CloseChatBotImage} alt="close-chatbot" width={18} height={18} />
       </div>
     ) : (
-      <Image src={ChatBotImage} alt="chatbot" width={60} height={60} />
+      <Image src={ChatBotImage} alt="chatbot" width={102} height={100} />
     )}
   </button>
 );
@@ -332,7 +332,7 @@ const ChatBotHeader = ({
 );
 
 const WelcomeMessage = () => (
-  <BotBubble>
+  <BotBubble classNameOverride="chatbot-welcome">
     <div className="flex flex-col gap-3">
       <p className="text-body1-regular text-grayScale-700">
         안녕하세요! Helpie의 엣치입니다! 무엇을 도와드릴까요?
@@ -362,7 +362,7 @@ const QuickReplyButton = ({
 }) => (
   <button
     type="button"
-    className="rounded-full border border-grayScale-200 px-3 py-1 text-body2 text-grayScale-600 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
+    className="chatbot-button-bounce rounded-full border border-grayScale-200 px-3 py-1 text-body2 text-grayScale-600 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
     onClick={onClick}
   >
     {label}
@@ -429,7 +429,7 @@ const CategorySelector = ({
         <button
           key={key}
           type="button"
-          className="flex size-[64px] flex-col items-center gap-1 rounded-2xl border border-grayScale-200 bg-white px-0 py-1 text-center transition hover:border-[var(--color-key-100)] hover:shadow-md"
+          className="chatbot-button-bounce flex size-[64px] flex-col items-center gap-1 rounded-2xl border border-grayScale-200 bg-white px-0 py-1 text-center transition hover:border-[var(--color-key-100)] hover:shadow-md"
           onClick={() => onSelect(key)}
         >
           <Image src={category.icon} alt={category.title} width={26} height={26} />
@@ -469,7 +469,7 @@ const QuestionButton = ({
 }) => (
   <button
     type="button"
-    className="w-full rounded-2xl border border-grayScale-200 px-4 py-3 text-left text-body2 text-grayScale-700 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
+    className="chatbot-button-bounce w-full rounded-2xl border border-grayScale-200 px-4 py-3 text-left text-body2 text-grayScale-700 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
     onClick={() => onClick(question.key)}
   >
     {question.label.replace(/(^“|”$)/g, '')}
@@ -507,8 +507,8 @@ const AnswerSection = ({
               type="button"
               className={
                 showGuestMessage
-                  ? 'h-11 rounded-2xl bg-[var(--color-key-100)] text-body2 text-white transition hover:opacity-90'
-                  : 'h-11 rounded-2xl border border-[var(--color-key-100)] text-body2 text-[var(--color-key-100)] transition hover:bg-[var(--color-key-100)] hover:text-white'
+                  ? 'chatbot-button-bounce h-11 rounded-2xl bg-[var(--color-key-100)] text-body2 text-white transition hover:opacity-90'
+                  : 'chatbot-button-bounce h-11 rounded-2xl border border-[var(--color-key-100)] text-body2 text-[var(--color-key-100)] transition hover:bg-[var(--color-key-100)] hover:text-white'
               }
               onClick={() => onCtaClick(ctaTarget)}
             >
@@ -524,11 +524,13 @@ const AnswerSection = ({
 const BotBubble = ({
   children,
   title,
+  classNameOverride,
 }: {
   children: React.ReactNode;
   title?: string;
+  classNameOverride?: string;
 }) => (
-  <div className="relative flex flex-col items-start gap-2">
+  <div className={`${classNameOverride ?? 'chatbot-bubble'} relative flex flex-col items-start gap-2`}>
     <div className="flex-1 rounded-3xl bg-white px-2 py-3 shadow-sm">
       {title && <p className="mb-2 text-body2 text-grayScale-500">{title}</p>}
       {children}
@@ -544,7 +546,7 @@ const BotBubble = ({
 );
 
 const UserBubble = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex justify-end">
+  <div className="chatbot-bubble flex justify-end">
     <div className="max-w-[220px] rounded-3xl bg-[var(--color-key-100)] px-4 py-2 text-body2 text-white">
       {children}
     </div>
