@@ -131,11 +131,6 @@ export default function ModalForm({ email, socialAccessToken, socialType, icon }
     router.push('/');
   };
 
-  const handleWelcomeModalBack = () => {
-    // 웰컴 모달에서 뒤로가기 -> 회원가입 폼으로 복귀
-    setShowWelcomeModal(false);
-  };
-
   const handleWelcomeModalSkip = () => {
     setShowWelcomeModal(false);
     closeModal(); // 회원가입 모달 닫기
@@ -261,7 +256,7 @@ export default function ModalForm({ email, socialAccessToken, socialType, icon }
       {/* 환영 모달 */}
       {showWelcomeModal && (
         <WelcomeModal 
-          onBack={handleWelcomeModalBack}
+          
           onSkip={handleWelcomeModalSkip}
           onComplete={handleWelcomeModalComplete}
         />

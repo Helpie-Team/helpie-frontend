@@ -8,6 +8,8 @@ import { useModalStore } from '../../../lib/stores/modalStore';
 import ModalForm from '../../../components/domain/auth/modal-form/signup/sns/ModalForm';
 import { isGoogleProfile, isKakaoProfile } from '../../../api/types/auth/auth';
 import { setTokens } from '../../../lib/utils/token';
+import GoogleIcon from '@/public/icons/google_icon.png';
+import KakaoIcon from '@/public/icons/kakao_icon.svg';
 
 export default function SocialCallback() {
   const params = useSearchParams();
@@ -79,6 +81,7 @@ export default function SocialCallback() {
           
         }
       } catch (error) {
+        console.error('소셜 로그인 콜백 처리 중 오류 발생', error);
         setStatus('error');
         setMessage('네트워크 오류가 발생했습니다.');
         
@@ -89,7 +92,16 @@ export default function SocialCallback() {
   }, [code, state, openSignupForm]);
 
   if (status === 'signup' && userEmail && socialToken) {
-    return <ModalForm email={userEmail} socialAccessToken={socialToken} socialType={state as 'GOOGLE' | 'KAKAO'} />;
+    const iconSrc = state === 'GOOGLE' ? GoogleIcon.src : KakaoIcon.src;
+
+    return (
+      <ModalForm
+        email={userEmail}
+        socialAccessToken={socialToken}
+        socialType={state as 'GOOGLE' | 'KAKAO'}
+        icon={iconSrc}
+      />
+    );
   }
 
   return (
