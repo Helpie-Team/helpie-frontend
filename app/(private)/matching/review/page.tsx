@@ -32,25 +32,25 @@ export default function Page() {
   return (
     <div className="flex flex-col w-[1000px] mx-auto pt-8 pb-20">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-8 pb-8 border-b border-grayScale-100">
-        <div className="flex items-center gap-4">
-          <button type="button" onClick={() => router.push('/matching')}>
-            <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
-          </button>
-          <h1 className="text-head">후기 작성</h1>
-        </div>
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          disabled={!isFormValid}
-          className={`px-6 py-2 rounded-full font-medium transition-all ${
-            isFormValid
-              ? 'bg-key-100 text-white'
-              : 'bg-grayScale-100 text-grayScale-400 cursor-not-allowed'
-          }`}
-        >
-          작성완료
+      <div className="w-full flex flex-col gap-6 mb-8 pb-8 border-b border-grayScale-100">
+        <button type="button" onClick={() => router.push('/matching')}>
+          <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
         </button>
+        <div className="flex items-center justify-between">
+          <h1 className="text-head">후기 작성</h1>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+            className={`px-6 py-2 rounded-full font-medium transition-all ${
+              isFormValid
+                ? 'bg-key-100 text-white'
+                : 'bg-grayScale-100 text-grayScale-400 cursor-not-allowed'
+            }`}
+          >
+            작성완료
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8 border border-grayScale-200 bg-[#FAF8F7] rounded-[20px] p-6">
@@ -165,18 +165,37 @@ export default function Page() {
         </div>
 
         {/* 익명 작성 체크박스 */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="anonymous"
-            checked={isAnonymous}
-            onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="w-5 h-5 rounded border-grayScale-300 text-key-100 focus:ring-key-100"
-          />
-          <label htmlFor="anonymous" className="text-body2-regular text-grayScale-700 cursor-pointer">
+        <label htmlFor="anonymous" className="flex items-center gap-3 cursor-pointer">
+          <div className="relative flex items-center justify-center w-6 h-6">
+            <input
+              type="checkbox"
+              id="anonymous"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="peer absolute w-6 h-6 opacity-0 cursor-pointer z-10"
+            />
+            <div className="w-4 h-4 border-2 border-grayScale-300 rounded bg-white peer-checked:bg-black peer-checked:border-grayScale-900 transition-colors flex items-center justify-center">
+              {isAnonymous && (
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            </div>
+          </div>
+          <span className="text-body2-regular text-grayScale-600">
             닉네임 비공개로 작성
-          </label>
-        </div>
+          </span>
+        </label>
       </form>
     </div>
   );
