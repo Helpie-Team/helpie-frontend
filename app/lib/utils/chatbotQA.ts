@@ -56,14 +56,14 @@ export const chatbotCategories: Record<
   }
 > = {
   account: {
-    title: '계정 관련',
-    label: '계정 관련',
+    title: '로그인·계정',
+    label: '로그인·계정',
     description: '로그인 · 프로필 · 언어 설정 안내',
     icon: '/images/categori_account.png',
   },
   meetups: {
-    title: '소모임 관련',
-    label: '소모임 관련',
+    title: '소모임·추천',
+    label: '소모임·추천',
     description: '소모임 참여 · 생성 · 추천',
     icon: '/images/categori_matching.png',
   },

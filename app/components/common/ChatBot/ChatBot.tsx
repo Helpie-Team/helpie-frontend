@@ -243,11 +243,10 @@ const ChatBot = () => {
             className="chatbot-messages flex-1 overflow-y-auto bg-white px-4 pb-6 pt-8"
           >
             <div className="flex flex-col gap-4">
-              <WelcomeMessage />
-
-              {stage === 'welcome' && (
-                <QuickReplyButtons onSelect={handleSelectQuickReply} />
-              )}
+              <WelcomeMessage
+                showQuickReplies={stage === 'welcome'}
+                onSelectQuickReply={handleSelectQuickReply}
+              />
 
               {stage !== 'welcome' && (
                 <div className="flex flex-col gap-4">
@@ -331,7 +330,13 @@ const ChatBotHeader = ({
   </div>
 );
 
-const WelcomeMessage = () => (
+const WelcomeMessage = ({
+  showQuickReplies,
+  onSelectQuickReply,
+}: {
+  showQuickReplies: boolean;
+  onSelectQuickReply: (type: QuickReplyType) => void;
+}) => (
   <BotBubble classNameOverride="chatbot-welcome">
     <div className="flex flex-col gap-3">
       <p className="text-body1-regular text-grayScale-700">
@@ -342,6 +347,11 @@ const WelcomeMessage = () => (
         <span>✉️ E-mail 문의</span>
         <span className="font-medium">lifestylehelpie@gmail.com</span>
       </div>
+      {showQuickReplies && (
+        <div className="pt-2">
+          <QuickReplyButtons onSelect={onSelectQuickReply} />
+        </div>
+      )}
     </div>
   </BotBubble>
 );
@@ -429,10 +439,18 @@ const CategorySelector = ({
         <button
           key={key}
           type="button"
-          className="chatbot-button-bounce flex size-[64px] flex-col items-center gap-1 rounded-2xl border border-grayScale-200 bg-white px-0 py-1 text-center transition hover:border-[var(--color-key-100)] hover:shadow-md"
+          className="chatbot-button-bounce flex size-[64px] flex-col items-center gap-2 rounded-2xl border border-grayScale-200 bg-white px-0 py-2 text-center transition hover:border-[var(--color-key-100)] hover:shadow-md"
           onClick={() => onSelect(key)}
         >
-          <Image src={category.icon} alt={category.title} width={26} height={26} />
+          <div className="relative h-[26px] w-[26px]">
+            <Image
+              src={category.icon}
+              alt={category.title}
+              fill
+              className="object-contain"
+              sizes="26px"
+            />
+          </div>
           <span className="text-[12px] text-grayScale-500">{category.label}</span>
         </button>
       ))}
@@ -525,33 +543,51 @@ const BotBubble = ({
   children,
   title,
   classNameOverride,
+  timestamp,
 }: {
   children: React.ReactNode;
   title?: string;
   classNameOverride?: string;
-}) => (
-  <div className={`${classNameOverride ?? 'chatbot-bubble'} relative flex flex-col items-start gap-2`}>
-    <div className="flex-1 rounded-3xl bg-white px-2 py-3 shadow-sm">
-      {title && <p className="mb-2 text-body2 text-grayScale-500">{title}</p>}
-      {children}
-    </div>
-    <Image
-      src={HelpieChatBotImage}
-      alt="helpie-chat-bot"
-      width={40}
-      height={31}
-      className="absolute -top-5 left-3"
-    />
-  </div>
-);
+  timestamp?: string;
+}) => {
+  const displayTime = useMemo(() => timestamp ?? getCurrentTime(), [timestamp]);
 
-const UserBubble = ({ children }: { children: React.ReactNode }) => (
-  <div className="chatbot-bubble flex justify-end">
-    <div className="max-w-[220px] rounded-3xl bg-[var(--color-key-100)] px-4 py-2 text-body2 text-white">
-      {children}
+  return (
+    <div className={`${classNameOverride ?? 'chatbot-bubble'} relative flex flex-col items-start gap-2`}>
+      <div className="flex-1 rounded-3xl bg-white px-2 py-3 shadow-sm">
+        {title && <p className="mb-2 text-body2 text-grayScale-500">{title}</p>}
+        {children}
+      </div>
+      <p className="text-caption1-regular text-grayScale-400">{displayTime}</p>
+      <Image
+        src={HelpieChatBotImage}
+        alt="helpie-chat-bot"
+        width={40}
+        height={31}
+        className="absolute -top-5 left-3"
+      />
     </div>
-  </div>
-);
+  );
+};
+
+const UserBubble = ({
+  children,
+  timestamp,
+}: {
+  children: React.ReactNode;
+  timestamp?: string;
+}) => {
+  const displayTime = useMemo(() => timestamp ?? getCurrentTime(), [timestamp]);
+
+  return (
+    <div className="chatbot-bubble flex flex-col items-end gap-2">
+      <div className="max-w-[220px] rounded-3xl bg-[var(--color-key-100)] px-4 py-2 text-body2 text-white">
+        {children}
+      </div>
+      <p className="text-caption1-regular text-grayScale-400">{displayTime}</p>
+    </div>
+  );
+};
 
 const buildQAMap = () => {
   const map = new Map<ChatbotItemKey, QAEntry>();
@@ -570,5 +606,11 @@ const buildQAMap = () => {
 
   return map;
 };
+
+const getCurrentTime = () =>
+  new Date().toLocaleTimeString('ko-KR', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 
 export default ChatBot;
