@@ -106,7 +106,7 @@ export default function StepLayout({
   };
 
   const handleBrowseGroups = () => {
-    router.push('/groups');
+    router.push('/matching');
   };
 
   return (

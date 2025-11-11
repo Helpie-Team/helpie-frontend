@@ -20,7 +20,7 @@ export default function ProfileComplete() {
   };
 
   const handleBrowseGroups = () => {
-    router.push('/groups');
+    router.push('/matching');
   };
 
   useEffect(() => {
