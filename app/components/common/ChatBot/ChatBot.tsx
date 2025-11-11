@@ -262,6 +262,7 @@ const ChatBot = () => {
                       selectedCategory={selectedCategory}
                       onSelectCategory={handleSelectCategory}
                       onSelectQuestion={handleSelectQuestion}
+                      isLoggedIn={isLoggedIn}
                     />
                   )}
 
@@ -405,10 +406,12 @@ const CategoryFlow = ({
   selectedCategory,
   onSelectCategory,
   onSelectQuestion,
+  isLoggedIn,
 }: {
   selectedCategory: ChatbotCategoryKey | null;
   onSelectCategory: (category: ChatbotCategoryKey) => void;
   onSelectQuestion: (key: ChatbotItemKey) => void;
+  isLoggedIn: boolean;
 }) => (
   <>
     <UserBubble>카테고리별 질문</UserBubble>
@@ -419,6 +422,7 @@ const CategoryFlow = ({
         <QuestionList
           category={selectedCategory}
           onSelectQuestion={onSelectQuestion}
+          isLoggedIn={isLoggedIn}
         />
       </>
     )}
@@ -461,19 +465,26 @@ const CategorySelector = ({
 const QuestionList = ({
   category,
   onSelectQuestion,
+  isLoggedIn,
 }: {
   category: ChatbotCategoryKey;
   onSelectQuestion: (key: ChatbotItemKey) => void;
+  isLoggedIn: boolean;
 }) => (
   <BotBubble title="궁금한 질문을 선택해주세요.">
     <div className="flex flex-col gap-2">
-      {chatbotQuestions[category].map((question) => (
-        <QuestionButton
-          key={question.key}
-          question={question}
-          onClick={onSelectQuestion}
-        />
-      ))}
+      {chatbotQuestions[category]
+        .filter(
+          (question) =>
+            !(isLoggedIn && category === 'account' && question.key === 'account_email_verification'),
+        )
+        .map((question) => (
+          <QuestionButton
+            key={question.key}
+            question={question}
+            onClick={onSelectQuestion}
+          />
+        ))}
     </div>
   </BotBubble>
 );
