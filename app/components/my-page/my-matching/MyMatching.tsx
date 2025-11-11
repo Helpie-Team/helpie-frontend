@@ -309,8 +309,8 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
 
           <div className="flex flex-1 flex-col gap-2">
             <div>
-              <p className="text-body2 text-grayScale-500">{group.summary ?? '본문'}</p>
               <p className="text-body1 text-grayScale-title">{group.title ?? '이름'}</p>
+              <p className="text-body2 text-grayScale-500">{group.summary ?? '본문'}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-caption1-regular text-grayScale-500">
               <span>{locationText}</span>
