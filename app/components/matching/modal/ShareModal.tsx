@@ -44,12 +44,12 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
     >
       <div
         id="공유 모달 내부"
-        className="w-[500px] bg-white rounded-[30px] px-8 py-8 flex flex-col gap-6"
+        className="w-[500px] h-[298px] bg-white rounded-[30px] px-7 py-8 flex flex-col gap-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="flex items-center gap-3">
-          <button onClick={onClose} className="hover:bg-gray-100 p-1 rounded-full transition-colors">
+        <div className="flex items-center gap-1">
+          <button onClick={onClose} className="hover:bg-gray-100  rounded-full transition-colors">
             <Image
               src={arrow_left}
               alt="뒤로 가기"
@@ -61,36 +61,34 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
         </div>
 
         {/* 공유 아이콘 */}
-        <div className="flex justify-around items-center py-4">
+        <div className="flex justify-around items-center">
           {shareOptions.map((option, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
-              <button
-                className={`w-16 h-16 rounded-full ${option.color} flex items-center justify-center text-white hover:scale-110 transition-transform overflow-hidden`}
-              >
+              <button>
                 <Image
                   src={option.icon}
                   alt={option.name}
-                  width={40}
-                  height={40}
+                  width={56}
+                  height={56}
                   className="object-contain"
                 />
               </button>
-              <span className="text-caption1-regular text-grayScale-700">{option.name}</span>
+              <span className="text-body3 text-black">{option.name}</span>
             </div>
           ))}
         </div>
 
         {/* 링크 복사 */}
-        <div className="flex items-center gap-3 bg-grayScale-50 rounded-xl p-4">
+        <div className="flex items-center justify-center gap-2.5 bg-[#FAF8F7] rounded-xl p-3">
           <input
             type="text"
             value="https://www.helpie.com/ 각 소모임 모달카드 공유 링크"
             readOnly
-            className="flex-1 bg-transparent text-body3-regular text-grayScale-600 outline-none"
+            className="flex-1 bg-transparent text-body3-regular text-grayScale-700 outline-none"
           />
           <button
             onClick={handleCopyLink}
-            className="px-4 py-2 bg-white border border-grayScale-300 rounded-lg text-body3-medium hover:bg-grayScale-100 transition-colors"
+            className="h-[35px] px-4 bg-white border border-grayScale-200 rounded-full text-body1 flex items-center justify-center"
           >
             복사
           </button>
