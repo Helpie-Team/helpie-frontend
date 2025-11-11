@@ -48,8 +48,8 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="flex items-center gap-1">
-          <button onClick={onClose} className="hover:bg-gray-100  rounded-full transition-colors">
+        <div className="flex items-center">
+          <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
             <Image
               src={arrow_left}
               alt="뒤로 가기"
@@ -57,7 +57,7 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
               height={24}
             />
           </button>
-          <h2 className="text-h2">공유하기</h2>
+          <h2 className="text-h2 ml-1">공유하기</h2>
         </div>
 
         {/* 공유 아이콘 */}

@@ -7,6 +7,7 @@ import { Share2, MapPin, Users, Tag, Eye, Clock } from "lucide-react";
 import noImage from "@/public/images/noImage.png";
 import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
 import ShareModal from '@/app/components/matching/modal/ShareModal';
+import CancelModal from "./CancelModal";
 
 interface JoinModalProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
   const [isJoined, setIsJoined] = useState(false); //api 연동때 수정 예정- 참여하기 버튼 누르면 JoinConfirm 모달과 함께 isJoined true로 변경됨.
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
+  const [isCancleModalOpen, setIsCancleModalOpen] = useState(false);
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -31,10 +32,6 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
     setIsModalOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsJoined(false);
-    // 실제 취소 로직 추가 예정
-  };
 
   // 예시 데이터
   const meetingData = {
@@ -139,7 +136,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
           /* 가입한 모임 - 신청취소 + 채팅방으로 이동 */
           <div className="w-full flex flex-row gap-3">
             <button
-              onClick={handleCancel}
+              onClick={()=>setIsCancleModalOpen(true)}
               className="flex-1 py-4 bg-grayScale-100 text-grayScale-700 text-h3-sb rounded-full hover:bg-grayScale-200 transition-colors"
             >
               신청취소
@@ -171,6 +168,11 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
       {/* 공유 모달 */}
       <ShareModal
         isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
+      {/* 신청취소 모달 */}
+            <CancelModal
+        isOpen={isCancleModalOpen}
         onClose={() => setIsShareModalOpen(false)}
       />
     </div>
