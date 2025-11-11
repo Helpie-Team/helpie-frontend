@@ -32,12 +32,12 @@ export default function CancelModal({ isOpen, onClose }: CancelModalProps) {
     >
       <div
         id="공유 모달 내부"
-        className="w-[500px] h-[298px] bg-white rounded-[30px] px-7 py-8 flex flex-col gap-8"
+        className="w-[500px] h-[298px] bg-white rounded-[30px] px-7 py-8 flex flex-col gap-12"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
-        <div className="flex flex-col items-center justify-center gap-5">
-          <button onClick={onClose} className="items-start justify-start ">
+        <div className="flex flex-col gap-5">
+          <button onClick={onClose} className="flex items-start justify-start">
             <Image
               src={arrow_left}
               alt="뒤로 가기"
@@ -45,9 +45,9 @@ export default function CancelModal({ isOpen, onClose }: CancelModalProps) {
               height={24}
             />
           </button>
-          <div className="gap-2 flex flex-col">
-          <h2 className="text-h2">소모임 참여 신청을 취소하시겠어요?</h2>
-          <p className="text-body1-regular text-grayScale-700">신청이 취소되면 해당 모임에 참여할 수 없습니다.</p>
+          <div className="w-full gap-2 flex flex-col items-center justify-center text-center">
+            <h2 className="text-h2">소모임 참여 신청을 취소하시겠어요?</h2>
+            <p className="text-body1-regular text-grayScale-700">신청이 취소되면 해당 모임에 참여할 수 없습니다.</p>
           </div>
         </div>
 
