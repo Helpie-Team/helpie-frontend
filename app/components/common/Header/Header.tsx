@@ -12,8 +12,12 @@ import HamBurgerMenu from '@/public/icons/hamburger_icon.svg';
 import DefaultProfileImage from '@/public/images/profile_icon.png';
 import { useMyProfileInfo, MY_PROFILE_INFO_QUERY_KEY } from '@/app/hooks/my-page/useMyProfileInfo';
 import { useQueryClient } from '@tanstack/react-query';
+import MainLogoImage from '@/public/images/main_logo.png';
+import { usePathname } from 'next/navigation';
 
 const Header = () => {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
   const { openModal } = useModalStore();
   const queryClient = useQueryClient();
   const [hasToken, setHasToken] = useState(false);
@@ -61,7 +65,7 @@ const Header = () => {
             <ul className="flex flex-row justify-between w-full">
               <li className="flex flex-row items-center gap-2">
                 <Link href={item.logo.link}>
-                  <Image src={HelpieLogoImage} alt={item.logo.alt} width={141} height={36} />
+                  <Image src={isHome ? MainLogoImage : HelpieLogoImage} alt={item.logo.alt} width={141} height={36} />
                 </Link>
               </li>
 
