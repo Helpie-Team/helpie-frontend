@@ -8,7 +8,7 @@ import noImage from "@/public/images/noImage.png";
 import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
 import ShareModal from '@/app/components/matching/modal/ShareModal';
 import CancelModal from "./CancelModal";
-
+import ChatModal from "./ChatModal";
 interface JoinModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +19,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCancleModalOpen, setIsCancleModalOpen] = useState(false);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -142,6 +143,7 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
               신청취소
             </button>
             <button
+            onClick={()=>setIsChatModalOpen(true)}
               className="flex-1 py-4 bg-grayScale-700 text-white rounded-full text-h3-sb hover:bg-grayScale-800 transition-colors"
             >
               채팅방으로 이동
@@ -171,9 +173,14 @@ export default function JoinModal({ isOpen, onClose }: JoinModalProps) {
         onClose={() => setIsShareModalOpen(false)}
       />
       {/* 신청취소 모달 */}
-            <CancelModal
+      <CancelModal
         isOpen={isCancleModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
+        onClose={() => setIsCancleModalOpen(false)}
+      />
+      {/* 채팅방으로 이동 모달 */}
+      <ChatModal
+        isOpen={isChatModalOpen}
+        onClose={() => setIsChatModalOpen(false)}
       />
     </div>
   );

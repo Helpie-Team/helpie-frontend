@@ -14,23 +14,8 @@ export default function MatchingFilter() {
     '사회 · 교류'
   ];
 
-  const handleReset = () => {
-    setSelectedCategory('전체');
-  };
-
   return (
     <div className="w-[200px] h-full gap-8 flex flex-col items-ceter justify-start">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between mb-10">
-        <h1 className="text-[24px] font-bold text-black">필터</h1>
-        <button
-          onClick={handleReset}
-          className="text-[14px] text-grayScale-400 underline hover:text-grayScale-600"
-        >
-          초기화
-        </button>
-      </div>
-
       {/* 카테고리 */}
       <div>
         <h2 className="text-[18px] font-semibold text-black mb-6">카테고리</h2>
