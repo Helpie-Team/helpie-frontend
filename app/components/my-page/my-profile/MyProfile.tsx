@@ -34,6 +34,7 @@ import {
   transformInterestFromAPI,
   transformLanguageFromAPI,
 } from '@/app/lib/utils/surveyTransformers';
+import ArrowIcon from '@/public/icons/arrow_icon.svg';
 
 const MyProfile = () => {
   const router = useRouter();
@@ -51,7 +52,12 @@ const MyProfile = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useMyProfileInfo();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const currentUsername = profile?.username ?? '';
 
@@ -381,7 +387,7 @@ const MyProfile = () => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6 w-full">
         <button
           type="button"
           className="text-body1 text-grayScale-600 transition hover:text-grayScale-title"
@@ -390,11 +396,12 @@ const MyProfile = () => {
           로그아웃
         </button>
 
+       <p className="w-full h-[0.1px] bg-grayScale-300"/>
         <div className="flex flex-col items-center gap-2 text-center">
           <p className="text-body2 text-grayScale-500">더 이상 헬피 서비스를 이용을 원하지 않으시나요?</p>
           <button
             type="button"
-            className="text-body2 text-grayScale-400 underline underline-offset-4 transition hover:text-grayScale-600"
+            className="text-body2 text-grayScale-400  transition hover:text-grayScale-600"
           >
             회원탈퇴
           </button>
@@ -589,7 +596,7 @@ const ProfileDetailCard = ({
 );
 
 const ProfileCallout = () => (
-  <div className="flex w-full flex-col gap-4 rounded-[24px] border border-[#FFE3D6] bg-[#FFF6F0] px-6 py-8 text-center shadow-[0_20px_60px_rgba(255,77,0,0.08)]">
+  <div className="flex w-full flex-col gap-4 rounded-[24px] border border-[#FFE3D6] bg-[#FAF8F7] px-6 py-8 text-center shadow-[0_20px_60px_rgba(255,77,0,0.08)]">
     <p className="text-body1 text-grayScale-title">
       프로필을 완성하면 나에게 딱 맞는 소모임을 추천받을 수 있어요.
     </p>
@@ -615,7 +622,7 @@ const LogoutConfirmModal = ({
   isLoading: boolean;
 }) => (
   <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
-    <div className="w-full max-w-[360px] rounded-[28px] bg-white px-8 py-10 text-center shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
+    <div className="w-full max-w-[540px] rounded-[28px] bg-white px-8 py-10 text-center shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
       <p className="text-h2 text-grayScale-title">로그아웃 하시겠습니까?</p>
       <div className="mt-8 flex gap-4">
         <button
@@ -674,21 +681,27 @@ const NicknameEditModal = ({
 
   return (
     <div className="fixed inset-0 z-[65] flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-[380px] rounded-[28px] bg-white px-6 py-8 shadow-[0_16px_60px_rgba(0,0,0,0.3)]">
-        <header className="mb-6 flex items-center justify-between">
-          <h2 className="text-h2 text-grayScale-title">프로필 수정</h2>
-          <button
+      <div className="w-full max-w-[540px] rounded-[28px] bg-white px-6 py-8 shadow-[0_16px_60px_rgba(0,0,0,0.3)]">
+        <header className="mb-6 flex items-center gap-4">
+        <button
             type="button"
             onClick={onClose}
             className="text-body1 text-grayScale-400 hover:text-grayScale-600"
             disabled={isSubmitting}
+            aria-label="프로필 수정 닫기"
           >
-            닫기
+            <Image
+              src={ArrowIcon}
+              alt="Close"
+              width={14}
+              height={14}
+            />
           </button>
+          <h2 className="font-pretendard font-semibold text-[20px] text-grayScale-title">프로필 수정</h2>
         </header>
 
         <form className="space-y-6" onSubmit={onSubmit}>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2 space-y-2">
             <label htmlFor="current-nickname" className="text-caption1-regular text-grayScale-500">현재 사용 중인 별명</label>
             <input
               type="text"
@@ -699,7 +712,7 @@ const NicknameEditModal = ({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2 space-y-2">
             <label htmlFor="new-nickname" className="text-caption1-regular text-grayScale-500">새로운 별명</label>
             <div className="relative">
               <input
