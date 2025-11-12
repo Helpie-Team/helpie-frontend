@@ -5,6 +5,7 @@ export type Language = 'korean' | 'english' | 'chinese' | 'japanese' | 'spanish'
 interface LanguageState {
   selectedLanguages: Language[];
   toggleLanguage: (language: Language) => void;
+  setLanguages: (languages: Language[]) => void;
   clearLanguages: () => void;
 }
 
@@ -18,6 +19,10 @@ export const useLanguageStore = create<LanguageState>((set, get) => ({
     } else {
       set({ selectedLanguages: [...selectedLanguages, language] });
     }
+  },
+
+  setLanguages: (languages) => {
+    set({ selectedLanguages: languages });
   },
   
   clearLanguages: () => {

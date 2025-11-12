@@ -9,7 +9,7 @@ import { useCityStore } from '@/app/lib/stores/cityStore';
 import { useGenderStore } from '@/app/lib/stores/genderStore';
 import { useAgeStore } from '@/app/lib/stores/ageStore';
 import { useLanguageStore } from '@/app/lib/stores/languageStore';
-import { submitBasicInfo } from '@/app/api/survey/survey';
+import { submitBasicInfo, updateBasicInfo } from '@/app/api/survey/survey';
 import { transformGenderToAPI, transformAgeGroupToAPI, transformLanguageToAPI, transformInterestToAPI } from '@/app/lib/utils/surveyTransformers';
 import BackIcon from '@/public/icons/arrow_icon.svg';
 import Image from 'next/image';
@@ -35,7 +35,7 @@ export default function StepLayout({
   isNextDisabled = false,
 }: StepLayoutProps) {
   const router = useRouter();
-  const { prevStep, currentStep, nextStep, totalSteps, setStep } = useStepStore();
+  const { prevStep, currentStep, nextStep, totalSteps, setStep, hasBasicInfo } = useStepStore();
   const { selectedInterests } = useInterestStore();
   const { selectedCity } = useCityStore();
   const { selectedGender } = useGenderStore();
@@ -69,7 +69,9 @@ export default function StepLayout({
         interests: selectedInterests.map(transformInterestToAPI),
       };
 
-      const response = await submitBasicInfo(requestBody);
+      const response = hasBasicInfo
+        ? await updateBasicInfo(requestBody)
+        : await submitBasicInfo(requestBody);
       
       // 성공 시 완료 페이지로 이동 (currentStep을 6으로 설정)
       const { setCompleted } = useStepStore.getState();
@@ -104,7 +106,7 @@ export default function StepLayout({
   };
 
   const handleBrowseGroups = () => {
-    router.push('/groups');
+    router.push('/matching');
   };
 
   return (

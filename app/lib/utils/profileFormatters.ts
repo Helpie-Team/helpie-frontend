@@ -1,9 +1,7 @@
-import { BasicInfoResponseData } from '@/app/api/types/survey/survey';
-
 /**
  * 성별을 사용자 친화적인 텍스트로 변환
  */
-export const formatGender = (gender: BasicInfoResponseData['gender']): string => {
+export const formatGender = (gender: string): string => {
   const genderMap: Record<string, string> = {
     MALE: '남',
     FEMALE: '여',
@@ -15,7 +13,7 @@ export const formatGender = (gender: BasicInfoResponseData['gender']): string =>
 /**
  * 나이대를 사용자 친화적인 텍스트로 변환
  */
-export const formatAgeGroup = (ageGroup: BasicInfoResponseData['ageGroup']): string => {
+export const formatAgeGroup = (ageGroup: string): string => {
   const ageGroupMap: Record<string, string> = {
     TEENS: '10대',
     TWENTIES: '20대',
