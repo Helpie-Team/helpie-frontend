@@ -1,5 +1,6 @@
 export interface MyGroupInfoItem {
-  id: number;
+  id?: number;
+  groupId?: number;
   title: string;
   summary?: string;
   thumbnailUrl?: string | null;

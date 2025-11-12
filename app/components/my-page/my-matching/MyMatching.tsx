@@ -19,12 +19,15 @@ const TABS = [
 
 type TabType = (typeof TABS)[number]['id'];
 
-type GroupVariant = 'upcoming' | 'past';
+type GroupVariant = 'UPCOMING' | 'PAST';
 
-type EmptyStateVariant = 'upcoming' | 'past' | 'bookmark';
+type EmptyStateVariant = 'UPCOMING' | 'PAST' | 'bookmark';
+
+const getGroupIdentifier = (group: MyGroupInfoItem) => group.id ?? group.groupId;
 
 const generateGroupKey = (prefix: string, group: MyGroupInfoItem, index: number) => {
-  const uniqueSource = group.id ?? `${group.meetingDate ?? ''}-${group.title ?? ''}`.trim();
+  const identifier = getGroupIdentifier(group);
+  const uniqueSource = identifier ?? `${group.meetingDate ?? ''}-${group.title ?? ''}`.trim();
   return `${prefix}-${uniqueSource || 'fallback'}-${index}`;
 };
 
@@ -46,7 +49,24 @@ const MyMatching = () => {
     onMutate: (groupId: number) => {
       setCancelTargetId(groupId);
     },
-    onSuccess: () => {
+    onSuccess: (_, groupId) => {
+      if (typeof groupId === 'number') {
+        queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyGroupInfoItem>>>(
+          { queryKey: MY_GROUP_INFO_QUERY_KEY },
+          (old) => {
+            if (!old) return old;
+
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                content: page.content.filter((item) => getGroupIdentifier(item) !== groupId),
+              })),
+            };
+          },
+        );
+      }
+
       queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
     },
     onError: (error) => {
@@ -97,17 +117,17 @@ const MyMatching = () => {
     },
   });
 
-  const upcomingQuery = useMyGroupInfo({ status: 'RECRUITING', size: 4, enabled: activeTab === 'UPCOMING' });
-  const pastQuery = useMyGroupInfo({ status: 'COMPLETED', size: 4, enabled: activeTab === 'PAST' });
+  const UPCOMINGQuery = useMyGroupInfo({ status: 'UPCOMING', size: 4, enabled: activeTab === 'UPCOMING' });
+  const PASTQuery = useMyGroupInfo({ status: 'PAST', size: 4, enabled: activeTab === 'PAST' });
   const bookmarkQuery = useMyBookmarkInfo({ size: 8, enabled: activeTab === 'BOOKMARK' });
 
-  const upcomingGroups = useMemo(
-    () => upcomingQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
-    [upcomingQuery.data],
+  const UPCOMINGGroups = useMemo(
+    () => UPCOMINGQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
+    [UPCOMINGQuery.data],
   );
-  const pastGroups = useMemo(
-    () => pastQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
-    [pastQuery.data],
+  const PASTGroups = useMemo(
+    () => PASTQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
+    [PASTQuery.data],
   );
   const bookmarkedGroups = useMemo(
     () => bookmarkQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
@@ -131,11 +151,17 @@ const MyMatching = () => {
     });
   }, [bookmarkedGroups]);
 
-  const handleCancelGroup = (groupId: number) => {
+  const handleCancelGroup = (group: MyGroupInfoItem) => {
+    const targetId = getGroupIdentifier(group);
+    if (!targetId) {
+      console.error('소모임 식별자를 찾을 수 없습니다.', group);
+      return;
+    }
+
     if (cancelMutation.isPending) {
       return;
     }
-    cancelMutation.mutate(groupId);
+    cancelMutation.mutate(targetId);
   };
 
   const handleToggleBookmark = (groupId: number) => {
@@ -149,24 +175,24 @@ const MyMatching = () => {
     if (activeTab === 'UPCOMING') {
       return (
         <TabSection
-          isLoading={upcomingQuery.isLoading}
-          hasError={!!upcomingQuery.error}
-          errorMessage={upcomingQuery.error instanceof Error ? upcomingQuery.error.message : undefined}
-          isEmpty={!upcomingQuery.isLoading && upcomingGroups.length === 0}
-          emptyVariant="upcoming"
+          isLoading={UPCOMINGQuery.isLoading}
+          hasError={!!UPCOMINGQuery.error}
+          errorMessage={UPCOMINGQuery.error instanceof Error ? UPCOMINGQuery.error.message : undefined}
+          isEmpty={!UPCOMINGQuery.isLoading && UPCOMINGGroups.length === 0}
+          emptyVariant="UPCOMING"
           onEmptyAction={() => router.push('/matching')}
           emptyActionLabel="소모임 둘러보기"
-          onLoadMore={upcomingQuery.hasNextPage ? () => upcomingQuery.fetchNextPage() : undefined}
-          isLoadingMore={upcomingQuery.isFetchingNextPage}
+          onLoadMore={UPCOMINGQuery.hasNextPage ? () => UPCOMINGQuery.fetchNextPage() : undefined}
+          isLoadingMore={UPCOMINGQuery.isFetchingNextPage}
         >
           <div className="flex flex-col gap-4">
-            {upcomingGroups.map((group, index) => (
+            {UPCOMINGGroups.map((group, index) => (
               <GroupCard
-                key={generateGroupKey('upcoming', group, index)}
+                key={generateGroupKey('UPCOMING', group, index)}
                 group={group}
-                variant="upcoming"
-                onCancel={() => handleCancelGroup(group.id)}
-                isCancelling={cancelTargetId === group.id && cancelMutation.isPending}
+                variant="UPCOMING"
+                onCancel={() => handleCancelGroup(group)}
+                isCancelling={cancelTargetId === getGroupIdentifier(group) && cancelMutation.isPending}
               />
             ))}
           </div>
@@ -177,20 +203,20 @@ const MyMatching = () => {
     if (activeTab === 'PAST') {
       return (
         <TabSection
-          isLoading={pastQuery.isLoading}
-          hasError={!!pastQuery.error}
-          errorMessage={pastQuery.error instanceof Error ? pastQuery.error.message : undefined}
-          isEmpty={!pastQuery.isLoading && pastGroups.length === 0}
-          emptyVariant="past"
-          onLoadMore={pastQuery.hasNextPage ? () => pastQuery.fetchNextPage() : undefined}
-          isLoadingMore={pastQuery.isFetchingNextPage}
+          isLoading={PASTQuery.isLoading}
+          hasError={!!PASTQuery.error}
+          errorMessage={PASTQuery.error instanceof Error ? PASTQuery.error.message : undefined}
+          isEmpty={!PASTQuery.isLoading && PASTGroups.length === 0}
+          emptyVariant="PAST"
+          onLoadMore={PASTQuery.hasNextPage ? () => PASTQuery.fetchNextPage() : undefined}
+          isLoadingMore={PASTQuery.isFetchingNextPage}
         >
           <div className="flex flex-col gap-4">
-            {pastGroups.map((group, index) => (
+            {PASTGroups.map((group, index) => (
               <GroupCard
-                key={generateGroupKey('past', group, index)}
+                key={generateGroupKey('PAST', group, index)}
                 group={group}
-                variant="past"
+                variant="PAST"
               />
             ))}
           </div>
@@ -331,11 +357,11 @@ const EmptyState = ({
   actionLabel?: string;
 }) => {
   const messages: Record<EmptyStateVariant, { title: string; description: string }> = {
-    upcoming: {
+    UPCOMING: {
       title: '아직 참여한 소모임이 없어요',
       description: '지금 새로운 모임을 찾아보세요!',
     },
-    past: {
+    PAST: {
       title: '아직 참여한 소모임이 없어요',
       description: '첫 소모임에 참여하고, 나만의 기록을 만들어보세요.',
     },
@@ -379,10 +405,11 @@ const GroupCard = ({
   onCancel?: () => void;
   isCancelling?: boolean;
 }) => {
-  const isPast = variant === 'past';
+  const actionGroupId = getGroupIdentifier(group);
+  const isPAST = variant === 'PAST';
   const meetingDate = formatDate(group.meetingDate);
-  const headLabel = isPast ? '모임완료' : '참여 중인 모임';
-  const rightLabel = isPast
+  const headLabel = isPAST ? '모임완료' : '참여 중인 모임';
+  const rightLabel = isPAST
     ? meetingDate ?? '모임 일정 미확인'
     : meetingDate ?? (group.meetingType === 'OFFLINE' ? '오프라인 모임 일시' : '모임 일정 준비 중');
 
@@ -443,7 +470,7 @@ const GroupCard = ({
             채팅방 이동
           </button>
 
-          {isPast ? (
+          {isPAST ? (
             <button
               type="button"
               className={`flex-1 rounded-full py-2 text-body2 transition ${
@@ -459,7 +486,7 @@ const GroupCard = ({
               type="button"
               className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200 disabled:cursor-not-allowed disabled:opacity-70"
               onClick={onCancel}
-              disabled={!onCancel || isCancelling}
+              disabled={!onCancel || isCancelling || !actionGroupId}
             >
               {isCancelling ? '취소 중...' : '신청취소'}
             </button>
