@@ -9,7 +9,7 @@ import fire from "@/public/icons/fire.png";
 import JoinModal from "./modal/JoinModal";
 
 // 더미 데이터
-const meetingData = [
+const allMeetingData = [
   { dday: 3, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "15명", title: "창경궁 여행 같이 가요~!", description: "고궁의 멋과 추억을, 편한 한복으로 안전히 시간 ~" },
   { dday: 5, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "서울", participants: "6명", title: "한복입고 같이 경복궁 가요~!", description: "친밀한 장을 만고, 한국의 이념과 문화를 함께 누려봅시다!" },
   { dday: 10, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "10명", title: "한국에서 같이 전철 역여러 고궁다녀 요즘과 경관 짭게 감싸~!", description: "고궁다녀 요즘에 않의이 먹이하고 짭게 감싸 쟈외~" },
@@ -19,10 +19,18 @@ const meetingData = [
   { dday: 6, category: "자기계발 / 성장", categoryColor: "bg-[#E94B3C]", location: "서울", participants: "8명", title: "GRWM 서울 같이 준비해요!", description: "북성향 해줘서달, 같이 의로 헤헴 값여 저의 관찰 얻어갑니다 :)" },
   { dday: 15, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "20명", title: "FIFA 월드컵 다함께보기 ⚽", description: "각자 응원하는 팀이 맞는 게임을 기억!" },
   { dday: 3, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "15명", title: "소모임 제목을 입력하세요", description: "멤버될 소모임 설명을 두 줄까지 표시됩니다." },
+  { dday: 7, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "부산", participants: "12명", title: "해운대 해변 산책하실 분!", description: "바다 보며 걷고 맛있는 거 먹어요" },
+  { dday: 11, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "인천", participants: "8명", title: "차이나타운 투어", description: "인천 차이나타운에서 중국 문화 체험!" },
+  { dday: 4, category: "자기계발 / 성장", categoryColor: "bg-[#E94B3C]", location: "대전", participants: "6명", title: "영어 스터디 모집", description: "매주 토요일 영어로 대화해요" },
+  { dday: 18, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "서울", participants: "10명", title: "뮤지컬 관람 같이해요", description: "브로드웨이 뮤지컬 함께 봐요!" },
+  { dday: 9, category: "게임 / 오락", categoryColor: "bg-[#4A90E2]", location: "서울", participants: "16명", title: "보드게임 카페 모임", description: "다양한 보드게임을 즐겨요" },
+  { dday: 13, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "대구", participants: "9명", title: "대구 야시장 탐방", description: "맛있는 길거리 음식 투어!" },
+  { dday: 2, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "7명", title: "파스타 쿠킹클래스", description: "이탈리안 요리를 배워봐요" },
 ];
 
 export default function MatchingCards() {
-  const [liked, setLiked] = useState<boolean[]>(Array(meetingData.length).fill(false));
+  const [displayCount, setDisplayCount] = useState(12); // 처음에 12개만 표시
+  const [liked, setLiked] = useState<boolean[]>(Array(allMeetingData.length).fill(false));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCardClick = () => {
@@ -32,6 +40,12 @@ export default function MatchingCards() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => Math.min(prev + 12, allMeetingData.length));
+  };
+
+  const meetingData = allMeetingData.slice(0, displayCount);
 
   return (
     <div className="flex flex-col gap-8">
@@ -104,6 +118,16 @@ export default function MatchingCards() {
           </div>
         ))}
       </div>
+
+      {/* 더보기 버튼 */}
+      {displayCount < allMeetingData.length && (
+        <button
+          onClick={handleLoadMore}
+          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors"
+        >
+          소모임 더보기
+        </button>
+      )}
 
       <JoinModal
         isOpen={isModalOpen}

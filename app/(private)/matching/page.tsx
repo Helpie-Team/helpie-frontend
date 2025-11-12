@@ -6,7 +6,7 @@ import RecommendCarousel from '@/app/components/matching/RecommendCarousel';
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="h-[3589px] flex flex-col items-center gap-8">
       <MatchingBar />
       <div className="w-[1000px]">
         <RecommendCarousel />

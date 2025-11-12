@@ -7,7 +7,7 @@ import heart from "@/public/icons/heart.png";
 import noHeart from "@/public/icons/noHeart.png";
 import noImage from "@/public/images/noImage.png";
 
-const reviewData = [
+const allReviewData = [
   {
     id: 1,
     nickname: "김헬피",
@@ -37,13 +37,50 @@ const reviewData = [
     content: "고즈넉한 한옥 분위기 속에서 맛있는 점심을 함께했어요. 정갈한 음식 덕분에 마음까지 편안해졌어요. 함께한 사람들과의 대화가 정말 즐겁고 따뜻한 시간이었어요",
     images: 3,
     likes: 12
+  },
+  {
+    id: 4,
+    nickname: "최헬피",
+    meetingTitle: "GRWM 서류 같이 준비해요!",
+    date: "2025.8.15 참여",
+    rating: 5,
+    content: "복잡한 행정 서류를 혼자 하려니 막막했는데, 함께 하니까 훨씬 수월했어요. 서로 도와가며 빠르게 처리할 수 있었습니다!",
+    images: 3,
+    likes: 15
+  },
+  {
+    id: 5,
+    nickname: "정헬피",
+    meetingTitle: "FIFA 월드컵 다함께보기",
+    date: "2025.7.20 참여",
+    rating: 5,
+    content: "응원하는 팀이 달라도 모두가 즐거웠어요. 열띤 경기를 함께 보며 환호하고 아쉬워하던 순간들이 기억에 남네요!",
+    images: 3,
+    likes: 20
+  },
+  {
+    id: 6,
+    nickname: "강헬피",
+    meetingTitle: "한밤의 오페라 공연관람",
+    date: "2025.6.10 참여",
+    rating: 4,
+    content: "오페라를 처음 봤는데 너무 감동적이었어요. 함께 간 분들과 공연 후 이야기 나누는 시간도 좋았습니다.",
+    images: 3,
+    likes: 11
   }
 ];
 
 export default function ReviewList() {
   const [sortOption, setSortOption] = useState("latest");
-  const [liked, setLiked] = useState<boolean[]>(Array(reviewData.length).fill(false));
-  const [expandedReviews, setExpandedReviews] = useState<boolean[]>(Array(reviewData.length).fill(false));
+  const [displayCount, setDisplayCount] = useState(3);
+  const [liked, setLiked] = useState<boolean[]>(Array(allReviewData.length).fill(false));
+  const [expandedReviews, setExpandedReviews] = useState<boolean[]>(Array(allReviewData.length).fill(false));
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => Math.min(prev + 3, allReviewData.length));
+  };
+
+  const reviewData = allReviewData.slice(0, displayCount);
 
   const renderStars = (rating: number) => {
     return (
@@ -173,9 +210,14 @@ export default function ReviewList() {
       </div>
 
       {/* 더보기 버튼 */}
-      <button className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors">
-        참여 후기 더보기
-      </button>
+      {displayCount < allReviewData.length && (
+        <button
+          onClick={handleLoadMore}
+          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors"
+        >
+          참여 후기 더보기
+        </button>
+      )}
     </div>
   );
 }

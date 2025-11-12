@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import Header from './components/common/Header/Header';
+import Footer from './components/common/Footer/Footer';
 import { QueryProvider } from './lib/query/QueryProvider';
 
 const pretendard = localFont({
@@ -27,6 +28,7 @@ export default function RootLayout({
         <QueryProvider>
           <Header />
           {children}
+          <Footer />
         </QueryProvider>
       </body>
     </html>
