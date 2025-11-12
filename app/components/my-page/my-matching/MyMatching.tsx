@@ -1,12 +1,14 @@
 'use client';
 
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
-import { useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
-import { MyBookmarkItem, MyGroupInfoItem } from '@/app/api/types/my-page/group';
+import { cancelGroupApplication, toggleGroupBookmark } from '@/app/api/my-page/group';
+import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
+import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
+import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
 import PlaceholderGroupImage from '@/public/images/helpie-chat-bot.png';
 
 const TABS = [
@@ -34,6 +36,66 @@ const generateBookmarkKey = (bookmark: MyBookmarkItem, index: number) => {
 const MyMatching = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('UPCOMING');
+  const queryClient = useQueryClient();
+  const [cancelTargetId, setCancelTargetId] = useState<number | null>(null);
+  const [bookmarkTargetId, setBookmarkTargetId] = useState<number | null>(null);
+  const [bookmarkStates, setBookmarkStates] = useState<Record<number, boolean>>({});
+
+  const cancelMutation = useMutation({
+    mutationFn: cancelGroupApplication,
+    onMutate: (groupId: number) => {
+      setCancelTargetId(groupId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
+    },
+    onError: (error) => {
+      console.error('소모임 신청 취소에 실패했습니다.', error);
+    },
+    onSettled: () => {
+      setCancelTargetId(null);
+    },
+  });
+
+  const toggleBookmarkMutation = useMutation({
+    mutationFn: toggleGroupBookmark,
+    onMutate: (groupId: number) => {
+      setBookmarkTargetId(groupId);
+    },
+    onSuccess: (data, groupId) => {
+      if (typeof groupId === 'number') {
+        setBookmarkStates((prev) => ({
+          ...prev,
+          [groupId]: data.status === 'ADDED',
+        }));
+
+        if (data.status === 'REMOVED') {
+          queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyBookmarkItem>>>(
+            { queryKey: MY_BOOKMARK_INFO_QUERY_KEY },
+            (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                pages: old.pages.map((page) => ({
+                  ...page,
+                  content: page.content.filter((item) => item.id !== groupId),
+                })),
+              };
+            },
+          );
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: MY_BOOKMARK_INFO_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
+    },
+    onError: (error) => {
+      console.error('관심 소모임 업데이트에 실패했습니다.', error);
+    },
+    onSettled: () => {
+      setBookmarkTargetId(null);
+    },
+  });
 
   const upcomingQuery = useMyGroupInfo({ status: 'RECRUITING', size: 4, enabled: activeTab === 'UPCOMING' });
   const pastQuery = useMyGroupInfo({ status: 'COMPLETED', size: 4, enabled: activeTab === 'PAST' });
@@ -51,6 +113,37 @@ const MyMatching = () => {
     () => bookmarkQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
     [bookmarkQuery.data],
   );
+
+  useEffect(() => {
+    if (bookmarkedGroups.length === 0) {
+      setBookmarkStates({});
+      return;
+    }
+
+    setBookmarkStates((prev) => {
+      const next: Record<number, boolean> = {};
+
+      bookmarkedGroups.forEach((item) => {
+        next[item.id] = prev[item.id] ?? item.liked ?? true;
+      });
+
+      return next;
+    });
+  }, [bookmarkedGroups]);
+
+  const handleCancelGroup = (groupId: number) => {
+    if (cancelMutation.isPending) {
+      return;
+    }
+    cancelMutation.mutate(groupId);
+  };
+
+  const handleToggleBookmark = (groupId: number) => {
+    if (toggleBookmarkMutation.isPending) {
+      return;
+    }
+    toggleBookmarkMutation.mutate(groupId);
+  };
 
   const renderContent = () => {
     if (activeTab === 'UPCOMING') {
@@ -72,6 +165,8 @@ const MyMatching = () => {
                 key={generateGroupKey('upcoming', group, index)}
                 group={group}
                 variant="upcoming"
+                onCancel={() => handleCancelGroup(group.id)}
+                isCancelling={cancelTargetId === group.id && cancelMutation.isPending}
               />
             ))}
           </div>
@@ -120,6 +215,9 @@ const MyMatching = () => {
             <BookmarkCard
               key={generateBookmarkKey(item, index)}
               bookmark={item}
+              onToggleBookmark={() => handleToggleBookmark(item.id)}
+              isToggling={bookmarkTargetId === item.id && toggleBookmarkMutation.isPending}
+              isLiked={bookmarkStates[item.id] ?? item.liked ?? true}
             />
           ))}
         </div>
@@ -270,7 +368,17 @@ const EmptyState = ({
   );
 };
 
-const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupVariant }) => {
+const GroupCard = ({
+  group,
+  variant,
+  onCancel,
+  isCancelling = false,
+}: {
+  group: MyGroupInfoItem;
+  variant: GroupVariant;
+  onCancel?: () => void;
+  isCancelling?: boolean;
+}) => {
   const isPast = variant === 'past';
   const meetingDate = formatDate(group.meetingDate);
   const headLabel = isPast ? '모임완료' : '참여 중인 모임';
@@ -349,9 +457,11 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
           ) : (
             <button
               type="button"
-              className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200"
+              className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200 disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={onCancel}
+              disabled={!onCancel || isCancelling}
             >
-              신청취소
+              {isCancelling ? '취소 중...' : '신청취소'}
             </button>
           )}
         </div>
@@ -360,7 +470,17 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
   );
 };
 
-const BookmarkCard = ({ bookmark }: { bookmark: MyBookmarkItem }) => {
+const BookmarkCard = ({
+  bookmark,
+  onToggleBookmark,
+  isToggling,
+  isLiked,
+}: {
+  bookmark: MyBookmarkItem;
+  onToggleBookmark: () => void;
+  isToggling: boolean;
+  isLiked: boolean;
+}) => {
   const meetingDDay = typeof bookmark.dday === 'number' ? bookmark.dday : undefined;
   const ddayLabel = meetingDDay !== undefined ? `D-${meetingDDay}` : undefined;
 
@@ -382,9 +502,12 @@ const BookmarkCard = ({ bookmark }: { bookmark: MyBookmarkItem }) => {
         </div>
         <button
           type="button"
-          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-lg text-[var(--color-key-100)]"
+          onClick={onToggleBookmark}
+          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-lg text-[var(--color-key-100)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+          disabled={isToggling}
+          aria-label={isLiked ? '관심 소모임 해제' : '관심 소모임 등록'}
         >
-          ♥
+          {isToggling ? '···' : isLiked ? '♥' : '♡'}
         </button>
       </div>
 

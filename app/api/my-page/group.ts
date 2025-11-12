@@ -1,6 +1,11 @@
 import apiClient from '../axios/instance';
 import { ApiError, AxiosErrorResponse } from '../types/axios';
-import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '../types/my-page/group';
+import {
+  BookmarkToggleResponse,
+  MyBookmarkItem,
+  MyGroupInfoItem,
+  PaginatedResponse,
+} from '../types/my-page/group';
 
 export interface MyGroupInfoParams {
   status: string;
@@ -51,3 +56,27 @@ export async function getMyBookmarkInfo(params: MyBookmarkParams): Promise<Pagin
     throw error;
   }
 }
+
+export async function cancelGroupApplication(groupId: number): Promise<void> {
+  try {
+    await apiClient.post(`/group/cancel/${groupId}`);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error as ApiError<AxiosErrorResponse>;
+    }
+    throw error;
+  }
+}
+
+export async function toggleGroupBookmark(groupId: number): Promise<BookmarkToggleResponse> {
+  try {
+    const response = await apiClient.post<BookmarkToggleResponse>(`/group/mark/${groupId}`);
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error as ApiError<AxiosErrorResponse>;
+    }
+    throw error;
+  }
+}
+

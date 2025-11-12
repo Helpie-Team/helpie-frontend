@@ -28,6 +28,12 @@ export interface MyBookmarkItem {
   liked?: boolean;
 }
 
+export type BookmarkToggleStatus = 'ADDED' | 'REMOVED';
+
+export interface BookmarkToggleResponse {
+  status: BookmarkToggleStatus;
+}
+
 export interface PaginatedResponse<T> {
   content: T[];
   totalPages: number;
