@@ -27,8 +27,10 @@ export default function RootLayout({
       <body className={`${pretendard.variable} font-pretendard antialiased`}>
         <QueryProvider>
           <Header />
+          <div className='h-[700px]'>
           {children}
           <Footer />
+          </div>
         </QueryProvider>
       </body>
     </html>

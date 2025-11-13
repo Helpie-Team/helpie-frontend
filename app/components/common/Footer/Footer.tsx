@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState} from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import logoFooter from "@/public/logoFooter.png";
 import instagramFooter from "@/public/icons/instagramFooter.png";
 import twitterFooter from "@/public/icons/twitterFooter.png";
@@ -12,8 +12,16 @@ import Image from "next/image";
 export default function Footer() {
   const [language, setLanguage] = useState("한국어");
   const router=useRouter();
-
+  const pathname = usePathname();
+  const isUserInfoPage = pathname === '/new-user-info';
+  if (isUserInfoPage) {
+    return null;
+  }
   return (
+    isUserInfoPage ? (
+      <></>
+    ) : (
+      <>  
     <div className="w-full min-w-[900px] bg-[#FAF8F7] flex flex-col items-center justify-center py-16 px-8">
       <div className="w-[1000px] flex flex-col gap-12">
         {/* 상단 영역 */}
@@ -91,6 +99,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             {/* 언어 선택 */}
             <select
+              title="언어 선택"
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               className="text-h3-regular text-black bg-transparent border-none cursor-pointer outline-none"
@@ -114,5 +123,6 @@ export default function Footer() {
         </div>
       </div>
     </div>
+    </>)
   );
 }
