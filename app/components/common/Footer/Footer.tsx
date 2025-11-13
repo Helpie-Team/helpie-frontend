@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState} from "react";
+import { useRouter } from "next/navigation";
 import logoFooter from "@/public/logoFooter.png";
 import instagramFooter from "@/public/icons/instagramFooter.png";
 import twitterFooter from "@/public/icons/twitterFooter.png";
 import blogFooter from "@/public/icons/blogFooter.png";
 import Image from "next/image";
 
+
 export default function Footer() {
   const [language, setLanguage] = useState("한국어");
+  const router=useRouter();
 
   return (
     <div className="w-full min-w-[900px] bg-[#FAF8F7] flex flex-col items-center justify-center py-16 px-8">
@@ -57,7 +60,7 @@ export default function Footer() {
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 text-grayScale-500">탐색</h3>
               <div className="flex flex-col gap-3">
-                <a href="#" className="text-h3-regular text-black hover:underline">
+                <a href="#" className="text-h3-regular text-black hover:underline" onClick={() => router.push('/matching')}>
                   소모임
                 </a>
                 <a href="#" className="text-h3-regular text-black hover:underline">

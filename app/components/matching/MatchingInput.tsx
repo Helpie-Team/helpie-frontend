@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getAllCitiesFlat } from '@/app/api/location/location';
+import { City } from '@/app/api/types/location/location';
 
 import picture  from '@/public/icons/picture.png';
 
@@ -31,7 +33,7 @@ interface MatchingInputProps {
   required?: boolean;
   placeholder?: string;
   value?: string | number;
-  onChange?: (value: string | number | string[] | File[]) => void;
+  onChange?: (value: string | number | string[] | File[] | { cityId: number; cityName: string }) => void;
   maxLength?: number;
   minLength?: number;
   showCharCount?: boolean;
@@ -120,44 +122,77 @@ const TextareaInput: React.FC<MatchingInputProps> = ({
 // 지역 검색 입력
 const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredCities, setFilteredCities] = useState(CITY_OPTIONS);
+  const [cities, setCities] = useState<City[]>([]);
+  const [filteredCities, setFilteredCities] = useState<City[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [inputValue, setInputValue] = useState('');
+
+  // 도시 목록 가져오기
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const cityList = await getAllCitiesFlat();
+        setCities(cityList);
+        setFilteredCities(cityList);
+      } catch (error) {
+        console.error('도시 목록 조회 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
+  // 부모로부터 받은 value를 inputValue에 동기화
+  useEffect(() => {
+    setInputValue(value as string);
+  }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    onChange?.(inputValue);
+    const newValue = e.target.value;
+    setInputValue(newValue);
     setIsOpen(true);
-    setFilteredCities(CITY_OPTIONS.filter(city => city.toLowerCase().includes(inputValue.toLowerCase())));
+
+    const filtered = cities.filter(city =>
+      city.name.toLowerCase().includes(newValue.toLowerCase()) ||
+      city.englishName.toLowerCase().includes(newValue.toLowerCase())
+    );
+    setFilteredCities(filtered);
   };
 
-  const handleSelectCity = (city: string) => {
-    onChange?.(city);
+  const handleSelectCity = (city: City) => {
+    setInputValue(city.name);
+    onChange?.({ cityId: city.id, cityName: city.name });
     setIsOpen(false);
-    setFilteredCities(CITY_OPTIONS);
+    setFilteredCities(cities);
   };
 
   return (
     <div className="relative">
       <input
         type="text"
-        value={value}
+        value={inputValue}
         onChange={handleInputChange}
         onFocus={() => setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-        placeholder={placeholder}
+        placeholder={loading ? '도시 목록 로딩 중...' : placeholder}
+        disabled={loading}
         className={INPUT_CLASS}
       />
 
       {/* 드롭다운 */}
-      {isOpen && value && filteredCities.length > 0 && (
+      {isOpen && filteredCities.length > 0 && (
         <div className="absolute z-10 w-full mt-2 bg-white border border-grayScale-300 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-          {filteredCities.map((city, index) => (
+          {filteredCities.map((city) => (
             <button
-              key={index}
+              key={city.id}
               type="button"
               onClick={() => handleSelectCity(city)}
-              className="w-full px-4 py-3 text-left hover:bg-grayScale-100 transition-colors text-body2-regular"
+              className="w-full px-4 py-3 text-left hover:bg-grayScale-100 transition-colors text-body2-regular flex justify-between items-center"
             >
-              {city}
+              <span>{city.name}</span>
+              <span className="text-caption1-regular text-grayScale-500">{city.country.name}</span>
             </button>
           ))}
         </div>

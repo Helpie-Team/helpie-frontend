@@ -6,15 +6,37 @@ import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
 import { MatchingInput, CATEGORY_OPTIONS } from '@/app/components/matching/MatchingInput';
 import { DateTimePicker } from '@/app/components/matching/DateTimePicker';
+import { useCreateMatching } from '@/app/hooks/matching/useMatching';
+import { Interest } from '@/app/api/types/matching/matching';
+
+// 카테고리 ID를 Interest 타입으로 매핑
+const CATEGORY_TO_INTEREST: Record<string, Interest> = {
+  'culture': 'MOVIE_WATCHING',
+  'art': 'ART',
+  'activity': 'SPORTS',
+  'study': 'STUDY',
+  'social': 'VOLUNTEER',
+};
+
+// 카테고리 ID를 백엔드 Category enum으로 매핑
+const CATEGORY_TO_STRING: Record<string, string> = {
+  'culture': 'HOBBY',
+  'art': 'ART',
+  'activity': 'LIFE',
+  'study': 'STUDY',
+  'social': 'SOCIAL',
+};
 
 export default function Page() {
   const router = useRouter();
+  const { mutate: createMatching, isPending, error: mutationError } = useCreateMatching();
 
   // 폼 상태 관리
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     location: '',
+    cityId: 0,
     meetingDate: undefined as Date | undefined,
     meetingTime: '',
     maxParticipants: 0,
@@ -23,9 +45,68 @@ export default function Page() {
     images: [] as File[],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setValidationError(null);
+
+    try {
+      // meetingDate와 meetingTime을 결합하여 ISO 문자열로 변환
+      if (!formData.meetingDate || !formData.meetingTime) {
+        throw new Error('모임 일시를 입력해주세요.');
+      }
+
+      const meetingDateTime = new Date(formData.meetingDate);
+      const [hours, minutes] = formData.meetingTime.split(':');
+      meetingDateTime.setHours(parseInt(hours), parseInt(minutes));
+
+      // categories를 Interest 타입으로 변환
+      const interests = formData.categories
+        .map(category => CATEGORY_TO_INTEREST[category])
+        .filter(Boolean) as Interest[];
+
+      if (interests.length === 0) {
+        throw new Error('카테고리를 선택해주세요.');
+      }
+
+      // 첫 번째 카테고리를 category 문자열로 변환
+      const categoryString = CATEGORY_TO_STRING[formData.categories[0]];
+
+      const payload = {
+        title: formData.name,
+        description: formData.description,
+        maxMember: formData.maxParticipants,
+        cityId: formData.cityId,
+        category: categoryString,
+        interest: interests,
+        meetingDate: meetingDateTime.toISOString(),
+      };
+
+      console.log('전송할 데이터:', payload);
+      console.log('이미지 개수:', formData.images.length);
+
+      // API 호출 (mutation hook 사용)
+      createMatching(
+        {
+          payload,
+          images: formData.images.length > 0 ? formData.images : undefined,
+        },
+        {
+          onSuccess: (response) => {
+            console.log('소모임 생성 성공:', response);
+            router.push(`/matching/`);
+          },
+          onError: (err) => {
+            console.error('소모임 생성 실패:', err);
+            setValidationError(err instanceof Error ? err.message : '소모임 생성에 실패했습니다.');
+          },
+        }
+      );
+    } catch (err) {
+      console.error('유효성 검사 실패:', err);
+      setValidationError(err instanceof Error ? err.message : '입력값을 확인해주세요.');
+    }
   };
 
   // 모든 필수 입력이 완료되었는지 확인
@@ -33,6 +114,7 @@ export default function Page() {
     formData.name.length > 0 && formData.name.length <= 13 &&
     formData.description.length >= 20 && formData.description.length <= 500 &&
     formData.location.length > 0 &&
+    formData.cityId > 0 &&
     formData.meetingDate !== undefined &&
     formData.meetingTime.length > 0 &&
     formData.maxParticipants >= 3 &&
@@ -52,18 +134,27 @@ export default function Page() {
           <button
             type="submit"
             onClick={handleSubmit}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isPending}
             className={`px-6 py-2 rounded-full font-medium transition-all ${
-              isFormValid
-                ? 'bg-key-100 text-white'
+              isFormValid && !isPending
+                ? 'bg-key-100 text-white hover:bg-key-200'
                 : 'bg-grayScale-100 text-grayScale-400 cursor-not-allowed'
             }`}
           >
-            등록하기
+            {isPending ? '등록 중...' : '등록하기'}
           </button>
           </div>
         </div>
       </div>
+
+      {/* 에러 메시지 */}
+      {(validationError || mutationError) && (
+        <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-body2 text-red-600">
+            {validationError || (mutationError instanceof Error ? mutationError.message : '소모임 생성에 실패했습니다.')}
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="w-full h-[1200px] flex flex-col py-[1px] gap-10">
         {/* 소모임 명 */}
@@ -97,7 +188,11 @@ export default function Page() {
           label="지역 설정"
           required
           value={formData.location}
-          onChange={(location) => setFormData({ ...formData, location: location as string })}
+          onChange={(data) => {
+            if (typeof data === 'object' && 'cityId' in data && 'cityName' in data) {
+              setFormData({ ...formData, location: data.cityName, cityId: data.cityId });
+            }
+          }}
           placeholder="도시를 검색하세요."
         />
 

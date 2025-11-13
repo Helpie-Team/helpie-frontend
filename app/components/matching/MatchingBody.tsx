@@ -4,7 +4,15 @@ import { useState } from "react";
 import MatchingFilter from '@/app/components/matching/MatchingFilter';
 import MatchingCards from '@/app/components/matching/MatchingCards';
 import ReviewList from '@/app/components/matching/ReviewList';
-export default function MatchingBody() {
+import { GroupCategory } from '@/app/api/types/matching/matching';
+
+interface MatchingBodyProps {
+  country: string;
+  category: GroupCategory;
+  onCategoryChange: (category: GroupCategory) => void;
+}
+
+export default function MatchingBody({ country, category, onCategoryChange }: MatchingBodyProps) {
   const [activeTab, setActiveTab] = useState<"browse" | "review">("browse");
 
   const tabs = [
@@ -35,10 +43,16 @@ export default function MatchingBody() {
       {activeTab === "browse" ? (
         <div className="flex">
           <div className="flex-shrink-0">
-            <MatchingFilter />
+            <MatchingFilter
+              selectedCategory={category}
+              onCategoryChange={onCategoryChange}
+            />
           </div>
           <div className="flex-1">
-            <MatchingCards />
+            <MatchingCards
+              country={country}
+              category={category}
+            />
           </div>
         </div>
       ) : (

@@ -1,137 +1,276 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import heart from "@/public/icons/heart.png";
 import noHeart from "@/public/icons/noHeart.png";
 import noImage from "@/public/images/noImage.png";
 import fire from "@/public/icons/fire.png";
 import JoinModal from "./modal/JoinModal";
+import LoginModal from "./modal/LoginModal";
+import { useGroupListByAuth, useToggleGroupMark } from "@/app/hooks/matching/useMatching";
+import { GroupCategory, GroupListItem } from "@/app/api/types/matching/matching";
 
-// 더미 데이터
-const allMeetingData = [
-  { dday: 3, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "15명", title: "창경궁 여행 같이 가요~!", description: "고궁의 멋과 추억을, 편한 한복으로 안전히 시간 ~" },
-  { dday: 5, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "서울", participants: "6명", title: "한복입고 같이 경복궁 가요~!", description: "친밀한 장을 만고, 한국의 이념과 문화를 함께 누려봅시다!" },
-  { dday: 10, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "10명", title: "한국에서 같이 전철 역여러 고궁다녀 요즘과 경관 짭게 감싸~!", description: "고궁다녀 요즘에 않의이 먹이하고 짭게 감싸 쟈외~" },
-  { dday: 14, category: "역사/문화", categoryColor: "bg-[#9B6FCC]", location: "서울", participants: "7명", title: "Korean Pottery Class;)", description: "한국의 아릉다운 노릇을 보는 나만의 그릇을 만들어 가십니" },
-  { dday: 3, category: "게임 / 오락", categoryColor: "bg-[#4A90E2]", location: "서울", participants: "8명", title: "MARVEL DAY 🦸", description: "마블은 각 히어로에서 대를 열영 안 받으~" },
-  { dday: 20, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "15명", title: "한밤의 오페라 공연관람 ~", description: "국립 오페라단 공연 함께 관람하고 이야기 꽃을피워봐!" },
-  { dday: 6, category: "자기계발 / 성장", categoryColor: "bg-[#E94B3C]", location: "서울", participants: "8명", title: "GRWM 서울 같이 준비해요!", description: "북성향 해줘서달, 같이 의로 헤헴 값여 저의 관찰 얻어갑니다 :)" },
-  { dday: 15, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "20명", title: "FIFA 월드컵 다함께보기 ⚽", description: "각자 응원하는 팀이 맞는 게임을 기억!" },
-  { dday: 3, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "15명", title: "소모임 제목을 입력하세요", description: "멤버될 소모임 설명을 두 줄까지 표시됩니다." },
-  { dday: 7, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "부산", participants: "12명", title: "해운대 해변 산책하실 분!", description: "바다 보며 걷고 맛있는 거 먹어요" },
-  { dday: 11, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "인천", participants: "8명", title: "차이나타운 투어", description: "인천 차이나타운에서 중국 문화 체험!" },
-  { dday: 4, category: "자기계발 / 성장", categoryColor: "bg-[#E94B3C]", location: "대전", participants: "6명", title: "영어 스터디 모집", description: "매주 토요일 영어로 대화해요" },
-  { dday: 18, category: "예술 / 취미", categoryColor: "bg-[#F5A623]", location: "서울", participants: "10명", title: "뮤지컬 관람 같이해요", description: "브로드웨이 뮤지컬 함께 봐요!" },
-  { dday: 9, category: "게임 / 오락", categoryColor: "bg-[#4A90E2]", location: "서울", participants: "16명", title: "보드게임 카페 모임", description: "다양한 보드게임을 즐겨요" },
-  { dday: 13, category: "사회 / 교류", categoryColor: "bg-[#7BAF6E]", location: "대구", participants: "9명", title: "대구 야시장 탐방", description: "맛있는 길거리 음식 투어!" },
-  { dday: 2, category: "서양 / 요리", categoryColor: "bg-[#7BAF6E]", location: "서울", participants: "7명", title: "파스타 쿠킹클래스", description: "이탈리안 요리를 배워봐요" },
-];
+interface MatchingCardsProps {
+  country: string;
+  category: GroupCategory;
+}
 
-export default function MatchingCards() {
-  const [displayCount, setDisplayCount] = useState(12); // 처음에 12개만 표시
-  const [liked, setLiked] = useState<boolean[]>(Array(allMeetingData.length).fill(false));
-  const [isModalOpen, setIsModalOpen] = useState(false);
+// 카테고리별 색상 매핑
+const categoryColors: Record<GroupCategory, string> = {
+  'ALL': 'bg-grayScale-500',
+  'HOBBY': 'bg-[#7BAF6E]',
+  'ART': 'bg-[#F5A623]',
+  'LIFE': 'bg-[#9B6FCC]',
+  'STUDY': 'bg-[#E94B3C]',
+  'SOCIAL': 'bg-[#4A90E2]',
+};
+
+// 카테고리 한글 표시
+const categoryDisplayNames: Record<GroupCategory, string> = {
+  'ALL': '전체',
+  'HOBBY': '문화·취미',
+  'ART': '예술·창작',
+  'LIFE': '액티비티·라이프',
+  'STUDY': '자기계발·성장',
+  'SOCIAL': '사회·교류',
+};
+
+export default function MatchingCards({ country, category }: MatchingCardsProps) {
+  const [page, setPage] = useState(0);
+  const { data: groupListData, isLoading, error } = useGroupListByAuth({ country, category, page });
+  const [allMeetings, setAllMeetings] = useState<GroupListItem[]>([]);
+  const [likedGroups, setLikedGroups] = useState<Set<number>>(new Set()); // groupId를 저장
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const toggleMarkMutation = useToggleGroupMark();
+
+  // 클라이언트에서만 로그인 상태 확인
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // country나 category가 변경되면 page를 0으로 리셋하고 데이터 초기화
+  useEffect(() => {
+    setPage(0);
+    setAllMeetings([]);
+  }, [country, category]);
+
+  // 새로운 페이지 데이터가 로드되면 누적
+  useEffect(() => {
+    if (groupListData?.content) {
+      if (page === 0) {
+        setAllMeetings(groupListData.content);
+      } else {
+        setAllMeetings(prev => [...prev, ...groupListData.content]);
+      }
+    }
+  }, [groupListData, page]);
 
   const handleCardClick = () => {
-    setIsModalOpen(true);
+    // 로그인 상태에 따라 다른 모달 띄우기
+    if (isLoggedIn) {
+      setIsJoinModalOpen(true);
+    } else {
+      setIsLoginModalOpen(true);
+    }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseJoinModal = () => {
+    setIsJoinModalOpen(false);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleLikeClick = async (groupId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // 로그인 상태에서만 좋아요 처리
+    if (!isLoggedIn) return;
+
+    try {
+      // 낙관적 업데이트 (UI 먼저 변경)
+      setLikedGroups(prev => {
+        const next = new Set(prev);
+        if (next.has(groupId)) {
+          next.delete(groupId);
+        } else {
+          next.add(groupId);
+        }
+        return next;
+      });
+
+      // API 호출
+      const response = await toggleMarkMutation.mutateAsync(groupId);
+
+      // 서버 응답에 따라 상태 동기화
+      setLikedGroups(prev => {
+        const next = new Set(prev);
+        if (response.status === 'ADDED') {
+          next.add(groupId);
+        } else {
+          next.delete(groupId);
+        }
+        return next;
+      });
+    } catch (error) {
+      // 에러 발생 시 상태 롤백
+      setLikedGroups(prev => {
+        const next = new Set(prev);
+        if (next.has(groupId)) {
+          next.delete(groupId);
+        } else {
+          next.add(groupId);
+        }
+        return next;
+      });
+      console.error('좋아요 처리 중 오류 발생:', error);
+    }
   };
 
   const handleLoadMore = () => {
-    setDisplayCount(prev => Math.min(prev + 12, allMeetingData.length));
+    if (groupListData && !groupListData.last) {
+      setPage(prev => prev + 1);
+    }
   };
 
-  const meetingData = allMeetingData.slice(0, displayCount);
+  // D-day 계산 함수
+  const calculateDday = (meetingDate: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const meeting = new Date(meetingDate);
+    meeting.setHours(0, 0, 0, 0);
+    const diffTime = meeting.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // 로딩 상태 (첫 로딩만)
+  if (isLoading && page === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <p className="text-body1-regular text-grayScale-500">소모임을 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <p className="text-body1-regular text-grayScale-500">소모임을 불러오는 중 오류가 발생했습니다.</p>
+      </div>
+    );
+  }
+
+  // 데이터가 없는 경우
+  if (!allMeetings || allMeetings.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <p className="text-body1-regular text-grayScale-500">해당 조건에 맞는 소모임이 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-row flex-wrap gap-4">
-        {meetingData.map((meeting, index) => (
-          <div
-            key={index}
-            className="w-[180px] rounded-2xl flex flex-col cursor-pointer"
-            onClick={handleCardClick}
-          >
-            <div className="relative w-full h-[130px]">
-              <Image
-                src={noImage}
-                alt="이미지 없음"
-                width={180}
-                height={180}
-                className="object-cover rounded-2xl"
-              />
-              {/* D-day 배지 */}
-              <div className="absolute top-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-caption1 font-semibold">
-                D-{meeting.dday}
-              </div>
-              {/* 불 아이콘 */}
-              <Image
-                src={fire}
-                alt="불"
-                width={24}
-                height={24}
-                className="absolute top-2 right-2"
-              />
-             
-              {/* 하트 버튼 */}
-              <button
-                type="button"
-                aria-pressed={liked[index]}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLiked(prev => {
-                    const next = [...prev];
-                    next[index] = !next[index];
-                    return next;
-                  });
-                }}
-                className="absolute bottom-1 right-2 w-[32px] h-[32px] z-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
-              >
-                <Image
-                  src={liked[index] ? heart : noHeart}
-                  alt="찜하기"
-                  width={24}
-                  height={24}
-                />
-              </button>
-            </div>
+        {allMeetings.map((meeting) => {
+          const dday = calculateDday(meeting.meetingDate);
+          const categoryColor = categoryColors[meeting.category];
+          const categoryDisplay = categoryDisplayNames[meeting.category];
 
-            {/* 텍스트 영역 */}
-            <div className="flex flex-col gap-1 px-2 mt-2">
-              <div className="flex items-center gap-2 text-caption1-regular text-grayScale-500">
-                 {/* 카테고리 배지 */}
-              <div className={` ${meeting.categoryColor} text-white px-2 py-0.75 rounded-full text-caption1-b`}>
-                {meeting.category}
+          return (
+            <div
+              key={meeting.id}
+              className="w-[180px] rounded-2xl flex flex-col cursor-pointer"
+              onClick={handleCardClick}
+            >
+              <div className="relative w-[180px] h-[130px] overflow-hidden rounded-2xl">
+                <Image
+                  src={meeting.thumbnail || noImage}
+                  alt={meeting.title}
+                  fill
+                  className="object-cover"
+                />
+                {/* D-day 배지 */}
+                <div className="absolute top-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-caption1 font-semibold">
+                  D-{dday}
+                </div>
+                {/* 불 아이콘 (인기 소모임) */}
+                {meeting.isPopular && (
+                  <Image
+                    src={fire}
+                    alt="인기"
+                    width={24}
+                    height={24}
+                    className="absolute top-2 right-2"
+                  />
+                )}
+
+                {/* 하트 버튼 (로그인 상태에서만 표시) */}
+                {isLoggedIn && (
+                  <button
+                    type="button"
+                    aria-pressed={likedGroups.has(meeting.id)}
+                    onClick={(e) => handleLikeClick(meeting.id, e)}
+                    className="absolute bottom-1 right-2 w-[32px] h-[32px] z-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+                  >
+                    <Image
+                      src={likedGroups.has(meeting.id) ? heart : noHeart}
+                      alt="찜하기"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+                )}
               </div>
-                <span>{meeting.location}</span>
-                <span>{meeting.participants}</span>
+
+              {/* 텍스트 영역 */}
+              <div className="flex flex-col gap-1 px-2 mt-2">
+                <div className="flex items-center gap-2 text-caption1-regular text-grayScale-500">
+                  {/* 카테고리 배지 */}
+                  <div className={`${categoryColor} text-white px-2 py-1 rounded-full text-caption1-b whitespace-nowrap flex-shrink-0`}>
+                    {categoryDisplay}
+                  </div>
+                  <span className="whitespace-nowrap">{meeting.cityName}</span>
+                  <span className="whitespace-nowrap">{meeting.maxMember}명</span>
+                </div>
+                <h3 className="text-body2 text-black line-clamp-1 break-words">{meeting.title}</h3>
+                <p className="text-body3-regular text-grayScale-600 line-clamp-2 break-words">
+                  {meeting.description}
+                </p>
               </div>
-              <h3 className="text-body2 text-black line-clamp-1">{meeting.title}</h3>
-              <p className="text-body3-regular text-grayScale-600 line-clamp-2">
-                {meeting.description}
-              </p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 더보기 버튼 */}
-      {displayCount < allMeetingData.length && (
+      {groupListData && !groupListData.last && (
         <button
           onClick={handleLoadMore}
-          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors"
+          disabled={isLoading}
+          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          소모임 더보기
+          {isLoading ? '로딩 중...' : '소모임 더보기'}
         </button>
       )}
 
+      {/* 로그인 상태일 때: JoinModal */}
       <JoinModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isJoinModalOpen}
+        onClose={handleCloseJoinModal}
+      />
+
+      {/* 비로그인 상태일 때: LoginModal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
       />
     </div>
   );
