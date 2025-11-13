@@ -195,6 +195,7 @@ export default function MatchingCards({ country, category }: MatchingCardsProps)
                   src={meeting.thumbnail || noImage}
                   alt={meeting.title}
                   fill
+                  sizes="180px"
                   className="object-cover"
                 />
                 {/* D-day 배지 */}

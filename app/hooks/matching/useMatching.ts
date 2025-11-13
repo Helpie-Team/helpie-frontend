@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { matchingCreate, getGroupDetail, getGroupList, toggleGroupMark } from '@/app/api/matching/matching';
+import { matchingCreate, getGroupDetail, getGroupList, toggleGroupMark, getRecommendedGroups } from '@/app/api/matching/matching';
 import { getPublicGroupList } from '@/app/api/public/matching';
 import { MatchingCreateRequest, GroupListParams } from '@/app/api/types/matching/matching';
 
@@ -82,5 +82,18 @@ export const useToggleGroupMark = () => {
       // 관심 소모임 리스트 갱신 (나중에 필요할 수 있음)
       queryClient.invalidateQueries({ queryKey: ['groups', 'marked'] });
     },
+  });
+};
+
+/**
+ * Get recommended groups (맞춤추천 소모임)
+ * @param page - 페이지 번호
+ * @returns query object
+ */
+export const useRecommendedGroups = (page: number = 0) => {
+  return useQuery({
+    queryKey: ['groups', 'recommend', page],
+    queryFn: () => getRecommendedGroups(page),
+    staleTime: 5 * 60 * 1000, // 5분
   });
 };

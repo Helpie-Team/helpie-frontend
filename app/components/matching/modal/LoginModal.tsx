@@ -1,7 +1,7 @@
 import React from 'react';
 import arrow_left from '@/public/icons/arrow_left.png';
 import Image from "next/image";
-import { useRouter } from 'next/navigation';
+import { useModalStore } from '@/app/lib/stores/modalStore';
 
 interface JoinConfirmProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface JoinConfirmProps {
 }
 
 export default function LoginModal({isOpen, onClose, onConfirm}: JoinConfirmProps) {
-  const router = useRouter();
+  const { openModal } = useModalStore();
    if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -19,7 +19,8 @@ export default function LoginModal({isOpen, onClose, onConfirm}: JoinConfirmProp
     }
   }
   const handleConfirm = () => {
-    router.push('/login'); // 로그인 페이지로 이동
+    onClose(); // 현재 모달 닫기
+    openModal('login'); // 로그인 모달 열기
   };
     return (
       <div

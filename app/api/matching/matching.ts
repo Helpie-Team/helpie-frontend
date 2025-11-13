@@ -1,5 +1,5 @@
 import apiClient from '../axios/instance';
-import { MatchingCreateRequest, MatchingDetailResponse, GroupDetailResponse, GroupListResponse, GroupListParams, GroupMarkResponse } from '../types/matching/matching';
+import { MatchingCreateRequest, MatchingDetailResponse, GroupDetailResponse, GroupListResponse, GroupListParams, GroupMarkResponse, RecommendResponse } from '../types/matching/matching';
 
 /**
  * 소모임 생성
@@ -59,5 +59,17 @@ export const getGroupList = async (params: GroupListParams): Promise<GroupListRe
  */
 export const toggleGroupMark = async (groupId: number): Promise<GroupMarkResponse> => {
   const res = await apiClient.post<GroupMarkResponse>(`/group/mark/${groupId}`);
+  return res.data;
+};
+
+/**
+ * 소모임 맞춤추천 조회
+ * @param page - 페이지 번호 (default: 0)
+ * @returns RecommendResponse
+ */
+export const getRecommendedGroups = async (page: number = 0): Promise<RecommendResponse> => {
+  const res = await apiClient.get<RecommendResponse>('/group/recommend', {
+    params: { page },
+  });
   return res.data;
 };

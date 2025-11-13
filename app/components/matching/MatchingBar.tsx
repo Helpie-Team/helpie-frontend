@@ -18,7 +18,7 @@ export default function MatchingBar({ onCountrySelect }: MatchingBarProps) {
   // "전체" 옵션을 포함한 국가 목록
   const countries = [
     { name: "전체", code: "ALL" },
-    ...(countriesData?.map(country => ({ name: country.name, code: country.code })) || [])
+    ...(countriesData?.filter(country => country.name !== "전체").map(country => ({ name: country.name, code: country.code })) || [])
   ];
 
   // 드롭다운 외부 클릭 시 닫기

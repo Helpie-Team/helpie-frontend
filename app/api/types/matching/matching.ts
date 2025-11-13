@@ -134,3 +134,10 @@ export type GroupMarkStatus = 'ADDED' | 'REMOVED';
 export interface GroupMarkResponse {
   status: GroupMarkStatus;
 }
+
+// 소모임 맞춤추천 응답
+export interface RecommendResponse {
+  isLocked: boolean;
+  reason?: string;
+  page: GroupListResponse;
+}
