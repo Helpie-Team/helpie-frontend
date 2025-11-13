@@ -5,6 +5,7 @@ import GoogleLoginButton from '../../domain/auth/GoogleLoginButton';
 import KakaoLoginButton from '../../domain/auth/KakaoLoginButton';
 import EmailModalForm from '../../domain/auth/modal-form/signup/email/EmailModalForm';
 import EmailSigninModalForm from '../../domain/auth/modal-form/signin/EmailSigninModalForm';
+import ProfileModal from '../ProfileModal/ProfileModal';
 import KakaoIcon from '@/public/icons/kakao_icon.svg';
 import GoogleIcon from '@/public/icons/google_icon.png';
 import EmailIcon from '@/public/icons/email_icon.svg';
@@ -24,6 +25,11 @@ export default function Modal() {
   // 이메일 로그인 모달이 열려있으면 EmailSigninModalForm을 렌더링
   if (modalType === 'email-login') {
     return <EmailSigninModalForm />;
+  }
+
+  // 프로필 모달
+  if (modalType === 'profile') {
+    return <ProfileModal />;
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {

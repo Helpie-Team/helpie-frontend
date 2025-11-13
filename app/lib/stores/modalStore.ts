@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ModalType = 'login' | 'signup' | 'signup-form' | 'email-signup' | 'email-login' | null;
+export type ModalType = 'login' | 'signup' | 'signup-form' | 'email-signup' | 'email-login' | 'profile' | null;
 
 interface ModalState {
   isOpen: boolean;

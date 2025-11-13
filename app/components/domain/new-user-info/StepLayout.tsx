@@ -110,8 +110,8 @@ export default function StepLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white mt-[28px]">
-      <div className="w-full max-w-2xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-white mt-[28px] flex flex-col">
+      <div className="w-full max-w-2xl mx-auto px-4 flex-1 flex flex-col pb-24">
         {/* Header with Back Button */}
         {showBackButton && (
           <div className="relative mb-8">
@@ -148,57 +148,63 @@ export default function StepLayout({
         </div>
 
         {/* Content */}
-        {children}
+        <div className="flex-1">
+          {children}
+        </div>
+      </div>
 
-        {/* Bottom Action - Next Button or Custom Action */}
-        {bottomAction ? (
-          <div className="flex justify-center pb-8 mt-12">{bottomAction}</div>
-        ) : isStep6 ? (
-          <div className="flex gap-3 pb-8">
-            <button
-              onClick={handleGoToProfile}
-              className="flex-1 py-2 rounded-3xl text-body1-sb border-2 border-grayScale-300 bg-white text-grayScale-700 hover:bg-grayScale-100 transition-all"
-            >
-              나의 프로필로 이동
-            </button>
-            <button
-              onClick={handleBrowseGroups}
-              className="flex-1 py-2 rounded-3xl text-body1-sb bg-[var(--color-key-100)] text-white hover:opacity-90 transition-all"
-            >
-              소모임 둘러보기
-            </button>
-          </div>
-        ) : isStep5 ? (
-          <div className="flex justify-center pb-8 mt-12 w-full">
-            <button
-              onClick={handleCompleteProfile}
-              disabled={isStep5ButtonDisabled}
-              className={`w-full max-w-md py-4 rounded-3xl text-body1-sb transition-all ${
-                !isStep5ButtonDisabled
-                  ? 'bg-[var(--color-key-100)] text-white hover:opacity-90'
-                  : 'bg-grayScale-300 text-grayScale-500 cursor-not-allowed'
-              }`}
-            >
-              {isSubmitting ? '처리 중...' : '프로필 완성하기'}
-            </button>
-          </div>
-        ) : (
-          showNextButton && (
-            <div className="flex justify-center pb-8 mt-[20rem] w-full">
+      {/* Bottom Action - Next Button or Custom Action - Fixed at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-grayScale-200 px-4 py-4 z-10">
+        <div className="w-full max-w-2xl mx-auto">
+          {bottomAction ? (
+            <div className="flex justify-center">{bottomAction}</div>
+          ) : isStep6 ? (
+            <div className="flex gap-3">
               <button
-                onClick={handleNext}
-                disabled={isNextDisabled || isLastStep}
-                className={`w-full  py-4 rounded-3xl text-body1-sb transition-all ${
-                  !isNextDisabled && !isLastStep
-                    ? 'bg-[var(--color-grayScale-black)] text-white hover:opacity-90'
+                onClick={handleGoToProfile}
+                className="flex-1 py-2 rounded-3xl text-body1-sb border-2 border-grayScale-300 bg-white text-grayScale-700 hover:bg-grayScale-100 transition-all"
+              >
+                나의 프로필로 이동
+              </button>
+              <button
+                onClick={handleBrowseGroups}
+                className="flex-1 py-2 rounded-3xl text-body1-sb bg-[var(--color-key-100)] text-white hover:opacity-90 transition-all"
+              >
+                소모임 둘러보기
+              </button>
+            </div>
+          ) : isStep5 ? (
+            <div className="flex justify-center w-full">
+              <button
+                onClick={handleCompleteProfile}
+                disabled={isStep5ButtonDisabled}
+                className={`w-full max-w-md py-4 rounded-3xl text-body1-sb transition-all ${
+                  !isStep5ButtonDisabled
+                    ? 'bg-[var(--color-key-100)] text-white hover:opacity-90'
                     : 'bg-grayScale-300 text-grayScale-500 cursor-not-allowed'
                 }`}
               >
-                다음으로
+                {isSubmitting ? '처리 중...' : '프로필 완성하기'}
               </button>
             </div>
-          )
-        )}
+          ) : (
+            showNextButton && (
+              <div className="flex justify-center w-full">
+                <button
+                  onClick={handleNext}
+                  disabled={isNextDisabled || isLastStep}
+                  className={`w-full py-4 rounded-3xl text-body1-sb transition-all ${
+                    !isNextDisabled && !isLastStep
+                      ? 'bg-[var(--color-grayScale-black)] text-white hover:opacity-90'
+                      : 'bg-grayScale-300 text-grayScale-500 cursor-not-allowed'
+                  }`}
+                >
+                  다음으로
+                </button>
+              </div>
+            )
+          )}
+        </div>
       </div>
     </div>
   );

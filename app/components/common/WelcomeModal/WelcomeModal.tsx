@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import WelcomeImage from '@/public/images/wellcom_image.png';
-
+import WelcomeImage from '@/public/images/wellcome_image.png';
+import WellcomeIcon from '@/public/images/wellcome-helpie.png';
 interface WelcomeModalProps {
   onSkip: () => void;
   onComplete: () => void;
@@ -35,7 +35,8 @@ export function WelcomeModal({  onSkip, onComplete }: WelcomeModalProps) {
           </button>
 
           {/* 프로필 플레이스홀더 */}
-          <div className="w-16 h-16 bg-gray-200 rounded-full mb-6 mt-4" />
+          <Image src={WellcomeIcon} alt="Welcome" width={52} height={50} className="mb-6 mt-4" />
+
 
           {/* 제목들 */}
           <h1 className="text-3xl font-bold text-black mb-2">

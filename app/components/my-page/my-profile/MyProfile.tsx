@@ -35,6 +35,7 @@ import {
   transformLanguageFromAPI,
 } from '@/app/lib/utils/surveyTransformers';
 import ArrowIcon from '@/public/icons/arrow_icon.svg';
+import Link from 'next/link';
 
 const MyProfile = () => {
   const router = useRouter();
@@ -605,7 +606,9 @@ const ProfileCallout = () => (
         type="button"
         className="flex items-center gap-2 rounded-full bg-[var(--color-key-100)] px-6 py-3 text-body1 text-white transition hover:opacity-90"
       >
+        <Link href="/new-user-info">
         프로필 작성하러 가기
+        </Link>
         <span className="text-[20px] leading-none">→</span>
       </button>
     </div>
