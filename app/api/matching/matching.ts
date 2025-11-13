@@ -73,3 +73,11 @@ export const getRecommendedGroups = async (page: number = 0): Promise<RecommendR
   });
   return res.data;
 };
+
+//소모임 검색
+export const searchTags = async (query: string, page: number = 0): Promise<GroupListResponse> => {
+  const res = await apiClient.get<GroupListResponse>('/group/search', {
+    params: { },
+  });
+  return res.data;
+}

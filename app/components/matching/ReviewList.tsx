@@ -1,86 +1,75 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import chatIcon from "@/public/icons/chatIcon.png";
 import heart from "@/public/icons/heart.png";
 import noHeart from "@/public/icons/noHeart.png";
 import noImage from "@/public/images/noImage.png";
-
-const allReviewData = [
-  {
-    id: 1,
-    nickname: "김헬피",
-    meetingTitle: "한복입고 같이 경복궁 가요~!",
-    date: "2025.10.24 참여",
-    rating: 4,
-    content: "여러 종류의 한복을 입어보고 친구들과 사진도 많이 남겼어요. 날씨도 좋고 분위기도 너무 좋아서 하루 종일 웃었어요 :) 함께한 사람들 덕분에 정말 즐겁고 따뜻한 시간이었어요",
-    images: 3,
-    likes: 13
-  },
-  {
-    id: 2,
-    nickname: "이헬피",
-    meetingTitle: "Korean Pottery Class",
-    date: "2025.9.27 참여",
-    rating: 3,
-    content: "처음으로 도자기를 직접 만들어봤는데 생각보다 재밌었어요! 흙의 촉감도 좋고, 집중하다 보니 시간 가는 줄 몰랐어요. 함께한 사람들과 웃으며 이야기 나누는 시간까지 정말 즐거웠습니다 🌿",
-    images: 3,
-    likes: 8
-  },
-  {
-    id: 3,
-    nickname: "박헬피",
-    meetingTitle: "한옥에서 같이 전심 먹어요!",
-    date: "2025.5.11 참여",
-    rating: 4,
-    content: "고즈넉한 한옥 분위기 속에서 맛있는 점심을 함께했어요. 정갈한 음식 덕분에 마음까지 편안해졌어요. 함께한 사람들과의 대화가 정말 즐겁고 따뜻한 시간이었어요",
-    images: 3,
-    likes: 12
-  },
-  {
-    id: 4,
-    nickname: "최헬피",
-    meetingTitle: "GRWM 서류 같이 준비해요!",
-    date: "2025.8.15 참여",
-    rating: 5,
-    content: "복잡한 행정 서류를 혼자 하려니 막막했는데, 함께 하니까 훨씬 수월했어요. 서로 도와가며 빠르게 처리할 수 있었습니다!",
-    images: 3,
-    likes: 15
-  },
-  {
-    id: 5,
-    nickname: "정헬피",
-    meetingTitle: "FIFA 월드컵 다함께보기",
-    date: "2025.7.20 참여",
-    rating: 5,
-    content: "응원하는 팀이 달라도 모두가 즐거웠어요. 열띤 경기를 함께 보며 환호하고 아쉬워하던 순간들이 기억에 남네요!",
-    images: 3,
-    likes: 20
-  },
-  {
-    id: 6,
-    nickname: "강헬피",
-    meetingTitle: "한밤의 오페라 공연관람",
-    date: "2025.6.10 참여",
-    rating: 4,
-    content: "오페라를 처음 봤는데 너무 감동적이었어요. 함께 간 분들과 공연 후 이야기 나누는 시간도 좋았습니다.",
-    images: 3,
-    likes: 11
-  }
-];
+import { usePublicReviewList } from "@/app/hooks/review/useReview";
+import { ReviewItem } from "@/app/api/types/review/review";
 
 export default function ReviewList() {
-  const [sortOption, setSortOption] = useState("latest");
-  const [displayCount, setDisplayCount] = useState(3);
-  const [liked, setLiked] = useState<boolean[]>(Array(allReviewData.length).fill(false));
-  const [expandedReviews, setExpandedReviews] = useState<boolean[]>(Array(allReviewData.length).fill(false));
+  const [page, setPage] = useState(0);
+  const { data: reviewListData, isLoading, error } = usePublicReviewList({ page });
+  const [sortOption, setSortOption] = useState<"latest" | "rating" | "likes">("latest");
+  const [liked, setLiked] = useState<Record<number, boolean>>({});
+  const [expandedReviews, setExpandedReviews] = useState<Record<number, boolean>>({});
+  const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
 
-  const handleLoadMore = () => {
-    setDisplayCount(prev => Math.min(prev + 3, allReviewData.length));
+  // 페이지 데이터가 로드되면 누적 (중복 제거)
+  useEffect(() => {
+    if (reviewListData?.content) {
+      if (page === 0) {
+        setAllReviews(reviewListData.content);
+      } else {
+        setAllReviews(prev => {
+          // 기존 reviewId들을 Set으로 만들어서 중복 체크
+          const existingIds = new Set(prev.map(r => r.reviewId));
+          // 새로운 데이터 중 중복되지 않은 것만 추가
+          const newReviews = reviewListData.content.filter(r => !existingIds.has(r.reviewId));
+          return [...prev, ...newReviews];
+        });
+      }
+    }
+  }, [reviewListData, page]);
+
+  // 정렬 옵션 변경 시 첫 페이지로 리셋
+  const handleSortChange = (option: "latest" | "rating" | "likes") => {
+    setSortOption(option);
+    setPage(0);
+    setAllReviews([]);
   };
 
-  const reviewData = allReviewData.slice(0, displayCount);
+  // 정렬된 데이터
+  const reviewData = [...allReviews].sort((a, b) => {
+    switch (sortOption) {
+      case "latest":
+        // 최신순: 날짜 내림차순
+        return new Date(b.meetingDate).getTime() - new Date(a.meetingDate).getTime();
+      case "rating":
+        // 별점순: 별점 내림차순
+        return b.rate - a.rate;
+      case "likes":
+        // 좋아요순: 현재 API에 좋아요 수가 없으므로 임시로 reviewId 기준
+        // TODO: 백엔드에서 좋아요 수 필드 추가 필요
+        return 0;
+      default:
+        return 0;
+    }
+  });
+
+  const handleLoadMore = () => {
+    if (reviewListData && !reviewListData.last) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} 참여`;
+  };
 
   const renderStars = (rating: number) => {
     return (
@@ -94,6 +83,33 @@ export default function ReviewList() {
     );
   };
 
+  // 로딩 상태 (첫 페이지만)
+  if (isLoading && page === 0 && allReviews.length === 0) {
+    return (
+      <div className="w-full flex items-center justify-center py-20">
+        <p className="text-body1-regular text-grayScale-500">후기를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="w-full flex items-center justify-center py-20">
+        <p className="text-body1-regular text-grayScale-500">후기를 불러오는 중 오류가 발생했습니다.</p>
+      </div>
+    );
+  }
+
+  // 데이터가 없는 경우
+  if (!reviewData || reviewData.length === 0) {
+    return (
+      <div className="w-full flex items-center justify-center py-20">
+        <p className="text-body1-regular text-grayScale-500">아직 작성된 후기가 없습니다.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col gap-8">
       <div className="flex items-start gap-4">
@@ -106,19 +122,19 @@ export default function ReviewList() {
           </p>
         <div className="flex gap-1 text-body1">
           <button
-            onClick={() => setSortOption("latest")}
+            onClick={() => handleSortChange("latest")}
             className={sortOption === "latest" ? "text-black" : "text-grayScale-500"}
           >
             최신순
           </button>
           <button
-            onClick={() => setSortOption("rating")}
+            onClick={() => handleSortChange("rating")}
             className={sortOption === "rating" ? "text-black" : "text-grayScale-500"}
           >
             별점순
           </button>
           <button
-            onClick={() => setSortOption("likes")}
+            onClick={() => handleSortChange("likes")}
             className={sortOption === "likes" ? "text-black" : "text-grayScale-500"}
           >
             좋아요순
@@ -130,77 +146,93 @@ export default function ReviewList() {
 <hr className="text-grayScale-100"/>
       {/* 리뷰 리스트 */}
       <div className="flex flex-col gap-6">
-        {reviewData.map((review, index) => (
-          <div key={review.id} className="border-b border-grayScale-100 pb-6">
+        {reviewData.map((review) => (
+          <div key={review.reviewId} className="border-b border-grayScale-100 pb-6">
             <div className="flex gap-4">
               {/* 프로필 아이콘 */}
-              <div className="w-12 h-12 rounded-full bg-grayScale-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-h3 text-grayScale-500">👤</span>
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-grayScale-100 flex items-center justify-center flex-shrink-0">
+                {review.profileImage ? (
+                  <Image
+                    src={review.profileImage}
+                    alt={review.reviewerName}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-h3 text-grayScale-500">👤</span>
+                )}
               </div>
 
               {/* 리뷰 내용 */}
               <div className="flex-1 flex flex-col gap-3">
                 {/* 닉네임 */}
-                <h3 className="text-body1-medium text-black">{review.nickname}</h3>
+                <h3 className="text-body1-medium text-black">{review.reviewerName}</h3>
 
                 {/* 소모임 제목 & 날짜 & 별점 */}
                 <div className="flex items-center gap-3">
-                  <span className="text-body3-regular text-grayScale-600">{review.meetingTitle}</span>
-                  <span className="text-caption1-regular text-grayScale-500">{review.date}</span>
-                  {renderStars(review.rating)}
+                  <span className="text-body3-regular text-grayScale-600">{review.groupTitle}</span>
+                  <span className="text-caption1-regular text-grayScale-500">{formatDate(review.meetingDate)}</span>
+                  {renderStars(review.rate)}
                 </div>
 
                 {/* 리뷰 텍스트 */}
                 <p className="text-body2-regular text-black">
-                  {expandedReviews[index] ? review.content : `${review.content.slice(0, 100)}...`}
+                  {expandedReviews[review.reviewId] ? review.description : `${review.description.slice(0, 100)}${review.description.length > 100 ? '...' : ''}`}
                 </p>
 
                 {/* 더보기 버튼 */}
-                {review.content.length > 100 && (
+                {review.description.length > 100 && (
                   <button
                     onClick={() => {
-                      const newExpanded = [...expandedReviews];
-                      newExpanded[index] = !newExpanded[index];
-                      setExpandedReviews(newExpanded);
+                      setExpandedReviews(prev => ({
+                        ...prev,
+                        [review.reviewId]: !prev[review.reviewId]
+                      }));
                     }}
                     className="text-body3-regular text-grayScale-500 text-left flex items-center gap-1"
                   >
-                    더보기 <span>›</span>
+                    {expandedReviews[review.reviewId] ? '접기' : '더보기'} <span>›</span>
                   </button>
                 )}
 
                 {/* 이미지 */}
-                <div className="flex gap-2">
-                  {[...Array(review.images)].map((_, imgIndex) => (
-                    <div key={imgIndex} className="w-24 h-24 bg-grayScale-200 rounded-lg overflow-hidden">
-                      <Image
-                        src={noImage}
-                        alt={`리뷰 이미지 ${imgIndex + 1}`}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
+                {review.reviewImages && review.reviewImages.length > 0 && (
+                  <div className="flex gap-2">
+                    {review.reviewImages.map((image, imgIndex) => (
+                      <div key={imgIndex} className="w-24 h-24 bg-grayScale-200 rounded-lg overflow-hidden">
+                        <Image
+                          src={image || noImage}
+                          alt={`리뷰 이미지 ${imgIndex + 1}`}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* 좋아요 */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
-                      const newLiked = [...liked];
-                      newLiked[index] = !newLiked[index];
-                      setLiked(newLiked);
+                      setLiked(prev => ({
+                        ...prev,
+                        [review.reviewId]: !prev[review.reviewId]
+                      }));
                     }}
                     className="flex items-center gap-1"
                   >
                     <Image
-                      src={liked[index] ? heart : noHeart}
+                      src={liked[review.reviewId] ? heart : noHeart}
                       alt="좋아요"
                       width={20}
                       height={20}
                     />
-                    <span className="text-body3-regular text-grayScale-600">{review.likes}</span>
+                    <span className="text-body3-regular text-grayScale-600">
+                      {liked[review.reviewId] ? 1 : 0}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -210,12 +242,13 @@ export default function ReviewList() {
       </div>
 
       {/* 더보기 버튼 */}
-      {displayCount < allReviewData.length && (
+      {reviewListData && !reviewListData.last && (
         <button
           onClick={handleLoadMore}
-          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors"
+          disabled={isLoading}
+          className="w-full py-4 border border-grayScale-300 rounded-full text-body1 text-grayScale-700 hover:bg-grayScale-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          참여 후기 더보기
+          {isLoading ? '로딩 중...' : '참여 후기 더보기'}
         </button>
       )}
     </div>
