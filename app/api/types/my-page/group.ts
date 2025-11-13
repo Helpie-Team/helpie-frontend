@@ -1,5 +1,6 @@
 export interface MyGroupInfoItem {
-  id: number;
+  id?: number;
+  groupId?: number;
   title: string;
   summary?: string;
   thumbnailUrl?: string | null;
@@ -26,6 +27,12 @@ export interface MyBookmarkItem {
   dday?: number;
   tags?: string[];
   liked?: boolean;
+}
+
+export type BookmarkToggleStatus = 'ADDED' | 'REMOVED';
+
+export interface BookmarkToggleResponse {
+  status: BookmarkToggleStatus;
 }
 
 export interface PaginatedResponse<T> {

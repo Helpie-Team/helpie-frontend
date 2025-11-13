@@ -1,12 +1,14 @@
 'use client';
 
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
-import { useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
-import { MyBookmarkItem, MyGroupInfoItem } from '@/app/api/types/my-page/group';
+import { cancelGroupApplication, toggleGroupBookmark } from '@/app/api/my-page/group';
+import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
+import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
+import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
 import PlaceholderGroupImage from '@/public/images/helpie-chat-bot.png';
 
 const TABS = [
@@ -17,12 +19,15 @@ const TABS = [
 
 type TabType = (typeof TABS)[number]['id'];
 
-type GroupVariant = 'upcoming' | 'past';
+type GroupVariant = 'UPCOMING' | 'PAST';
 
-type EmptyStateVariant = 'upcoming' | 'past' | 'bookmark';
+type EmptyStateVariant = 'UPCOMING' | 'PAST' | 'bookmark';
+
+const getGroupIdentifier = (group: MyGroupInfoItem) => group.id ?? group.groupId;
 
 const generateGroupKey = (prefix: string, group: MyGroupInfoItem, index: number) => {
-  const uniqueSource = group.id ?? `${group.meetingDate ?? ''}-${group.title ?? ''}`.trim();
+  const identifier = getGroupIdentifier(group);
+  const uniqueSource = identifier ?? `${group.meetingDate ?? ''}-${group.title ?? ''}`.trim();
   return `${prefix}-${uniqueSource || 'fallback'}-${index}`;
 };
 
@@ -34,44 +39,160 @@ const generateBookmarkKey = (bookmark: MyBookmarkItem, index: number) => {
 const MyMatching = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('UPCOMING');
+  const queryClient = useQueryClient();
+  const [cancelTargetId, setCancelTargetId] = useState<number | null>(null);
+  const [bookmarkTargetId, setBookmarkTargetId] = useState<number | null>(null);
+  const [bookmarkStates, setBookmarkStates] = useState<Record<number, boolean>>({});
 
-  const upcomingQuery = useMyGroupInfo({ status: 'RECRUITING', size: 4, enabled: activeTab === 'UPCOMING' });
-  const pastQuery = useMyGroupInfo({ status: 'COMPLETED', size: 4, enabled: activeTab === 'PAST' });
+  const cancelMutation = useMutation({
+    mutationFn: cancelGroupApplication,
+    onMutate: (groupId: number) => {
+      setCancelTargetId(groupId);
+    },
+    onSuccess: (_, groupId) => {
+      if (typeof groupId === 'number') {
+        queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyGroupInfoItem>>>(
+          { queryKey: MY_GROUP_INFO_QUERY_KEY },
+          (old) => {
+            if (!old) return old;
+
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                content: page.content.filter((item) => getGroupIdentifier(item) !== groupId),
+              })),
+            };
+          },
+        );
+      }
+
+      queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
+    },
+    onError: (error) => {
+      console.error('소모임 신청 취소에 실패했습니다.', error);
+    },
+    onSettled: () => {
+      setCancelTargetId(null);
+    },
+  });
+
+  const toggleBookmarkMutation = useMutation({
+    mutationFn: toggleGroupBookmark,
+    onMutate: (groupId: number) => {
+      setBookmarkTargetId(groupId);
+    },
+    onSuccess: (data, groupId) => {
+      if (typeof groupId === 'number') {
+        setBookmarkStates((prev) => ({
+          ...prev,
+          [groupId]: data.status === 'ADDED',
+        }));
+
+        if (data.status === 'REMOVED') {
+          queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyBookmarkItem>>>(
+            { queryKey: MY_BOOKMARK_INFO_QUERY_KEY },
+            (old) => {
+              if (!old) return old;
+              return {
+                ...old,
+                pages: old.pages.map((page) => ({
+                  ...page,
+                  content: page.content.filter((item) => item.id !== groupId),
+                })),
+              };
+            },
+          );
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: MY_BOOKMARK_INFO_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
+    },
+    onError: (error) => {
+      console.error('관심 소모임 업데이트에 실패했습니다.', error);
+    },
+    onSettled: () => {
+      setBookmarkTargetId(null);
+    },
+  });
+
+  const UPCOMINGQuery = useMyGroupInfo({ status: 'UPCOMING', size: 4, enabled: activeTab === 'UPCOMING' });
+  const PASTQuery = useMyGroupInfo({ status: 'PAST', size: 4, enabled: activeTab === 'PAST' });
   const bookmarkQuery = useMyBookmarkInfo({ size: 8, enabled: activeTab === 'BOOKMARK' });
 
-  const upcomingGroups = useMemo(
-    () => upcomingQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
-    [upcomingQuery.data],
+  const UPCOMINGGroups = useMemo(
+    () => UPCOMINGQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
+    [UPCOMINGQuery.data],
   );
-  const pastGroups = useMemo(
-    () => pastQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
-    [pastQuery.data],
+  const PASTGroups = useMemo(
+    () => PASTQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
+    [PASTQuery.data],
   );
   const bookmarkedGroups = useMemo(
     () => bookmarkQuery.data?.pages.flatMap((page) => page.content ?? []) ?? [],
     [bookmarkQuery.data],
   );
 
+  useEffect(() => {
+    if (bookmarkedGroups.length === 0) {
+      setBookmarkStates({});
+      return;
+    }
+
+    setBookmarkStates((prev) => {
+      const next: Record<number, boolean> = {};
+
+      bookmarkedGroups.forEach((item) => {
+        next[item.id] = prev[item.id] ?? item.liked ?? true;
+      });
+
+      return next;
+    });
+  }, [bookmarkedGroups]);
+
+  const handleCancelGroup = (group: MyGroupInfoItem) => {
+    const targetId = getGroupIdentifier(group);
+    if (!targetId) {
+      console.error('소모임 식별자를 찾을 수 없습니다.', group);
+      return;
+    }
+
+    if (cancelMutation.isPending) {
+      return;
+    }
+    cancelMutation.mutate(targetId);
+  };
+
+  const handleToggleBookmark = (groupId: number) => {
+    if (toggleBookmarkMutation.isPending) {
+      return;
+    }
+    toggleBookmarkMutation.mutate(groupId);
+  };
+
   const renderContent = () => {
     if (activeTab === 'UPCOMING') {
       return (
         <TabSection
-          isLoading={upcomingQuery.isLoading}
-          hasError={!!upcomingQuery.error}
-          errorMessage={upcomingQuery.error instanceof Error ? upcomingQuery.error.message : undefined}
-          isEmpty={!upcomingQuery.isLoading && upcomingGroups.length === 0}
-          emptyVariant="upcoming"
+          isLoading={UPCOMINGQuery.isLoading}
+          hasError={!!UPCOMINGQuery.error}
+          errorMessage={UPCOMINGQuery.error instanceof Error ? UPCOMINGQuery.error.message : undefined}
+          isEmpty={!UPCOMINGQuery.isLoading && UPCOMINGGroups.length === 0}
+          emptyVariant="UPCOMING"
           onEmptyAction={() => router.push('/matching')}
           emptyActionLabel="소모임 둘러보기"
-          onLoadMore={upcomingQuery.hasNextPage ? () => upcomingQuery.fetchNextPage() : undefined}
-          isLoadingMore={upcomingQuery.isFetchingNextPage}
+          onLoadMore={UPCOMINGQuery.hasNextPage ? () => UPCOMINGQuery.fetchNextPage() : undefined}
+          isLoadingMore={UPCOMINGQuery.isFetchingNextPage}
         >
           <div className="flex flex-col gap-4">
-            {upcomingGroups.map((group, index) => (
+            {UPCOMINGGroups.map((group, index) => (
               <GroupCard
-                key={generateGroupKey('upcoming', group, index)}
+                key={generateGroupKey('UPCOMING', group, index)}
                 group={group}
-                variant="upcoming"
+                variant="UPCOMING"
+                onCancel={() => handleCancelGroup(group)}
+                isCancelling={cancelTargetId === getGroupIdentifier(group) && cancelMutation.isPending}
               />
             ))}
           </div>
@@ -82,20 +203,20 @@ const MyMatching = () => {
     if (activeTab === 'PAST') {
       return (
         <TabSection
-          isLoading={pastQuery.isLoading}
-          hasError={!!pastQuery.error}
-          errorMessage={pastQuery.error instanceof Error ? pastQuery.error.message : undefined}
-          isEmpty={!pastQuery.isLoading && pastGroups.length === 0}
-          emptyVariant="past"
-          onLoadMore={pastQuery.hasNextPage ? () => pastQuery.fetchNextPage() : undefined}
-          isLoadingMore={pastQuery.isFetchingNextPage}
+          isLoading={PASTQuery.isLoading}
+          hasError={!!PASTQuery.error}
+          errorMessage={PASTQuery.error instanceof Error ? PASTQuery.error.message : undefined}
+          isEmpty={!PASTQuery.isLoading && PASTGroups.length === 0}
+          emptyVariant="PAST"
+          onLoadMore={PASTQuery.hasNextPage ? () => PASTQuery.fetchNextPage() : undefined}
+          isLoadingMore={PASTQuery.isFetchingNextPage}
         >
           <div className="flex flex-col gap-4">
-            {pastGroups.map((group, index) => (
+            {PASTGroups.map((group, index) => (
               <GroupCard
-                key={generateGroupKey('past', group, index)}
+                key={generateGroupKey('PAST', group, index)}
                 group={group}
-                variant="past"
+                variant="PAST"
               />
             ))}
           </div>
@@ -120,6 +241,9 @@ const MyMatching = () => {
             <BookmarkCard
               key={generateBookmarkKey(item, index)}
               bookmark={item}
+              onToggleBookmark={() => handleToggleBookmark(item.id)}
+              isToggling={bookmarkTargetId === item.id && toggleBookmarkMutation.isPending}
+              isLiked={bookmarkStates[item.id] ?? item.liked ?? true}
             />
           ))}
         </div>
@@ -233,11 +357,11 @@ const EmptyState = ({
   actionLabel?: string;
 }) => {
   const messages: Record<EmptyStateVariant, { title: string; description: string }> = {
-    upcoming: {
+    UPCOMING: {
       title: '아직 참여한 소모임이 없어요',
       description: '지금 새로운 모임을 찾아보세요!',
     },
-    past: {
+    PAST: {
       title: '아직 참여한 소모임이 없어요',
       description: '첫 소모임에 참여하고, 나만의 기록을 만들어보세요.',
     },
@@ -270,11 +394,22 @@ const EmptyState = ({
   );
 };
 
-const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupVariant }) => {
-  const isPast = variant === 'past';
+const GroupCard = ({
+  group,
+  variant,
+  onCancel,
+  isCancelling = false,
+}: {
+  group: MyGroupInfoItem;
+  variant: GroupVariant;
+  onCancel?: () => void;
+  isCancelling?: boolean;
+}) => {
+  const actionGroupId = getGroupIdentifier(group);
+  const isPAST = variant === 'PAST';
   const meetingDate = formatDate(group.meetingDate);
-  const headLabel = isPast ? '모임완료' : '참여 중인 모임';
-  const rightLabel = isPast
+  const headLabel = isPAST ? '모임완료' : '참여 중인 모임';
+  const rightLabel = isPAST
     ? meetingDate ?? '모임 일정 미확인'
     : meetingDate ?? (group.meetingType === 'OFFLINE' ? '오프라인 모임 일시' : '모임 일정 준비 중');
 
@@ -335,7 +470,7 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
             채팅방 이동
           </button>
 
-          {isPast ? (
+          {isPAST ? (
             <button
               type="button"
               className={`flex-1 rounded-full py-2 text-body2 transition ${
@@ -349,9 +484,11 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
           ) : (
             <button
               type="button"
-              className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200"
+              className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200 disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={onCancel}
+              disabled={!onCancel || isCancelling || !actionGroupId}
             >
-              신청취소
+              {isCancelling ? '취소 중...' : '신청취소'}
             </button>
           )}
         </div>
@@ -360,7 +497,17 @@ const GroupCard = ({ group, variant }: { group: MyGroupInfoItem; variant: GroupV
   );
 };
 
-const BookmarkCard = ({ bookmark }: { bookmark: MyBookmarkItem }) => {
+const BookmarkCard = ({
+  bookmark,
+  onToggleBookmark,
+  isToggling,
+  isLiked,
+}: {
+  bookmark: MyBookmarkItem;
+  onToggleBookmark: () => void;
+  isToggling: boolean;
+  isLiked: boolean;
+}) => {
   const meetingDDay = typeof bookmark.dday === 'number' ? bookmark.dday : undefined;
   const ddayLabel = meetingDDay !== undefined ? `D-${meetingDDay}` : undefined;
 
@@ -382,9 +529,12 @@ const BookmarkCard = ({ bookmark }: { bookmark: MyBookmarkItem }) => {
         </div>
         <button
           type="button"
-          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-lg text-[var(--color-key-100)]"
+          onClick={onToggleBookmark}
+          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-lg text-[var(--color-key-100)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+          disabled={isToggling}
+          aria-label={isLiked ? '관심 소모임 해제' : '관심 소모임 등록'}
         >
-          ♥
+          {isToggling ? '···' : isLiked ? '♥' : '♡'}
         </button>
       </div>
 
