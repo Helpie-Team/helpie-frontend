@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import HelpieLogoImage from '@/public/images/helpie-logo.png';
-import { navItems } from '.';
+import { navItems } from './index';
 import Modal from '../Modal/Modal';
 import { useModalStore } from '../../../lib/stores/modalStore';
 import { isAuthenticated, TOKEN_CHANGE_EVENT } from '../../../lib/utils/token';
@@ -130,7 +130,7 @@ const Header = () => {
                   )}
                 </>
               )}
-            </div>
+            </ul>
           </nav>
         ))}
       </header>
