@@ -1,4 +1,3 @@
-// 국가 정보
 export interface Country {
   id: number;
   code: string;
@@ -6,14 +5,6 @@ export interface Country {
   englishName: string;
 }
 
-// 국가 목록 조회 응답
-export interface CountriesResponse {
-  statusCode: number;
-  message: string;
-  result: Country[];
-}
-
-// 도시 정보
 export interface City {
   id: number;
   code: string;
@@ -23,16 +14,27 @@ export interface City {
   isFavorite: boolean;
 }
 
-// 도시 목록 조회 응답 (국가별 그룹핑)
-export interface CitiesResponse {
+export interface CountryResponse {
+  statusCode: number;
+  message: string;
+  result: Country[];
+}
+
+export interface CityResponse {
+  statusCode: number;
+  message: string;
+  result: City[];
+}
+
+export interface CitiesGroupedResponse {
   statusCode: number;
   message: string;
   result: Record<string, City[]>;
 }
 
-// 국가별 도시 조회 응답
-export interface CitiesByCountryResponse {
+export interface FavoriteCitiesResponse {
   statusCode: number;
   message: string;
   result: City[];
 }
+

@@ -8,7 +8,7 @@ interface WelcomeModalProps {
   onComplete: () => void;
 }
 
-export function WelcomeModal({ onSkip, onComplete }: WelcomeModalProps) {
+export function WelcomeModal({  onSkip, onComplete }: WelcomeModalProps) {
   
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
@@ -59,13 +59,13 @@ export function WelcomeModal({ onSkip, onComplete }: WelcomeModalProps) {
           <div className="flex gap-3">
             <button
               onClick={onSkip}
-              className="flex-1 py-4 rounded-xl font-medium text-lg bg-white border-2 border-black text-black hover:bg-gray-50 transition-colors"
+              className="flex-1 py-4 rounded-full font-medium text-lg bg-white border-1 border-black text-black hover:bg-gray-50 transition-colors"
             >
               다음에 할게요
             </button>
             <button
               onClick={onComplete}
-              className="flex-1 py-4 rounded-xl font-medium text-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+              className="flex-1 py-4 rounded-full font-medium text-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
             >
               프로필 완성하기
             </button>
