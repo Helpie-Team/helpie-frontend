@@ -35,6 +35,7 @@ export default function Footer() {
                 alt="인스타 아이콘"
                 width={24}
                 height={24}
+                
                 className="cursor-pointer"
               />
               <Image

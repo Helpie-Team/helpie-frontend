@@ -7,9 +7,10 @@ import Image from "next/image";
 interface CancelModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm?: () => void;
 }
 
-export default function CancelModal({ isOpen, onClose }: CancelModalProps) {
+export default function CancelModal({ isOpen, onClose, onConfirm }: CancelModalProps) {
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -19,9 +20,11 @@ export default function CancelModal({ isOpen, onClose }: CancelModalProps) {
   };
 
   const handleCancel = () => {
-    // 실제 취소 로직 추가 예정
+    if (onConfirm) {
+      onConfirm(); // 부모 컴포넌트의 취소 로직 실행
+    }
     onClose();
-  }
+  };
  
 
   return (

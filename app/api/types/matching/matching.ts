@@ -59,19 +59,13 @@ export interface GroupDetail {
   cityName: string;
   category: GroupCategory;
   maxMember: number;
-  thumbnail: string;
+  thumbnail: string | null; // 이미지 없을 때 null 가능
   isPopular: boolean;
   dayBefore: number;
   status: GroupStatus;
   meetingDate: string;
 }
 
-// 소모임 상세 정보 응답
-export interface GroupDetailResponse {
-  statusCode: number;
-  message: string;
-  result: GroupDetail;
-}
 
 // 소모임 리스트 아이템
 export interface GroupListItem {
@@ -81,7 +75,7 @@ export interface GroupListItem {
   cityName: string;
   category: GroupCategory;
   maxMember: number;
-  thumbnail: string;
+  thumbnail: string | null; // 이미지 없을 때 null 가능
   isPopular: boolean;
   dayBefore: number;
   status: GroupStatus;
@@ -140,4 +134,15 @@ export interface RecommendResponse {
   isLocked: boolean;
   reason?: string;
   page: GroupListResponse;
+}
+
+// 소모임 가입 응답
+export interface GroupJoinResponse {
+  roomId: number;
+  message: string;
+}
+
+//소모임 가입 여부 조회
+export interface GroupJoinStatus{
+  joinYn: boolean;
 }

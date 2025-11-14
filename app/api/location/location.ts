@@ -4,6 +4,7 @@ import {
   CityResponse,
   CitiesGroupedResponse,
   FavoriteCitiesResponse,
+  City,
 } from '../types/location/location';
 import { ApiError, AxiosErrorResponse } from '../types/axios';
 
@@ -70,6 +71,39 @@ export async function getFavoriteCities(): Promise<FavoriteCitiesResponse> {
     const response = await apiClient.get<FavoriteCitiesResponse>('/locations/cities/favorites');
     return response.data;
   } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      throw axiosError;
+    }
+    throw error;
+  }
+}
+
+/**
+ * 전체 도시 조회 (flat 배열)
+ * 모든 국가의 도시 목록을 반환
+ * @returns: City[]
+ */
+export async function getAllCitiesFlat(): Promise<City[]> {
+  try {
+    // 1. 전체 국가 목록 가져오기
+    const countriesResponse = await getCountries();
+
+    // 2. 각 국가별로 도시 목록 가져오기
+    const allCities: City[] = [];
+
+    for (const country of countriesResponse.result) {
+      try {
+        const citiesResponse = await getCitiesByCountry(country.code);
+        allCities.push(...citiesResponse.result);
+      } catch (error) {
+        console.warn(`${country.name} 도시 조회 실패:`, error);
+      }
+    }
+
+    return allCities;
+  } catch (error) {
+    console.error('getAllCitiesFlat 에러:', error);
     if (error instanceof Error) {
       const axiosError = error as ApiError<AxiosErrorResponse>;
       throw axiosError;

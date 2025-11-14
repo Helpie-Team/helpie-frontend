@@ -154,10 +154,12 @@ const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, place
     setInputValue(newValue);
     setIsOpen(true);
 
-    const filtered = cities.filter(city =>
-      city.name.toLowerCase().includes(newValue.toLowerCase()) ||
-      city.englishName.toLowerCase().includes(newValue.toLowerCase())
-    );
+    const filtered = cities.filter(city => {
+      const nameMatch = city.name?.toLowerCase().includes(newValue.toLowerCase());
+      const englishNameMatch = city.englishName?.toLowerCase().includes(newValue.toLowerCase());
+      return nameMatch || englishNameMatch;
+    });
+
     setFilteredCities(filtered);
   };
 
