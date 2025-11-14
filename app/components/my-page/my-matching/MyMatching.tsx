@@ -10,6 +10,9 @@ import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/use
 import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
 import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
 import PlaceholderGroupImage from '@/public/images/helpie-chat-bot.png';
+import heart from '@/public/icons/heart.png';
+import noHeart from '@/public/icons/noHeart.png';
+import noImage from '@/public/images/noImage.png';
 
 const TABS = [
   { id: 'UPCOMING', label: '모임예정' },
@@ -236,7 +239,7 @@ const MyMatching = () => {
         onLoadMore={bookmarkQuery.hasNextPage ? () => bookmarkQuery.fetchNextPage() : undefined}
         isLoadingMore={bookmarkQuery.isFetchingNextPage}
       >
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex flex-row flex-wrap gap-4">
           {bookmarkedGroups.map((item, index) => (
             <BookmarkCard
               key={generateBookmarkKey(item, index)}
@@ -508,43 +511,86 @@ const BookmarkCard = ({
   isToggling: boolean;
   isLiked: boolean;
 }) => {
+  const router = useRouter();
   const meetingDDay = typeof bookmark.dday === 'number' ? bookmark.dday : undefined;
-  const ddayLabel = meetingDDay !== undefined ? `D-${meetingDDay}` : undefined;
+
+  // 카테고리 색상 매핑
+  const categoryColors: Record<string, string> = {
+    'HOBBY': 'bg-[#7BAF6E]',
+    'ART': 'bg-[#F5A623]',
+    'LIFE': 'bg-[#9B6FCC]',
+    'STUDY': 'bg-[#E94B3C]',
+    'SOCIAL': 'bg-[#4A90E2]',
+  };
+
+  // 카테고리 한글 표시
+  const categoryDisplayNames: Record<string, string> = {
+    'HOBBY': '문화·취미',
+    'ART': '예술·창작',
+    'LIFE': '액티비티·라이프',
+    'STUDY': '자기계발·성장',
+    'SOCIAL': '사회·교류',
+  };
+
+  const categoryColor = bookmark.category ? categoryColors[bookmark.category] : 'bg-grayScale-500';
+  const categoryDisplay = bookmark.category ? categoryDisplayNames[bookmark.category] : '소모임';
 
   return (
-    <div className="flex flex-col gap-3 rounded-[24px] bg-white p-4 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
-      <div className="relative h-[140px] w-full overflow-hidden rounded-[20px] bg-grayScale-200">
+    <div
+      className="w-[180px] rounded-2xl flex flex-col cursor-pointer"
+      onClick={() => router.push(`/matching?groupId=${bookmark.id}`)}
+    >
+      <div className="relative w-[180px] h-[130px] overflow-hidden rounded-2xl">
         <Image
-          src={bookmark.thumbnailUrl ?? PlaceholderGroupImage}
+          src={bookmark.thumbnailUrl && typeof bookmark.thumbnailUrl === 'string' && bookmark.thumbnailUrl.trim() !== '' ? bookmark.thumbnailUrl : noImage}
           alt={bookmark.title || 'bookmark-thumbnail'}
           fill
-          sizes="200px"
+          sizes="180px"
           className="object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = noImage.src;
+          }}
         />
-        <div className="absolute left-3 top-3 flex gap-2 text-caption1-regular text-white">
-          {ddayLabel && <span className="rounded-full bg-gray-900 px-2 py-1">{ddayLabel}</span>}
-          {bookmark.tags?.[0] && (
-            <span className="rounded-full bg-[var(--color-key-100)] px-2 py-1">{bookmark.tags[0]}</span>
-          )}
-        </div>
+        {/* D-day 배지 */}
+        {meetingDDay !== undefined && (
+          <div className="absolute top-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-caption1 font-semibold">
+            D-{meetingDDay}
+          </div>
+        )}
+
+        {/* 하트 버튼 */}
         <button
           type="button"
-          onClick={onToggleBookmark}
-          className="absolute right-3 top-3 rounded-full bg-white/80 p-2 text-lg text-[var(--color-key-100)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleBookmark();
+          }}
+          className="absolute bottom-1 right-2 w-[32px] h-[32px] z-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
           disabled={isToggling}
           aria-label={isLiked ? '관심 소모임 해제' : '관심 소모임 등록'}
         >
-          {isToggling ? '···' : isLiked ? '♥' : '♡'}
+          <Image
+            src={isLiked ? heart : noHeart}
+            alt="찜하기"
+            width={24}
+            height={24}
+          />
         </button>
       </div>
 
-      <div className="space-y-1">
-        <p className="text-caption1-regular text-grayScale-500">
-          {bookmark.city ?? '지역 정보 없음'} · {bookmark.category ?? '소모임'}
-        </p>
-        <p className="text-body1 text-grayScale-title">{bookmark.title ?? '소모임 제목을 입력하세요'}</p>
-        <p className="text-body2 text-grayScale-500">
-          {bookmark.summary ?? '썸네일 소모임 설명은 두 줄까지 표시됩니다.'}
+      {/* 텍스트 영역 */}
+      <div className="flex flex-col gap-1 px-2 mt-2">
+        <div className="flex items-center gap-2 text-caption1-regular text-grayScale-500">
+          {/* 카테고리 배지 */}
+          <div className={`${categoryColor} text-white px-2 py-1 rounded-full text-caption1-b whitespace-nowrap flex-shrink-0`}>
+            {categoryDisplay}
+          </div>
+          <span className="whitespace-nowrap">{bookmark.city ?? '지역'}</span>
+        </div>
+        <h3 className="text-body2 text-black line-clamp-1 break-words">{bookmark.title ?? '소모임 제목'}</h3>
+        <p className="text-body3-regular text-grayScale-600 line-clamp-2 break-words">
+          {bookmark.summary ?? '설명'}
         </p>
       </div>
     </div>

@@ -1,15 +1,19 @@
 //3.2.2 채팅방으로 이동
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import arrow_left from '@/public/icons/arrow_left.png';
 import Image from "next/image";
 
 interface ChatModalProps {
   isOpen: boolean;
   onClose: () => void;
+  roomId?: number;
 }
 
-export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
+export default function ChatModal({ isOpen, onClose, roomId }: ChatModalProps) {
+  const router = useRouter();
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -18,10 +22,15 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     }
   };
 
-  const handleCancel = () => {
-    // 실제 취소 로직 추가 예정
-    onClose();
-  }
+  const handleMoveToChatRoom = () => {
+    if (roomId) {
+      // 채팅방 페이지로 이동
+      router.push(`/chat/${roomId}`);
+    } else {
+      alert('채팅방 정보를 찾을 수 없습니다.');
+      onClose();
+    }
+  };
  
 
   return (
@@ -60,7 +69,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </button>
             <button
               className="flex-1 py-4 w-[240px] h-[53px] bg-key-100 text-white rounded-full text-h3-sb "
-              onClick={handleCancel}
+              onClick={handleMoveToChatRoom}
             >
               채팅방으로 이동
             </button>

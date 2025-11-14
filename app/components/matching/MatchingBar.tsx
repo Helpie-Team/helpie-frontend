@@ -6,19 +6,21 @@ import { useCountries } from "@/app/hooks/location/useLocations";
 
 interface MatchingBarProps {
   onCountrySelect?: (code: string) => void;
+  onSearch?: (keyword: string) => void;
 }
 
-export default function MatchingBar({ onCountrySelect }: MatchingBarProps) {
+export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarProps) {
   const router = useRouter();
   const { data: countriesData, isLoading } = useCountries();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("전체");
+  const [searchKeyword, setSearchKeyword] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // "전체" 옵션을 포함한 국가 목록
   const countries = [
     { name: "전체", code: "ALL" },
-    ...(countriesData?.filter(country => country.name !== "전체").map(country => ({ name: country.name, code: country.code })) || [])
+    ...(countriesData?.result?.filter(country => country.name !== "전체").map(country => ({ name: country.name, code: country.code })) || [])
   ];
 
   // 드롭다운 외부 클릭 시 닫기
@@ -42,6 +44,18 @@ export default function MatchingBar({ onCountrySelect }: MatchingBarProps) {
     setSelectedCountry(countryName);
     setIsDropdownOpen(false);
     onCountrySelect?.(countryCode);
+  };
+
+  const handleSearch = () => {
+    if (searchKeyword.trim()) {
+      onSearch?.(searchKeyword.trim());
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return(
@@ -94,6 +108,10 @@ export default function MatchingBar({ onCountrySelect }: MatchingBarProps) {
     {/* 검색 입력창 */}
     <div className="relative w-[1000px] items-center justify-center">
       <input
+        type="text"
+        value={searchKeyword}
+        onChange={(e) => setSearchKeyword(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="w-full h-[44px] py-2 pl-3 pr-12 rounded-full border border-grayScale-filter text-body2-regular placeholder:text-grayScale-300"
         placeholder="전체 소모임 검색"
       />
@@ -103,6 +121,7 @@ export default function MatchingBar({ onCountrySelect }: MatchingBarProps) {
         width={24}
         height={24}
         className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+        onClick={handleSearch}
       />
     </div>
   </div>

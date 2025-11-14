@@ -47,3 +47,18 @@ export interface ReviewListResponse {
 export interface ReviewListParams {
   page?: number;
 }
+
+// 리뷰 작성 요청 데이터
+export interface CreateReviewRequest {
+  anonymityYn: boolean;  // 익명 여부 (true: 익명, false: 실명)
+  rate: number;          // 평점
+  description: string;   // 후기 내용
+}
+
+// 리뷰 작성 응답
+export interface CreateReviewResponse {
+  id: number;
+  rate: number;
+  description: string;
+  imageUrls: string[];
+}
