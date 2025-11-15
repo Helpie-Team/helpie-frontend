@@ -59,8 +59,8 @@ export const usePublicGroupList = (params: GroupListParams) => {
  * @param params - GroupListParams (country, category, page)
  */
 export const useGroupListByAuth = (params: GroupListParams) => {
-  // 클라이언트 사이드에서만 localStorage 접근
-  const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('accessToken');
+  // 클라이언트 사이드에서만 sessionStorage 접근
+  const isLoggedIn = typeof window !== 'undefined' && !!sessionStorage.getItem('accessToken');
 
   return useQuery({
     queryKey: ['groups', isLoggedIn ? 'private' : 'public', 'list', params.country, params.category, params.page],

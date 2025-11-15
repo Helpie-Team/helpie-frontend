@@ -179,7 +179,7 @@ export default function ModalForm({ email, socialAccessToken, socialType, icon }
           onClick={handleBackdropClick}
         >
           <div 
-            className="bg-white rounded-[30px] p-8 w-full max-w-md mx-4"
+            className="bg-white rounded-[30px] p-8 w-full max-w-[540px] mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 헤더 */}

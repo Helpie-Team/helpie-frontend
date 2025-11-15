@@ -63,7 +63,7 @@ export default function EmailModalForm() {
   };
 
   const handleResend = async (): Promise<boolean> => {
-    const result = await sendEmailVerificationCode(email);
+    const result = await sendEmailVerificationCode(email, 'EMAIL_AUTH');
     
     if (!result.success) {
       // 재전송 실패 시 에러 반환 (VerificationCodeStep에서 처리)
@@ -115,7 +115,7 @@ export default function EmailModalForm() {
           onClick={handleBackdropClick}
         >
         <div 
-          className="bg-white rounded-[30px] p-8 w-full max-w-md mx-4"
+          className="bg-white rounded-[30px] p-8 w-full max-w-[540px] mx-4"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 헤더 */}
