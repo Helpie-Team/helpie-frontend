@@ -41,7 +41,7 @@ export default function RootLayout({
         <QueryProvider>
           <Header />
           {children}
-          <div className='h-[700px]'/>
+          <div className='h-[600px]'/>
           <Footer />
         </QueryProvider>
       </body>
