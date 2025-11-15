@@ -48,6 +48,7 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
 
   const handleSearch = () => {
     if (searchKeyword.trim()) {
+      console.log('matching bar searchKeywrod: ', searchKeyword.trim());
       onSearch?.(searchKeyword.trim());
     }
   };

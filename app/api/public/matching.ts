@@ -6,14 +6,19 @@ import { GroupListResponse, GroupListParams } from '../types/matching/matching';
  * @param params - GroupListParams (country, category, page)
  * @returns GroupListResponse
  */
-export const getPublicGroupList = async (params: GroupListParams): Promise<GroupListResponse> => {
+export const getPublicGroupList = async (
+  params: GroupListParams,
+): Promise<GroupListResponse> => {
+  const { country, category, page = 0} = params;
+
   const res = await publicApiClient.get<GroupListResponse>('/public/group/list', {
     params: {
-      country: params.country,
-      category: params.category,
-      page: params.page || 0,
+      country: country || 'ALL',                    
+      category: category || 'ALL',
+      page,
     },
   });
+
   return res.data;
 };
 
@@ -27,14 +32,16 @@ export const getPublicGroupList = async (params: GroupListParams): Promise<Group
 export const searchPublicGroups = async (
   country: string,
   keyword: string,
-  page: number = 0
+  page: number = 0,
 ): Promise<GroupListResponse> => {
   const res = await publicApiClient.get<GroupListResponse>('/public/search', {
     params: {
-      country,
+      country: country || 'ALL',  
+      
       keyword,
       page,
     },
   });
+
   return res.data;
 };

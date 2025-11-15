@@ -30,8 +30,9 @@ export interface MatchingCreatePayload {
   maxMember: number;
   cityId: number; // 도시 ID (/api/v1/locations/cities에서 조회)
   category: string; // 소모임 카테고리
-  interest: Interest[];
+  interest: Interest[];//태그 관심사 배열
   meetingDate: string; // 실제 모임 날짜시간
+  chatRoomId: number;
 }
 
 // 소모임 생성 요청 (FormData에 담을 데이터)

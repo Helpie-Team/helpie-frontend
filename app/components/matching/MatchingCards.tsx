@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useQueryClient } from "@tanstack/react-query";
 import heart from "@/public/icons/heart.png";
 import noHeart from "@/public/icons/noHeart.png";
 import noImage from "@/public/images/noImage.png";
@@ -10,6 +11,8 @@ import JoinModal from "./modal/JoinModal";
 import LoginModal from "./modal/LoginModal";
 import { useGroupListByAuth, useToggleGroupMark, useSearchPublicGroups } from "@/app/hooks/matching/useMatching";
 import { GroupCategory, GroupListItem } from "@/app/api/types/matching/matching";
+import { useMyBookmarkInfo, MY_BOOKMARK_INFO_QUERY_KEY } from "@/app/hooks/my-page/useMyBookmarkInfo";
+import { MyBookmarkItem } from "@/app/api/types/my-page/group";
 
 interface MatchingCardsProps {
   country: string;
@@ -39,6 +42,14 @@ const categoryDisplayNames: Record<GroupCategory, string> = {
 
 export default function MatchingCards({ country, category, searchKeyword }: MatchingCardsProps) {
   const [page, setPage] = useState(0);
+  const [allMeetings, setAllMeetings] = useState<GroupListItem[]>([]);
+  const [likedGroups, setLikedGroups] = useState<Set<number>>(new Set());
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const queryClient = useQueryClient();
+  const toggleMarkMutation = useToggleGroupMark();
 
   // 검색 모드 vs 일반 모드
   const { data: searchData, isLoading: isSearchLoading, error: searchError } = useSearchPublicGroups(
@@ -52,18 +63,36 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
   const currentData = searchKeyword ? searchData : groupListData;
   const currentLoading = searchKeyword ? isSearchLoading : isLoading;
   const currentError = searchKeyword ? searchError : error;
-  const [allMeetings, setAllMeetings] = useState<GroupListItem[]>([]);
-  const [likedGroups, setLikedGroups] = useState<Set<number>>(new Set()); // groupId를 저장
-  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const toggleMarkMutation = useToggleGroupMark();
+
+  // 로그인한 유저의 관심 목록 가져오기 (하트 초기 상태용)
+  const bookmarkQuery = useMyBookmarkInfo({
+    size: 100,
+    enabled: isLoggedIn,
+  });
 
   // 클라이언트에서만 로그인 상태 확인
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     setIsLoggedIn(!!token);
   }, []);
+
+  // 북마크 목록이 바뀔 때마다 likedGroups 초기화
+  useEffect(() => {
+    if (!bookmarkQuery.data) return;
+
+    const allBookmarks: MyBookmarkItem[] = bookmarkQuery.data.pages.flatMap(
+      (page) => page.content ?? []
+    );
+
+    const idSet = new Set<number>();
+    allBookmarks.forEach((item) => {
+      if (typeof item.id === 'number') {
+        idSet.add(item.id);
+      }
+    });
+
+    setLikedGroups(idSet);
+  }, [bookmarkQuery.data]);
 
   // country, category, searchKeyword가 변경되면 page를 0으로 리셋하고 데이터 초기화
   useEffect(() => {
@@ -99,50 +128,35 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
     setIsLoginModalOpen(false);
   };
 
-  const handleLikeClick = async (groupId: number, e: React.MouseEvent) => {
+  const handleLikeClick = (groupId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-
-    // 로그인 상태에서만 좋아요 처리
     if (!isLoggedIn) return;
 
-    try {
-      // 낙관적 업데이트 (UI 먼저 변경)
-      setLikedGroups(prev => {
-        const next = new Set(prev);
-        if (next.has(groupId)) {
-          next.delete(groupId);
-        } else {
-          next.add(groupId);
-        }
-        return next;
-      });
+    // 이전 상태 백업 (롤백용)
+    const prevLiked = new Set(likedGroups);
 
-      // API 호출
-      const response = await toggleMarkMutation.mutateAsync(groupId);
+    // 낙관적 토글
+    setLikedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupId)) next.delete(groupId);
+      else next.add(groupId);
+      return next;
+    });
 
-      // 서버 응답에 따라 상태 동기화
-      setLikedGroups(prev => {
-        const next = new Set(prev);
-        if (response.status === 'ADDED') {
-          next.add(groupId);
-        } else {
-          next.delete(groupId);
-        }
-        return next;
-      });
-    } catch (error) {
-      // 에러 발생 시 상태 롤백
-      setLikedGroups(prev => {
-        const next = new Set(prev);
-        if (next.has(groupId)) {
-          next.delete(groupId);
-        } else {
-          next.add(groupId);
-        }
-        return next;
-      });
-      console.error('좋아요 처리 중 오류 발생:', error);
-    }
+    // 서버 요청
+    toggleMarkMutation.mutate(groupId, {
+      onSuccess: () => {
+        // 마이페이지 관심 탭 최신화
+        queryClient.invalidateQueries({
+          queryKey: MY_BOOKMARK_INFO_QUERY_KEY,
+        });
+      },
+      onError: (err) => {
+        console.error('관심 소모임 토글 중 오류:', err);
+        // 실패 시 롤백
+        setLikedGroups(prevLiked);
+      },
+    });
   };
 
   const handleLoadMore = () => {
