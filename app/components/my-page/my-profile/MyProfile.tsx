@@ -44,6 +44,7 @@ const MyProfile = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [newNickname, setNewNickname] = useState('');
   const [nicknameStatus, setNicknameStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [nicknameHelperText, setNicknameHelperText] = useState('2자 ~ 12자 이내로 설정해주세요.');
@@ -217,6 +218,14 @@ const MyProfile = () => {
   const handleCloseLogoutModal = () => {
     if (isLoggingOut) return;
     setIsLogoutModalOpen(false);
+  };
+
+  const handleWithdrawClick = () => {
+    setIsWithdrawModalOpen(true);
+  };
+
+  const handleCloseWithdrawModal = () => {
+    setIsWithdrawModalOpen(false);
   };
 
   const handleConfirmLogout = async () => {
@@ -402,7 +411,8 @@ const MyProfile = () => {
           <p className="text-body2 text-grayScale-500">더 이상 헬피 서비스를 이용을 원하지 않으시나요?</p>
           <button
             type="button"
-            className="text-body2 text-grayScale-400  transition hover:text-grayScale-600"
+            className="text-body2 text-grayScale-400 transition hover:text-grayScale-600"
+            onClick={handleWithdrawClick}
           >
             회원탈퇴
           </button>
@@ -415,6 +425,10 @@ const MyProfile = () => {
           onConfirm={handleConfirmLogout}
           isLoading={isLoggingOut}
         />
+      )}
+
+      {isWithdrawModalOpen && (
+        <WithdrawInfoModal onClose={handleCloseWithdrawModal} />
       )}
 
       {isNicknameModalOpen && (
@@ -648,6 +662,82 @@ const LogoutConfirmModal = ({
     </div>
   </div>
 );
+
+const WithdrawInfoModal = ({ onClose }: { onClose: () => void }) => {
+  const router = useRouter();
+  const adminEmail = 'lifestylehelpie@gmail.com';
+  const [copyMessage, setCopyMessage] = useState('복사');
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(adminEmail);
+      setCopyMessage('복사됨!');
+      setTimeout(() => setCopyMessage('복사'), 2000);
+    } catch (error) {
+      console.error('이메일 복사 실패:', error);
+      setCopyMessage('실패');
+      setTimeout(() => setCopyMessage('복사'), 2000);
+    }
+  };
+
+  const handleGoHome = () => {
+    onClose();
+    router.push('/');
+  };
+
+  return (
+    <div className="fixed inset-0 z-[65] flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-[540px] rounded-[28px] bg-white px-8 py-10 text-center shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="회원탈퇴 안내 닫기"
+            className="text-grayScale-400 hover:text-grayScale-600 text-xl"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="mt-2 flex flex-col items-center gap-4">
+          <h2 className="text-h2 text-grayScale-title">회원탈퇴를 진행하시겠어요?</h2>
+          <p className="text-body2 text-grayScale-600">
+            HELPie 회원탈퇴는 관리자 확인 후 처리됩니다. 아래 이메일 주소로 탈퇴 요청 메일을 보내주시면, 확인 후 계정이 안전하게 삭제됩니다.
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-2xl bg-[#FFF2EC] px-5 py-4 text-left">
+          <p className="text-caption1 text-grayScale-500 mb-2">관리자 이메일 주소</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-body2 text-grayScale-title">
+              <span className="text-lg">✉</span>
+              <span>{adminEmail}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="rounded-full bg-white px-4 py-2 text-body2 text-grayScale-title border border-grayScale-200 hover:bg-grayScale-50 transition"
+            >
+              {copyMessage}
+            </button>
+          </div>
+        </div>
+
+        <p className="mt-4 text-caption1 text-grayScale-400">
+          탈퇴 완료까지 최대 3영업일이 소요될 수 있습니다. 탈퇴 후에는 계정 복구가 불가능합니다.
+        </p>
+
+        <button
+          type="button"
+          onClick={handleGoHome}
+          className="mt-8 w-full rounded-full bg-grayScale-title py-3 text-body1 text-white hover:bg-grayScale-900 transition"
+        >
+          홈 화면으로 돌아가기
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const NicknameEditModal = ({
   currentNickname,
