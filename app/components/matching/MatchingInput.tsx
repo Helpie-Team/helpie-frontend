@@ -154,10 +154,12 @@ const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, place
     setInputValue(newValue);
     setIsOpen(true);
 
-    const filtered = cities.filter(city =>
-      city.name.toLowerCase().includes(newValue.toLowerCase()) ||
-      city.englishName.toLowerCase().includes(newValue.toLowerCase())
-    );
+    const filtered = cities.filter(city => {
+      const nameMatch = city.name?.toLowerCase().includes(newValue.toLowerCase());
+      const englishNameMatch = city.englishName?.toLowerCase().includes(newValue.toLowerCase());
+      return nameMatch || englishNameMatch;
+    });
+
     setFilteredCities(filtered);
   };
 
@@ -314,7 +316,7 @@ const ImageInput: React.FC<MatchingInputProps> = ({ images = [], onChange, maxIm
   return (
     <div className="flex flex-col gap-3">
       <p className="text-body3-sb text-black ">사진추가</p>
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-2">
         {images.map((image, index) => (
           <div key={index} className="relative w-32 h-32">
             <Image src={URL.createObjectURL(image)} alt={`Preview ${index + 1}`} fill className="object-cover rounded-lg" />

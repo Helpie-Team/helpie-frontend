@@ -1,5 +1,5 @@
 import apiClient from '../axios/instance';
-import { MatchingCreateRequest, MatchingDetailResponse, GroupDetailResponse, GroupListResponse, GroupListParams, GroupMarkResponse, RecommendResponse } from '../types/matching/matching';
+import { MatchingCreateRequest, MatchingDetailResponse, GroupDetail,  GroupListResponse, GroupListParams, GroupMarkResponse, RecommendResponse, GroupJoinResponse, GroupJoinStatus } from '../types/matching/matching';
 
 /**
  * 소모임 생성
@@ -29,10 +29,10 @@ export const matchingCreate = async (data: MatchingCreateRequest): Promise<Match
 /**
  * 소모임 상세 정보 조회
  * @param groupId - 소모임 ID
- * @returns GroupDetailResponse
+ * @returns GroupDetail (result 래핑 없이 직접 반환)
  */
-export const getGroupDetail = async (groupId: number): Promise<GroupDetailResponse> => {
-  const res = await apiClient.get<GroupDetailResponse>(`/group/${groupId}`);
+export const getGroupDetail = async (groupId: number): Promise<GroupDetail> => {
+  const res = await apiClient.get<GroupDetail>(`/group/${groupId}`);
   return res.data;
 };
 
@@ -42,16 +42,18 @@ export const getGroupDetail = async (groupId: number): Promise<GroupDetailRespon
  * @returns GroupListResponse
  */
 export const getGroupList = async (params: GroupListParams): Promise<GroupListResponse> => {
+  const { country, category, page = 0 } = params;
+
   const res = await apiClient.get<GroupListResponse>('/group/list', {
     params: {
-      country: params.country,
-      category: params.category,
-      page: params.page || 0,
+      country: country,                   
+      category: category,
+      page,
     },
   });
+
   return res.data;
 };
-
 /**
  * 관심 소모임 등록/해제 (토글)
  * @param groupId - 소모임 ID
@@ -75,9 +77,38 @@ export const getRecommendedGroups = async (page: number = 0): Promise<RecommendR
 };
 
 //소모임 검색
-export const searchTags = async (query: string, page: number = 0): Promise<GroupListResponse> => {
+export const searchTags = async (query: string, page:number): Promise<GroupListResponse> => {
   const res = await apiClient.get<GroupListResponse>('/group/search', {
-    params: { },
+    params: { query, page},
   });
   return res.data;
 }
+
+/**
+ * 소모임 가입
+ * @param groupId - 소모임 ID
+ * @returns GroupJoinResponse
+ */
+export const joinGroup = async (groupId: number): Promise<GroupJoinResponse> => {
+  const res = await apiClient.post<GroupJoinResponse>(`/group/join/${groupId}`);
+  return res.data;
+};
+
+/**
+ * 소모임 신청 취소
+ * @param groupId - 소모임 ID
+ * @returns void
+ */
+export const cancelGroup = async (groupId: number): Promise<void> => {
+  await apiClient.post(`/group/cancel/${groupId}`);
+};
+
+/**
+ * 소모임 가입 여부 조회
+ * @param groupId - 소모임 ID
+ * @returns GroupJoinStatus
+ */
+export const getJoinStatus = async (groupId: number): Promise<GroupJoinStatus> => {
+  const res = await apiClient.get<GroupJoinStatus>(`/group/join/${groupId}`);
+  return res.data;
+};

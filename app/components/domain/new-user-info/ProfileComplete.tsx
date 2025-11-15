@@ -29,6 +29,7 @@ export default function ProfileComplete() {
         setIsLoading(true);
         const data = await getBasicInfo();
         setProfileData(data);
+        // 설문조사 완료는 서버에서 관리하므로 localStorage 불필요
       } catch (err) {
         console.error('프로필 정보 조회 실패:', err);
         setError('프로필 정보를 불러오는데 실패했습니다.');

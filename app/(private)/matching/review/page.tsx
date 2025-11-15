@@ -1,24 +1,68 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
 import picture from '@/public/icons/picture.png';
 import {Checkbox} from "@/components/ui/checkbox";
 import {Label} from "@/components/ui/label";
+import { useCreateReview } from '@/app/hooks/review/useReview';
+import { useGroupDetail } from '@/app/hooks/matching/useMatching';
+import noImage from "@/public/images/noImage.png";
+import { GroupCategory } from '@/app/api/types/matching/matching';
+
+// 카테고리 한글 표시
+const categoryDisplayNames: Record<GroupCategory, string> = {
+  'ALL': '전체',
+  'HOBBY': '문화·취미',
+  'ART': '예술·창작',
+  'LIFE': '액티비티·라이프',
+  'STUDY': '자기계발·성장',
+  'SOCIAL': '사회·교류',
+};
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const groupId = Number(searchParams.get('groupId'));
+
+  // 소모임 상세 정보 조회
+  const { data: groupData, isLoading: isLoadingGroup } = useGroupDetail(groupId);
 
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
+  const { mutate: createReview, isPending } = useCreateReview();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Review submitted:', { rating, review, images, isAnonymous });
+
+    // API 호출
+    createReview(
+      {
+        groupId,
+        reviewData: {
+          anonymityYn: isAnonymous,
+          rate: rating,
+          description: review,
+        },
+        images: images.length > 0 ? images : undefined,
+      },
+      {
+        onSuccess: (data) => {
+          console.log('리뷰 작성 성공:', data);
+          alert('리뷰가 성공적으로 등록되었습니다!');
+          router.push('/matching');
+        },
+        onError: (error) => {
+          console.error('리뷰 작성 실패:', error);
+          alert('리뷰 등록에 실패했습니다.');
+        },
+      }
+    );
   };
 
   const isFormValid = review.length >= 10 && review.length <= 500 && rating > 0;
@@ -32,6 +76,21 @@ export default function Page() {
     return '';
   };
 
+  // groupId가 없으면 에러 표시
+  if (!groupId || isNaN(groupId)) {
+    return (
+      <div className="flex flex-col w-[1000px] mx-auto pt-8 pb-20 items-center justify-center h-96">
+        <p className="text-h2 text-grayScale-700 mb-4">잘못된 접근입니다</p>
+        <button
+          onClick={() => router.push('/matching')}
+          className="px-6 py-3 bg-key-100 text-white rounded-full"
+        >
+          소모임 목록으로 돌아가기
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-[1000px] mx-auto pt-8 pb-20">
       {/* 헤더 */}
@@ -44,14 +103,14 @@ export default function Page() {
           <button
             type="submit"
             onClick={handleSubmit}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isPending}
             className={`px-6 py-2 rounded-full font-medium transition-all ${
-              isFormValid
+              isFormValid && !isPending
                 ? 'bg-key-100 text-white'
                 : 'bg-grayScale-100 text-grayScale-400 cursor-not-allowed'
             }`}
           >
-            작성완료
+            {isPending ? '등록 중...' : '작성완료'}
           </button>
         </div>
       </div>
@@ -60,32 +119,42 @@ export default function Page() {
         {/* 모임완료 섹션 */}
         <div className="bg-grayScale-50 rounded-2xl p-6">
           <h2 className="text-body1-medium mb-4">모임완료</h2>
-          <div className="flex gap-4">
-            <div className="w-24 h-24 bg-gray-300 rounded-lg overflow-hidden flex-shrink-0">
-              <Image
-                src="/images/sample-meeting.jpg"
-                alt="모임 이미지"
-                width={96}
-                height={96}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="flex items-start justify-between">
-                <h3 className="text-body1-medium">종량구 국밥투어 같이해요~</h3>
-                <span className="text-caption1-regular text-grayScale-500">2025-12-12</span>
+          {isLoadingGroup ? (
+            <div className="text-body2-regular text-grayScale-500">모임 정보를 불러오는 중...</div>
+          ) : groupData ? (
+            <div className="flex gap-4">
+              <div className="w-24 h-24 bg-gray-300 rounded-lg overflow-hidden flex-shrink-0 relative">
+                <Image
+                  src={groupData.thumbnail && typeof groupData.thumbnail === 'string' && groupData.thumbnail.trim() !== '' ? groupData.thumbnail : noImage}
+                  alt="모임 이미지"
+                  fill
+                  className="object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = noImage.src;
+                  }}
+                />
               </div>
-              <p className="text-body3-regular text-grayScale-700 line-clamp-2">
-                종량구에서 뜨끈한 국밥 투어 같이 하실 분 모십니다!
-                국밥 맛집 탐방하며 뜨듯하게 배 채우고, 함께 이야기 꽃을 피워봐요. 혼밥은 이제 그만!
-              </p>
-              <div className="flex items-center gap-3 text-caption1-regular text-grayScale-500">
-                <span className="flex items-center gap-1">📍 서울</span>
-                <span className="flex items-center gap-1">👥 2/5</span>
-                <span className="flex items-center gap-1">🏷️ 액티비티·라이프</span>
+              <div className="flex-1 flex flex-col gap-2">
+                <div className="flex items-start justify-between">
+                  <h3 className="text-body1-medium">{groupData.title}</h3>
+                  <span className="text-caption1-regular text-grayScale-500">
+                    {new Date(groupData.meetingDate).toLocaleDateString('ko-KR')}
+                  </span>
+                </div>
+                <p className="text-body3-regular text-grayScale-700 line-clamp-2">
+                  {groupData.description}
+                </p>
+                <div className="flex items-center gap-3 text-caption1-regular text-grayScale-500">
+                  <span className="flex items-center gap-1">📍 {groupData.cityName}</span>
+                  <span className="flex items-center gap-1">👥 {groupData.maxMember}명</span>
+                  <span className="flex items-center gap-1">🏷️ {categoryDisplayNames[groupData.category]}</span>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-body2-regular text-grayScale-500">모임 정보를 불러올 수 없습니다.</div>
+          )}
         </div>
 
         <hr className="border-t border-grayScale-100" />
@@ -148,23 +217,49 @@ export default function Page() {
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="w-40 h-40 border-2  border-grayScale-200 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-key-100 transition-colors gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  if (images.length + files.length <= 3) {
-                    setImages([...images, ...files]);
-                  }
-                }}
-              />
-              <Image src={picture} alt="사진 업로드 아이콘" width={48} height={48} />
-              <span className="text-body3-regular text-grayScale-500">사진 업로드하기</span>
-            </label>
-            <span className="text-caption2-regular text-grayScale-500">최대 3장 업로드 가능</span>
+            <div className="flex gap-4">
+              {/* 업로드된 이미지 미리보기 */}
+              {images.map((image, index) => (
+                <div key={index} className="relative w-40 h-40">
+                  <Image
+                    src={URL.createObjectURL(image)}
+                    alt={`Preview ${index + 1}`}
+                    fill
+                    className="object-cover rounded-xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setImages(images.filter((_, i) => i !== index))}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-grayScale-900 text-white rounded-full flex items-center justify-center hover:bg-grayScale-800"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              {/* 업로드 버튼 - 3장 미만일 때만 표시 */}
+              {images.length < 3 && (
+                <label className="w-40 h-40 border-2 border-grayScale-200 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-key-100 transition-colors gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (images.length + files.length <= 3) {
+                        setImages([...images, ...files]);
+                      }
+                    }}
+                  />
+                  <Image src={picture} alt="사진 업로드 아이콘" width={48} height={48} />
+                  <span className="text-body3-regular text-grayScale-500">사진 업로드하기</span>
+                </label>
+              )}
+            </div>
+            <span className="text-caption2-regular text-grayScale-500">
+              최대 3장 업로드 가능 ({images.length}/3)
+            </span>
           </div>
         </div>
 

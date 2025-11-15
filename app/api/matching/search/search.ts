@@ -14,8 +14,10 @@ export interface GroupSearchParams {
 export async function searchGroups(
   { country, keyword, page = 0 }: GroupSearchParams
 ): Promise<Page<GroupSummary>> {
+  console.log('searchGroups params: ', { country, keyword, page });
   const res = await apiClient.get<Page<GroupSummary>>('/group/search', {
     params: { country, keyword, page },
   });
+  console.log('searchGroups response data: ', res.data);
   return res.data;
 }

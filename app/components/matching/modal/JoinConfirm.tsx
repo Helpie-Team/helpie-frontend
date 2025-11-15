@@ -19,9 +19,9 @@ export default function JoinConfirm({isOpen, onClose, onConfirm}: JoinConfirmPro
   }
   const handleConfirm = () => {
     if (onConfirm) {
-      onConfirm(); // 부모 컴포넌트의 확인 로직 실행
+      onConfirm(); // 부모 컴포넌트에서 성공 시에만 setIsJoinModalOpen(true) 
     }
-    onClose(); // 모달 닫기
+    onClose(); 
   };
     return (
       <div
