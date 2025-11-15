@@ -1,6 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
 import { getEnvConfig } from '../../../env';
+import { syncAuthCookie } from '@/app/lib/utils/token';
+
+const getSessionValue = (key: string) => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return window.sessionStorage.getItem(key);
+};
+
+const setSessionValue = (key: string, value: string) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.sessionStorage.setItem(key, value);
+};
 
 const apiClient = axios.create({
   baseURL: getEnvConfig().API_BASE_URL,
@@ -13,7 +28,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = getSessionValue('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -41,7 +56,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = getSessionValue('refreshToken');
         if (refreshToken) {
           const envConfig = getEnvConfig();
           const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${envConfig.API_BASE_URL}/auth/refresh`, {
@@ -49,7 +64,8 @@ apiClient.interceptors.response.use(
           });
 
           const { accessToken } = response.data;
-          localStorage.setItem('accessToken', accessToken);
+          setSessionValue('accessToken', accessToken);
+          syncAuthCookie(true);
 
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return apiClient(originalRequest);

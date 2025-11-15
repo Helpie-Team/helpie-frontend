@@ -81,7 +81,7 @@ export function VerificationCodeStep({ onNext, onResend }: VerificationCodeStepP
     setIsLoading(true);
     setServerError(null);
 
-    const result = await verifyEmailCode(email, parseInt(data.code, 10));
+    const result = await verifyEmailCode(email, parseInt(data.code, 10), 'EMAIL_AUTH');
 
     if (result.success) {
       setVerificationCode(data.code);

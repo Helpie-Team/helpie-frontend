@@ -1,7 +1,7 @@
 import { SocialAuthRequest, SocialSignupRequest, AuthResult, UserInfoResponse } from '../types/auth/auth';
 import { ApiError, AxiosErrorResponse } from '../types/axios';
 import apiClient from '../axios/instance';
-import { clearTokens } from '../../lib/utils/token';
+import { clearTokens, getRefreshToken } from '../../lib/utils/token';
 
 /**
  * 소셜 로그인 (Google, Kakao)
@@ -171,7 +171,7 @@ export async function logout(refreshToken: string): Promise<void> {
  */
 export async function refreshToken(): Promise<AuthResult> {
   try {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = getRefreshToken();
     if (!refreshToken) {
       return {
         success: false,
@@ -253,14 +253,20 @@ export async function checkUsername(username: string): Promise<boolean> {
  * 이메일 인증번호 검증
  * @param: email - string
  * @param: authNumber - number (인증번호)
+ * @param: authType - EmailAuthType
  * @returns: AuthResult
  */
-export async function verifyEmailCode(email: string, authNumber: number): Promise<AuthResult> {
+export async function verifyEmailCode(
+  email: string,
+  authNumber: number,
+  authType: EmailAuthType,
+): Promise<AuthResult> {
   try {
     const response = await apiClient.get('/auth/mail-check', {
       params: {
-        mail: email,
-        authNumber: authNumber,
+        email,
+        authNumber,
+        authType,
       }
     });
     
@@ -427,11 +433,23 @@ export async function emailSignup(email: string, username: string, password: str
  *   error: string;
  * }
  */
-export async function sendEmailVerificationCode(email: string): Promise<AuthResult> {
+export type EmailAuthType = 'EMAIL_AUTH' | 'PW_AUTH';
+
+export async function sendEmailVerificationCode(
+  email: string,
+  authType: EmailAuthType,
+): Promise<AuthResult> {
   try {
-    const response = await apiClient.post('/auth/mail', {}, {
-      params: { mail: email }
-    });
+    const response = await apiClient.post(
+      '/auth/mail',
+      null,
+      {
+        params: {
+          email,
+          authType,
+        },
+      },
+    );
     
     return {
       success: true,
@@ -506,6 +524,70 @@ export async function getUserInfo(): Promise<AuthResult> {
         return {
           success: false,
           message: errorData.message || '사용자 정보 조회에 실패했습니다.',
+          error: errorData.error || `HTTP ${axiosError.response.status}`,
+        };
+      } else if (axiosError.request) {
+        return {
+          success: false,
+          message: '서버에 연결할 수 없습니다.',
+          error: 'Network Error',
+        };
+      } else {
+        return {
+          success: false,
+          message: '요청 처리 중 오류가 발생했습니다.',
+          error: axiosError.message,
+        };
+      }
+    }
+    
+    return {
+      success: false,
+      message: '알 수 없는 오류가 발생했습니다.',
+      error: 'Unknown error',
+    };
+  }
+}
+
+/**
+ * 비밀번호 변경
+ * @param email - string
+ * @param password - string
+ * @param authType - EmailAuthType
+ * @returns: AuthResult
+ */
+export async function changePassword(
+  email: string,
+  password: string,
+  authType: EmailAuthType = 'PW_AUTH',
+): Promise<AuthResult> {
+  try {
+    const response = await apiClient.post(
+      '/auth/password-change',
+      null,
+      {
+        params: {
+          email,
+          password,
+          authType,
+        },
+      },
+    );
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      
+      if (axiosError.response) {
+        const errorData = axiosError.response.data;
+        
+        return {
+          success: false,
+          message: errorData.message || '비밀번호 변경에 실패했습니다.',
           error: errorData.error || `HTTP ${axiosError.response.status}`,
         };
       } else if (axiosError.request) {

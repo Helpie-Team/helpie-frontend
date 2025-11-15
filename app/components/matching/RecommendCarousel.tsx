@@ -48,7 +48,8 @@ export default function RecommendCarousel({
 
   // 클라이언트에서만 로그인 상태 확인
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    if (typeof window === 'undefined') return;
+    const token = sessionStorage.getItem('accessToken');
     setIsLoggedIn(!!token);
   }, []);
 

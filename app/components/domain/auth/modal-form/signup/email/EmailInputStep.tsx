@@ -37,7 +37,7 @@ export function EmailInputStep({ onNext }: EmailInputStepProps) {
     setIsLoading(true);
     setServerError(null);
 
-    const result = await sendEmailVerificationCode(data.email);
+    const result = await sendEmailVerificationCode(data.email, 'EMAIL_AUTH');
 
     if (result.success) {
       setEmail(data.email);
