@@ -48,6 +48,7 @@ export const clearTokens = () => {
 
   storage.removeItem('accessToken');
   storage.removeItem('refreshToken');
+  document.cookie = `${AUTH_COOKIE_NAME}=; path=/; max-age=0; sameSite=Lax`;
   window.dispatchEvent(new Event(TOKEN_CHANGE_EVENT));
   setAuthCookie(false);
 };

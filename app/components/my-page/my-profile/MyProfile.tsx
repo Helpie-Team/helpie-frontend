@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { ToastContainer, toast } from 'react-toastify';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -666,17 +666,15 @@ const LogoutConfirmModal = ({
 const WithdrawInfoModal = ({ onClose }: { onClose: () => void }) => {
   const router = useRouter();
   const adminEmail = 'lifestylehelpie@gmail.com';
-  const [copyMessage, setCopyMessage] = useState('복사');
 
+  const notify = () => toast("복사 완료.");
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(adminEmail);
-      setCopyMessage('복사됨!');
-      setTimeout(() => setCopyMessage('복사'), 2000);
+      notify();
     } catch (error) {
       console.error('이메일 복사 실패:', error);
-      setCopyMessage('실패');
-      setTimeout(() => setCopyMessage('복사'), 2000);
+      notify();
     }
   };
 
@@ -718,7 +716,19 @@ const WithdrawInfoModal = ({ onClose }: { onClose: () => void }) => {
               onClick={handleCopy}
               className="rounded-full bg-white px-4 py-2 text-body2 text-grayScale-title border border-grayScale-200 hover:bg-grayScale-50 transition"
             >
-              {copyMessage}
+              복사
+              <ToastContainer 
+              position="top-center"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              />
             </button>
           </div>
         </div>

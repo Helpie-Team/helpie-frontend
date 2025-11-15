@@ -9,10 +9,11 @@ import { cancelGroupApplication, toggleGroupBookmark } from '@/app/api/my-page/g
 import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
 import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
 import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
-import PlaceholderGroupImage from '@/public/images/helpie-chat-bot.png';
+import PlaceholderGroupImage from "@/public/images/noImage.png";
 import heart from '@/public/icons/heart.png';
 import noHeart from '@/public/icons/noHeart.png';
 import noImage from '@/public/images/noImage.png';
+import { MapPin, Tag, Users } from 'lucide-react';
 
 const TABS = [
   { id: 'UPCOMING', label: '모임예정' },
@@ -451,13 +452,16 @@ const GroupCard = ({
               <p className="text-body2 text-grayScale-500">{group.summary ?? '본문'}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-caption1-regular text-grayScale-500">
+            <MapPin className="w-4 h-4" />
               <span>{locationText}</span>
               <SeparatorDot />
               <span className="flex items-center gap-1">
-                <span aria-hidden="true">👥</span>
+                <span aria-hidden="true"></span>
+                <Users className="w-4 h-4" />
                 {memberText}
               </span>
               <SeparatorDot />
+              <Tag className="w-4 h-4" />
               <span>{categoryText}</span>
             </div>
           </div>
