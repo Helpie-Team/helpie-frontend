@@ -3,13 +3,22 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { socialLogin } from '../../../api/auth/auth';
-import { getEnvConfig } from '../../../../env';
 import { useModalStore } from '../../../lib/stores/modalStore';
 import ModalForm from '../../../components/domain/auth/modal-form/signup/sns/ModalForm';
 import { isGoogleProfile, isKakaoProfile } from '../../../api/types/auth/auth';
 import { setTokens } from '../../../lib/utils/token';
 import GoogleIcon from '@/public/icons/google_icon.png';
 import KakaoIcon from '@/public/icons/kakao_icon.svg';
+
+const ensureEnv = (value: string | undefined, key: string) => {
+  if (!value) {
+    throw new Error(`Missing environment variable: ${key}`);
+  }
+  return value;
+};
+
+const GOOGLE_REDIRECT_URI = ensureEnv(process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI, 'NEXT_PUBLIC_GOOGLE_REDIRECT_URI');
+const KAKAO_REDIRECT_URI = ensureEnv(process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI, 'NEXT_PUBLIC_KAKAO_REDIRECT_URI');
 
 function SocialCallbackContent() {
   const params = useSearchParams();
@@ -30,8 +39,7 @@ function SocialCallbackContent() {
 
     const handleLogin = async () => {
       try {
-        const envConfig = getEnvConfig();
-        const redirectUri = state === 'GOOGLE' ? envConfig.GOOGLE_REDIRECT_URI : envConfig.KAKAO_REDIRECT_URI;
+        const redirectUri = state === 'GOOGLE' ? GOOGLE_REDIRECT_URI : KAKAO_REDIRECT_URI;
         
         const result = await socialLogin({
           code,

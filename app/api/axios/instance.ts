@@ -1,7 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
-import { getEnvConfig } from '../../../env';
 import { syncAuthCookie } from '@/app/lib/utils/token';
+
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+if (!apiBaseUrl) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_API_BASE_URL');
+}
+
+const apiTimeoutRaw = process.env.NEXT_PUBLIC_API_TIMEOUT;
+if (!apiTimeoutRaw) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TIMEOUT');
+}
+
+const apiTimeout = Number(apiTimeoutRaw);
+if (Number.isNaN(apiTimeout)) {
+  throw new Error('Invalid environment variable: NEXT_PUBLIC_API_TIMEOUT must be a number');
+}
 
 const getSessionValue = (key: string) => {
   if (typeof window === 'undefined') {
@@ -18,8 +32,8 @@ const setSessionValue = (key: string, value: string) => {
 };
 
 const apiClient = axios.create({
-  baseURL: getEnvConfig().API_BASE_URL,
-  timeout: getEnvConfig().API_TIMEOUT,
+  baseURL: apiBaseUrl,
+  timeout: apiTimeout,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -58,8 +72,7 @@ apiClient.interceptors.response.use(
       try {
         const refreshToken = getSessionValue('refreshToken');
         if (refreshToken) {
-          const envConfig = getEnvConfig();
-          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${envConfig.API_BASE_URL}/auth/refresh`, {
+          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${apiBaseUrl}/auth/refresh`, {
             refreshToken,
           });
 

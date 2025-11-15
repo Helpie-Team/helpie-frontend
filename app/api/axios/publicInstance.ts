@@ -1,10 +1,24 @@
 import axios from 'axios';
-import { getEnvConfig } from '../../../env';
+
+const publicApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+if (!publicApiBaseUrl) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_API_BASE_URL');
+}
+
+const publicApiTimeoutRaw = process.env.NEXT_PUBLIC_API_TIMEOUT;
+if (!publicApiTimeoutRaw) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_API_TIMEOUT');
+}
+
+const publicApiTimeout = Number(publicApiTimeoutRaw);
+if (Number.isNaN(publicApiTimeout)) {
+  throw new Error('Invalid environment variable: NEXT_PUBLIC_API_TIMEOUT must be a number');
+}
 
 // 비로그인 사용자도 접근 가능한 공개 API용 axios instance
 const publicApiClient = axios.create({
-  baseURL: getEnvConfig().API_BASE_URL,
-  timeout: getEnvConfig().API_TIMEOUT,
+  baseURL: publicApiBaseUrl,
+  timeout: publicApiTimeout,
   headers: {
     'Content-Type': 'application/json',
   },
