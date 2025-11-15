@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { socialLogin } from '../../../api/auth/auth';
 import { getEnvConfig } from '../../../../env';
@@ -11,7 +11,7 @@ import { setTokens } from '../../../lib/utils/token';
 import GoogleIcon from '@/public/icons/google_icon.png';
 import KakaoIcon from '@/public/icons/kakao_icon.svg';
 
-export default function SocialCallback() {
+function SocialCallbackContent() {
   const params = useSearchParams();
   const code = params.get('code');
   const state = params.get('state') as 'GOOGLE' | 'KAKAO' | null;
@@ -123,5 +123,22 @@ export default function SocialCallback() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SocialCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-700">잠시만 기다려주세요...</p>
+          </div>
+        </div>
+      }
+    >
+      <SocialCallbackContent />
+    </Suspense>
   );
 }

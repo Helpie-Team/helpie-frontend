@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
@@ -22,7 +22,7 @@ const categoryDisplayNames: Record<GroupCategory, string> = {
   'SOCIAL': '사회·교류',
 };
 
-export default function Page() {
+function ReviewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const groupId = Number(searchParams.get('groupId'));
@@ -279,5 +279,19 @@ export default function Page() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-body1 text-grayScale-600">로딩 중입니다...</p>
+        </div>
+      }
+    >
+      <ReviewPageContent />
+    </Suspense>
   );
 }
