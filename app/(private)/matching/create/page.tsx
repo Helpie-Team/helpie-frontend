@@ -1,47 +1,46 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import arrow_left from "@/public/icons/arrow_left.png";
-import Image from 'next/image';
-import { MatchingInput, CATEGORY_OPTIONS } from '@/app/components/matching/MatchingInput';
-import { DateTimePicker } from '@/app/components/matching/DateTimePicker';
-import { useCreateMatching } from '@/app/hooks/matching/useMatching';
-import { Interest } from '@/app/api/types/matching/matching';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-// 카테고리 ID를 Interest 타입으로 매핑
-const CATEGORY_TO_INTEREST: Record<string, Interest> = {
-  'culture': 'MOVIE_WATCHING',
-  'art': 'ART',
-  'activity': 'SPORTS',
-  'study': 'STUDY',
-  'social': 'VOLUNTEER',
-};
+import arrow_left from "@/public/icons/arrow_left.png";
+import {
+  MatchingInput,
+  CATEGORY_OPTIONS,
+} from "@/app/components/matching/MatchingInput";
+import { DateTimePicker } from "@/app/components/matching/DateTimePicker";
+import { useCreateMatching } from "@/app/hooks/matching/useMatching";
+import type { Interest } from "@/app/api/types/matching/matching"; // ✅ payload 타입 맞추려고만 사용
 
 // 카테고리 ID를 백엔드 Category enum으로 매핑
 const CATEGORY_TO_STRING: Record<string, string> = {
-  'culture': 'HOBBY',
-  'art': 'ART',
-  'activity': 'LIFE',
-  'study': 'STUDY',
-  'social': 'SOCIAL',
+  culture: "HOBBY",
+  art: "ART",
+  activity: "LIFE",
+  study: "STUDY",
+  social: "SOCIAL",
 };
 
 export default function Page() {
   const router = useRouter();
-  const { mutate: createMatching, isPending, error: mutationError } = useCreateMatching();
+  const {
+    mutate: createMatching,
+    isPending,
+    error: mutationError,
+  } = useCreateMatching();
 
   // 폼 상태 관리
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    location: '',
+    name: "",
+    description: "",
+    location: "",
     cityId: 0,
     meetingDate: undefined as Date | undefined,
-    meetingTime: '',
+    meetingTime: "",
     maxParticipants: 0,
-    categories: [] as string[],
-    tags: [] as string[],
+    categories: [] as string[], // 대분류(category)
+    interests: [] as string[], // 화면에만 보이는 태그 문자열
     images: [] as File[],
   });
 
@@ -54,24 +53,19 @@ export default function Page() {
     try {
       // meetingDate와 meetingTime을 결합하여 ISO 문자열로 변환
       if (!formData.meetingDate || !formData.meetingTime) {
-        throw new Error('모임 일시를 입력해주세요.');
+        throw new Error("모임 일시를 입력해주세요.");
       }
 
       const meetingDateTime = new Date(formData.meetingDate);
-      const [hours, minutes] = formData.meetingTime.split(':');
+      const [hours, minutes] = formData.meetingTime.split(":");
       meetingDateTime.setHours(parseInt(hours), parseInt(minutes));
 
-      // categories를 Interest 타입으로 변환
-      const interests = formData.categories
-        .map(category => CATEGORY_TO_INTEREST[category])
-        .filter(Boolean) as Interest[];
+      // ✅ 태그는 지금은 화면용이기 때문에 백엔드 interest 에는 아무것도 안 보냄
+      const interests: Interest[] = [];
 
-      if (interests.length === 0) {
-        throw new Error('카테고리를 선택해주세요.');
-      }
-
-      // 첫 번째 카테고리를 category 문자열로 변환
-      const categoryString = CATEGORY_TO_STRING[formData.categories[0]];
+      // 카테고리는 기존처럼 대분류에서 1개 선택
+      const categoryKey = formData.categories[0];
+      const categoryString = CATEGORY_TO_STRING[categoryKey];
 
       const payload = {
         title: formData.name,
@@ -79,12 +73,14 @@ export default function Page() {
         maxMember: formData.maxParticipants,
         cityId: formData.cityId,
         category: categoryString,
-        interest: interests,
+        interest: interests, // 현재는 빈 배열
         meetingDate: meetingDateTime.toISOString(),
+        chatRoomId: 0,
       };
 
-      console.log('전송할 데이터:', payload);
-      console.log('이미지 개수:', formData.images.length);
+      console.log("전송할 데이터:", payload);
+      console.log("이미지 개수:", formData.images.length);
+      console.log("화면용 태그(문자열):", formData.interests);
 
       // API 호출 (mutation hook 사용)
       createMatching(
@@ -94,55 +90,64 @@ export default function Page() {
         },
         {
           onSuccess: (response) => {
-            console.log('소모임 생성 성공:', response);
+            console.log("소모임 생성 성공:", response);
             router.push(`/matching/`);
           },
           onError: (err) => {
-            console.error('소모임 생성 실패:', err);
-            setValidationError(err instanceof Error ? err.message : '소모임 생성에 실패했습니다.');
+            console.error("소모임 생성 실패:", err);
+            setValidationError(
+              err instanceof Error
+                ? err.message
+                : "소모임 생성에 실패했습니다.",
+            );
           },
-        }
+        },
       );
     } catch (err) {
-      console.error('유효성 검사 실패:', err);
-      setValidationError(err instanceof Error ? err.message : '입력값을 확인해주세요.');
+      console.error("유효성 검사 실패:", err);
+      setValidationError(
+        err instanceof Error ? err.message : "입력값을 확인해주세요.",
+      );
     }
   };
 
   // 모든 필수 입력이 완료되었는지 확인
   const isFormValid =
-    formData.name.length > 0 && formData.name.length <= 13 &&
-    formData.description.length >= 20 && formData.description.length <= 500 &&
+    formData.name.length > 0 &&
+    formData.name.length <= 13 &&
+    formData.description.length >= 20 &&
+    formData.description.length <= 500 &&
     formData.location.length > 0 &&
     formData.cityId > 0 &&
     formData.meetingDate !== undefined &&
     formData.meetingTime.length > 0 &&
     formData.maxParticipants >= 3 &&
-    formData.categories.length >= 1 &&
-    formData.tags.length > 0;
+    formData.categories.length >= 1; // ✅ 태그는 필수 아님
 
   return (
     <div className="flex flex-col items-center justify-center w-[1000px] mx-auto gap-8 pt-8 pb-90">
       <div className="w-full h-[149px] flex flex-col gap-6 border-b border-grayScale-100 ">
-        <button type="button" onClick={() => router.push('/matching')}>
+        <button type="button" onClick={() => router.push("/matching")}>
           <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
         </button>
         <div className="flex flex-col gap-2">
-        <p className="text-caption1-regular text-grayScale-400">메인 &gt; 소모임</p>
-        <div className="flex items-center justify-between">
-          <h1 className="text-head">소모임 만들기</h1>
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            disabled={!isFormValid || isPending}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              isFormValid && !isPending
-                ? 'bg-key-100 text-white hover:bg-key-200'
-                : 'bg-grayScale-100 text-grayScale-400 cursor-not-allowed'
-            }`}
-          >
-            {isPending ? '등록 중...' : '등록하기'}
-          </button>
+          <p className="text-caption1-regular text-grayScale-400">
+            메인 &gt; 소모임
+          </p>
+          <div className="flex items-center justify-between">
+            <h1 className="text-head">소모임 만들기</h1>
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={!isFormValid || isPending}
+              className={`px-6 py-2 rounded-full font-medium transition-all ${
+                isFormValid && !isPending
+                  ? "bg-key-100 text-white hover:bg-key-200"
+                  : "bg-grayScale-100 text-grayScale-400 cursor-not-allowed"
+              }`}
+            >
+              {isPending ? "등록 중..." : "등록하기"}
+            </button>
           </div>
         </div>
       </div>
@@ -151,19 +156,27 @@ export default function Page() {
       {(validationError || mutationError) && (
         <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-body2 text-red-600">
-            {validationError || (mutationError instanceof Error ? mutationError.message : '소모임 생성에 실패했습니다.')}
+            {validationError ||
+              (mutationError instanceof Error
+                ? mutationError.message
+                : "소모임 생성에 실패했습니다.")}
           </p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="w-full h-[1200px] flex flex-col py-[1px] gap-10">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full h-[1200px] flex flex-col py-[1px] gap-10"
+      >
         {/* 소모임 명 */}
         <MatchingInput
           type="text"
           label="소모임 명"
           required
           value={formData.name}
-          onChange={(value) => setFormData({ ...formData, name: value as string })}
+          onChange={(value) =>
+            setFormData({ ...formData, name: value as string })
+          }
           placeholder="소모임 이름을 입력해주세요."
           maxLength={13}
           showCharCount
@@ -175,7 +188,9 @@ export default function Page() {
           label="소모임 설명"
           required
           value={formData.description}
-          onChange={(value) => setFormData({ ...formData, description: value as string })}
+          onChange={(value) =>
+            setFormData({ ...formData, description: value as string })
+          }
           placeholder="간단한 설명을 입력해주세요."
           maxLength={500}
           minLength={20}
@@ -189,8 +204,16 @@ export default function Page() {
           required
           value={formData.location}
           onChange={(data) => {
-            if (typeof data === 'object' && 'cityId' in data && 'cityName' in data) {
-              setFormData({ ...formData, location: data.cityName, cityId: data.cityId });
+            if (
+              typeof data === "object" &&
+              "cityId" in data &&
+              "cityName" in data
+            ) {
+              setFormData({
+                ...formData,
+                location: data.cityName as string,
+                cityId: data.cityId as number,
+              });
             }
           }}
           placeholder="도시를 검색하세요."
@@ -202,8 +225,12 @@ export default function Page() {
           required
           dateValue={formData.meetingDate}
           timeValue={formData.meetingTime}
-          onDateChange={(date) => setFormData({ ...formData, meetingDate: date })}
-          onTimeChange={(time) => setFormData({ ...formData, meetingTime: time })}
+          onDateChange={(date) =>
+            setFormData({ ...formData, meetingDate: date })
+          }
+          onTimeChange={(time) =>
+            setFormData({ ...formData, meetingTime: time })
+          }
         />
 
         {/* 모임인원 */}
@@ -212,7 +239,12 @@ export default function Page() {
           label="모임인원"
           required
           value={formData.maxParticipants}
-          onChange={(value) => setFormData({ ...formData, maxParticipants: value as number })}
+          onChange={(value) =>
+            setFormData({
+              ...formData,
+              maxParticipants: value as number,
+            })
+          }
           placeholder="숫자만 입력해 주세요."
         />
 
@@ -222,17 +254,20 @@ export default function Page() {
           label="카테고리 설정"
           required
           selectedTags={formData.categories}
-          onChange={(tags) => setFormData({ ...formData, categories: tags as string[] })}
+          onChange={(tags) =>
+            setFormData({ ...formData, categories: tags as string[] })
+          }
           options={CATEGORY_OPTIONS}
         />
 
-        {/* 소모임 태그 */}
+        {/* 소모임 태그 (화면에만 보이는 텍스트 태그) */}
         <MatchingInput
           type="tag-input"
           label="소모임 태그"
-          required
-          tags={formData.tags}
-          onChange={(tags) => setFormData({ ...formData, tags: tags as string[] })}
+          tags={formData.interests}
+          onChange={(interest) =>
+            setFormData({ ...formData, interests: interest as string[] })
+          }
           placeholder="표시할 태그를 입력해 주세요."
           maxTags={10}
         />
@@ -241,7 +276,9 @@ export default function Page() {
         <MatchingInput
           type="image"
           images={formData.images}
-          onChange={(images) => setFormData({ ...formData, images: images as File[] })}
+          onChange={(images) =>
+            setFormData({ ...formData, images: images as File[] })
+          }
           maxImages={3}
         />
       </form>

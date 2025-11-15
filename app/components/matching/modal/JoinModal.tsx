@@ -11,7 +11,9 @@ import CancelModal from "./CancelModal";
 import ChatModal from "./ChatModal";
 import { useGroupDetail, useJoinGroup, useCancelGroup, useJoinStatus } from "@/app/hooks/matching/useMatching";
 import { GroupCategory, GroupDetail } from "@/app/api/types/matching/matching";
+import { useEffect } from "react";
 
+import { useRouter } from "next/navigation";
 // 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   'ALL': '전체',
@@ -29,12 +31,13 @@ interface JoinModalProps {
 }
 
 export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) {
+  const router = useRouter();
   const {data: groupDetailData, isLoading, error} = useGroupDetail(groupId);
 
   // 로그인 여부 확인 (클라이언트 사이드에서만)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken');
       setIsLoggedIn(!!token);
@@ -80,7 +83,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       // 가입 여부 즉시 refetch
       await refetchJoinStatus();
       alert('소모임 참여 신청이 완료되었습니다!');
-    } catch (error: any) {
+    } catch (error:any) {
       console.error('소모임 가입 실패:', error);
       setIsModalOpen(false);
 
@@ -101,6 +104,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       }
     }
   };
+
 
   // CancelModal에서 "신청 취소" 버튼 클릭 (실제 API 호출)
   const handleCancelConfirm = async () => {
@@ -142,6 +146,10 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   // API 응답 데이터 (직접 GroupDetail 반환)
   const groupData: GroupDetail = groupDetailData;
 
+  const handleGoToChat = () => {
+    if (!chatRoomId) return;
+    router.push(`/chat/${chatRoomId}`);
+  };
   return (
     <div
       id="모달 외부"
@@ -262,7 +270,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
               신청취소
             </button>
             <button
-            onClick={()=>setIsChatModalOpen(true)}
+            onClick={handleGoToChat}
               className="flex-1 py-4 bg-grayScale-700 text-white rounded-full text-h3-sb hover:bg-grayScale-800 transition-colors"
             >
               채팅방으로 이동
@@ -297,6 +305,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
+        
       />
       {/* 신청취소 모달 */}
       <CancelModal

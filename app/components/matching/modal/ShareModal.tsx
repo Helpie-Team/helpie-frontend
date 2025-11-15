@@ -8,12 +8,14 @@ import x from '@/public/icons/x.png';
 import kakao from '@/public/icons/kakaoTalk.png';
 import blog from '@/public/icons/blog.png';
 import whatsapp from '@/public/icons/whatsApp.png';
+
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
+  
 }
 
-export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
+export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -30,11 +32,15 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
     { name: "인스타그램", icon: instagram, size: 56},
   ];
 
-  const handleCopyLink = () => {
-    const url = "https://www.helpie.com/ 각 소모임 모달카드 공유 링크";
-    navigator.clipboard.writeText(url);
-    alert("링크가 복사되었습니다!");
-  };
+  // const handleCopyLink = async () => {
+  //   try {
+  //     await navigator.clipboard.writeText(shareUrl);
+  //     alert("링크가 복사되었습니다!");
+  //   } catch (err) {
+  //     console.error("클립보드 복사 실패:", err);
+  //     alert("링크 복사에 실패했습니다. 다시 시도해주세요.");
+  //   }
+  // };
 
   return (
     <div
@@ -60,16 +66,16 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
           <h2 className="text-h2 ml-1">공유하기</h2>
         </div>
 
-        {/* 공유 아이콘 */}
+        {/* 공유 아이콘 (지금은 클릭하면 아무것도 안 함, 추후 연결용) */}
         <div className="flex justify-around items-center">
           {shareOptions.map((option, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
-              <button>
+              <button type="button">
                 <Image
                   src={option.icon}
                   alt={option.name}
-                  width={56}
-                  height={56}
+                  width={option.size}
+                  height={option.size}
                   className="object-contain"
                 />
               </button>
@@ -82,12 +88,12 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
         <div className="flex items-center justify-center gap-2.5 bg-[#FAF8F7] rounded-xl p-3">
           <input
             type="text"
-            value="https://www.helpie.com/ 각 소모임 모달카드 공유 링크"
+            // value={shareUrl}
             readOnly
             className="flex-1 bg-transparent text-body3-regular text-grayScale-700 outline-none"
           />
           <button
-            onClick={handleCopyLink}
+            // onClick={handleCopyLink}
             className="h-[35px] px-4 bg-white border border-grayScale-200 rounded-full text-body1 flex items-center justify-center"
           >
             복사

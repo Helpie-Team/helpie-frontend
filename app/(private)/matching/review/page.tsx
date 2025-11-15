@@ -35,7 +35,6 @@ export default function Page() {
   const [images, setImages] = useState<File[]>([]);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  // ✅ 올바른 사용법: mutate를 destructure
   const { mutate: createReview, isPending } = useCreateReview();
 
   const handleSubmit = (e: React.FormEvent) => {

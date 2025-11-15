@@ -42,16 +42,18 @@ export const getGroupDetail = async (groupId: number): Promise<GroupDetail> => {
  * @returns GroupListResponse
  */
 export const getGroupList = async (params: GroupListParams): Promise<GroupListResponse> => {
+  const { country, category, page = 0 } = params;
+
   const res = await apiClient.get<GroupListResponse>('/group/list', {
     params: {
-      country: params.country,
-      category: params.category,
-      page: params.page || 0,
+      country: country,                   
+      category: category,
+      page,
     },
   });
+
   return res.data;
 };
-
 /**
  * 관심 소모임 등록/해제 (토글)
  * @param groupId - 소모임 ID
@@ -77,7 +79,7 @@ export const getRecommendedGroups = async (page: number = 0): Promise<RecommendR
 //소모임 검색
 export const searchTags = async (query: string, page:number): Promise<GroupListResponse> => {
   const res = await apiClient.get<GroupListResponse>('/group/search', {
-    params: { },
+    params: { query, page},
   });
   return res.data;
 }

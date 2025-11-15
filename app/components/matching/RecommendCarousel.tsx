@@ -128,7 +128,7 @@ export default function RecommendCarousel({
       <h2 className="text-h1 text-black">헬피가 당신에게 추천하는 소모임</h2>
 
       {/* 피그마 스타일 캐러셀 컨테이너 */}
-      <div className="relative mt-1 w-full max-w-[954px] h-[244px] rounded-[15px] border border-grayScale-100 bg-white overflow-hidden">
+      <div className="relative mt-1 w-full h-[244px] rounded-[15px] border border-grayScale-100 bg-white overflow-hidden">
         {/* 실제 캐러셀 영역 */}
         <div className="overflow-hidden w-full h-full">
           <div
@@ -245,7 +245,7 @@ export default function RecommendCarousel({
         <button
           onClick={handleNext}
           disabled={isLocked || currentIndex >= Math.max(0, displayData.length - cardsPerView)}
-          className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${
+          className={`absolute right-10 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${
             isLocked || currentIndex >= Math.max(0, displayData.length - cardsPerView)
               ? "text-gray-300 cursor-default"
               : "hover:bg-gray-50 text-gray-700"
