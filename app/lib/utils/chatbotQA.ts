@@ -1,13 +1,3 @@
-const ensureEnv = (value: string | undefined, key: string) => {
-  if (!value) {
-    throw new Error(`Missing environment variable: ${key}`);
-  }
-  return value;
-};
-
-const siteUrl = ensureEnv(process.env.NEXT_PUBLIC_SITE_URL, 'NEXT_PUBLIC_SITE_URL');
-const withSiteUrl = (path: string) => `${siteUrl}${path}`;
-
 export type ChatbotItemKey =
   | 'account_email_verification'
   | 'account_password_reset'
@@ -28,6 +18,13 @@ export type ChatbotItemKey =
 
 export type ChatbotCategoryKey = 'account' | 'meetups' | 'system' | 'support';
 
+const ensureEnv = (value: string | undefined, key: string) => {
+  if (!value) {
+    throw new Error(`Missing environment variable: ${key}`);
+  }
+  return value;
+};
+const siteUrl = ensureEnv(process.env.NEXT_PUBLIC_SITE_URL, 'NEXT_PUBLIC_SITE_URL');
 export interface ChatbotQuestion {
   key: ChatbotItemKey;
   label: string;
@@ -69,25 +66,25 @@ export const chatbotCategories: Record<
     title: '로그인·계정',
     label: '로그인·계정',
     description: '로그인 · 프로필 · 언어 설정 안내',
-    icon: withSiteUrl('/images/categori_account.png'),
+    icon: `${siteUrl}/images/categori_account.png`,
   },
   meetups: {
     title: '소모임·추천',
     label: '소모임·추천',
     description: '소모임 참여 · 생성 · 추천',
-    icon: withSiteUrl('/images/categori_matching.png'),
+    icon: `${siteUrl}/images/categori_matching.png`,
   },
   system: {
     title: '시스템',
     label: '시스템',
     description: '알림 · 파일 업로드 · 광고',
-    icon: withSiteUrl('/images/categori_system.png'),
+    icon: `${siteUrl}/images/categori_system.png`,
   },
   support: {
     title: '고객센터',
     label: '고객센터',
     description: '문의 · 제안 · 협업',
-    icon: withSiteUrl('/images/categori_help.png'),
+    icon: `${siteUrl}/images/categori_help.png`,
   },
 };
 

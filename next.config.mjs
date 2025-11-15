@@ -7,6 +7,10 @@ const nextConfig = {
         hostname: 'kr.object.ncloudstorage.com',
         pathname: '/helpie-bucket/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'helpie-main.vercel.app',
+      },
     ],
   },
   async rewrites() {
