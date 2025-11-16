@@ -522,7 +522,7 @@ const BookmarkCard = ({
   isLiked: boolean;
 }) => {
   const router = useRouter();
-  const meetingDDay = typeof bookmark.dDay === 'number' ? bookmark.dDay : undefined;
+  
 
   // 카테고리 색상 매핑
   const categoryColors: Record<string, string> = {
@@ -563,9 +563,9 @@ const BookmarkCard = ({
           }}
         />
         {/* D-day 배지 */}
-        {meetingDDay !== undefined && (
+        {bookmark.dDay !== undefined && (
           <div className="absolute top-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-caption1 font-semibold">
-            D-{meetingDDay}
+            D-{bookmark.dDay}
           </div>
         )}
 
