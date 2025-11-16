@@ -1,3 +1,4 @@
+//useMatching.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { matchingCreate, getGroupDetail, getGroupList, toggleGroupMark, getRecommendedGroups, joinGroup, cancelGroup, getJoinStatus } from '@/app/api/matching/matching';
 import { getPublicGroupList, searchPublicGroups } from '@/app/api/public/matching';
@@ -124,10 +125,17 @@ export const useJoinGroup = () => {
   return useMutation({
     mutationFn: (groupId: number) => joinGroup(groupId),
     onSuccess: (_, groupId) => {
+      // 가입 상태 캐시 즉시 업데이트
+      queryClient.setQueryData(['group', 'join-status', groupId], {
+        joinYn: true
+      });
+
       // 소모임 상세 정보 갱신
       queryClient.invalidateQueries({ queryKey: ['group', groupId] });
       // 소모임 리스트 갱신
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      // 마이페이지 소모임 정보 갱신
+      queryClient.invalidateQueries({ queryKey: ['myGroupInfo'] });
       // 가입 여부 갱신
       queryClient.invalidateQueries({ queryKey: ['group', 'join-status', groupId] });
     },
@@ -144,12 +152,17 @@ export const useCancelGroup = () => {
   return useMutation({
     mutationFn: (groupId: number) => cancelGroup(groupId),
     onSuccess: (_, groupId) => {
+      // 가입 상태 캐시 즉시 업데이트
+      queryClient.setQueryData(['group', 'join-status', groupId], {
+        joinYn: false
+      });
+
       // 소모임 상세 정보 갱신
       queryClient.invalidateQueries({ queryKey: ['group', groupId] });
       // 소모임 리스트 갱신
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      // 마이페이지 소모임 정보 갱신
-      queryClient.invalidateQueries({ queryKey: ['my-page', 'group-info'] });
+      // 마이페이지 소모임 정보 갱신 (올바른 쿼리 키 사용)
+      queryClient.invalidateQueries({ queryKey: ['myGroupInfo'] });
       // 가입 여부 갱신
       queryClient.invalidateQueries({ queryKey: ['group', 'join-status', groupId] });
     },
@@ -166,7 +179,7 @@ export const useJoinStatus = (groupId?: number) => {
     queryKey: ['group', 'join-status', groupId],
     queryFn: () => getJoinStatus(groupId!),
     enabled: !!groupId, // Only fetch when groupId exists
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 0, // 항상 fresh 데이터 요구
   });
 };
 
@@ -185,3 +198,4 @@ export const useSearchPublicGroups = (country: string, keyword: string, page: nu
     staleTime: 30 * 1000, // 30 seconds
   });
 };
+

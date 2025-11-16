@@ -78,10 +78,6 @@ export default function Page() {
         chatRoomId: 0,
       };
 
-      console.log("전송할 데이터:", payload);
-      console.log("이미지 개수:", formData.images.length);
-      console.log("화면용 태그(문자열):", formData.interests);
-
       // API 호출 (mutation hook 사용)
       createMatching(
         {
@@ -89,8 +85,7 @@ export default function Page() {
           images: formData.images.length > 0 ? formData.images : undefined,
         },
         {
-          onSuccess: (response) => {
-            console.log("소모임 생성 성공:", response);
+          onSuccess: () => {
             router.push(`/matching/`);
           },
           onError: (err) => {

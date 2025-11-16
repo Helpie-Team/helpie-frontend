@@ -1,3 +1,4 @@
+//JoinModal.tsx
 //3.2.1.0 소모임참여하기
 "use client";
 import React, { useState } from "react";
@@ -12,9 +13,12 @@ import ChatModal from "./ChatModal";
 import { useGroupDetail, useJoinGroup, useCancelGroup, useJoinStatus } from "@/app/hooks/matching/useMatching";
 import { GroupCategory, GroupDetail } from "@/app/api/types/matching/matching";
 import { useEffect } from "react";
-
-import { useRouter } from "next/navigation";
-import { ApiError, AxiosErrorResponse } from "@/app/api/types/axios";
+import { useQueryClient } from "@tanstack/react-query";
+import { MY_GROUP_INFO_QUERY_KEY } from "@/app/hooks/my-page/useMyGroupInfo";
+import { ToastContainer, toast } from "react-toastify";
+// import { useRouter } from "next/navigation";
+import "react-toastify/dist/ReactToastify.css";
+import { isAuthenticated } from "@/app/lib/utils/token";
 // 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   'ALL': '전체',
@@ -32,21 +36,41 @@ interface JoinModalProps {
 }
 
 export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) {
-  const router = useRouter();
+  // const router = useRouter();
+  const queryClient = useQueryClient();
   const {data: groupDetailData, isLoading, error} = useGroupDetail(groupId);
 
-  // 로그인 여부 확인 (클라이언트 사이드에서만)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 로그인 여부 확인 - hydration 오류 방지를 위해 isAuthenticated 함수 사용
+  const [isClientMounted, setIsClientMounted] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      setIsLoggedIn(!!token);
-    }
+    setIsClientMounted(true);
   }, []);
+
+  const isLoggedIn = isClientMounted ? isAuthenticated() : false;
 
   // 로그인한 경우에만 가입 여부 조회
   const {data: joinStatusData, refetch: refetchJoinStatus} = useJoinStatus(isLoggedIn ? groupId : undefined);
+
+  // 모달이 열릴 때마다 가입 상태 최신화 + 마이페이지 동기화 체크
+  useEffect(() => {
+    if (isOpen && isLoggedIn && groupId) {
+      // refetch 후 결과 검증
+      refetchJoinStatus().then((result) => {
+        // 🔧 추가 검증: 캐시에서 이미 false로 설정되어 있는지 확인
+        const cachedStatus = queryClient.getQueryData(['group', 'join-status', groupId]) as {joinYn: boolean} | undefined;
+
+        if (result.data?.joinYn === true && cachedStatus?.joinYn === false) {
+          // 서버에서는 true인데 캐시에서는 false라면 마이페이지에서 취소했을 가능성이 높음
+          queryClient.setQueryData(['group', 'join-status', groupId], {
+            joinYn: false
+          });
+        }
+      }).catch((error) => {
+        console.error(`❌ 가입 상태 확인 실패:`, error);
+      });
+    }
+  }, [isOpen, isLoggedIn, groupId, refetchJoinStatus, queryClient]);
   const joinGroupMutation = useJoinGroup();
   const cancelGroupMutation = useCancelGroup();
 
@@ -81,28 +105,37 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         setChatRoomId(response.roomId);
       }
       setIsModalOpen(false);
-      // 가입 여부 즉시 refetch
-      await refetchJoinStatus();
-      alert('소모임 참여 신청이 완료되었습니다!');
-    } catch (error) {
-      const axiosError = error as ApiError<AxiosErrorResponse>;
+
+      // QueryClient를 사용하여 캐시 무효화
+      await queryClient.invalidateQueries({
+        queryKey: ['group', 'join-status', groupId]
+      });
+
+      queryClient.invalidateQueries({ queryKey: MY_GROUP_INFO_QUERY_KEY });
+
+      // 성공 toast 알림
+      toast.success('소모임 신청이 완료되었습니다! 🎉');
+    } catch (error: unknown) {
       console.error('소모임 가입 실패:', error);
       setIsModalOpen(false);
 
       // 에러 메시지 파싱
-      const errorMessage = axiosError?.response?.data?.message || axiosError?.message || '알 수 없는 오류가 발생했습니다.';
+      const errorMessage = (error as {response?: {data?: {message?: string}}; message?: string})?.response?.data?.message
+        || (error as {message?: string})?.message
+        || '알 수 없는 오류가 발생했습니다.';
 
       // 중복 참여 에러 처리 - 가입 여부 다시 확인
-      if (errorMessage.includes('이미') || errorMessage.includes('중복') || errorMessage.includes('Duplicate')) {
-        alert('이미 참여 신청한 소모임입니다.');
-        // 실제 가입 상태를 확인하기 위해 refetch
-        await refetchJoinStatus();
-      } else if (errorMessage.includes('완료')) {
-        alert('이미 완료된 소모임입니다.');
-      } else if (errorMessage.includes('채팅방이 존재하지 않습니다')) {
-        alert('채팅방 생성에 문제가 있습니다. 관리자에게 문의해주세요.');
-      } else {
-        alert(`소모임 참여에 실패했습니다.\n${errorMessage}`);
+      if (errorMessage.includes('이미') || errorMessage.includes('중복') || errorMessage.includes('Duplicate') || errorMessage.includes('가입된')) {
+        toast.warn('이미 참여 신청한 소모임입니다.');
+        // 실제 가입 상태를 강제로 확인
+        try {
+          await queryClient.invalidateQueries({
+            queryKey: ['group', 'join-status', groupId]
+          });
+          await refetchJoinStatus();
+        } catch (refetchError) {
+          console.error('가입 상태 확인 실패:', refetchError);
+        }
       }
     }
   };
@@ -112,18 +145,16 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   const handleCancelConfirm = async () => {
     try {
       await cancelGroupMutation.mutateAsync(groupId);
+
       setIsCancleModalOpen(false);
-      // 가입 여부 즉시 refetch
-      await refetchJoinStatus();
-      alert('소모임 참여 신청이 취소되었습니다.');
-    } catch (error) {
-      console.error('소모임 신청 취소 실패:', error);
-      alert('신청 취소에 실패했습니다. 다시 시도해주세요.');
+      toast.success('소모임 참여 신청이 취소되었습니다.');
+    } catch {
+      toast.warn('에러 발생');
     }
   };
 
-  // 로딩 상태
-  if (isLoading) {
+  // 로딩 상태 - 데이터 로딩 중이거나 클라이언트 마운트 대기 중
+  if (isLoading || !isClientMounted) {
     return (
       <div onClick={handleBackdropClick} className="fixed top-0 left-0 w-full h-full bg-black/70 flex justify-center items-center z-50">
         <div className="bg-white rounded-[30px] p-8">
@@ -148,10 +179,10 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   // API 응답 데이터 (직접 GroupDetail 반환)
   const groupData: GroupDetail = groupDetailData;
 
-  const handleGoToChat = () => {
-    if (!chatRoomId) return;
-    router.push(`/chat/${chatRoomId}`);
-  };
+  // const handleGoToChat = () => {
+  //   if (!chatRoomId) return;
+  //   router.push(`/chat/${chatRoomId}`);
+  // };
   return (
     <div
       id="모달 외부"
@@ -166,7 +197,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button title="뒤로 가기" onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
+            <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
               <Image
                 src={arrow_left}
                 alt="뒤로 가기"
@@ -177,7 +208,6 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
             <h2 className="text-h2">모임요약</h2>
           </div>
           <button
-            title="공유하기"
             onClick={() => setIsShareModalOpen(true)}
             className="hover:bg-gray-100 p-2 rounded-full transition-colors"
           >
@@ -267,13 +297,15 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
           /* 가입한 모임 - 신청취소 + 채팅방으로 이동 */
           <div className="w-full flex flex-row gap-3">
             <button
-              onClick={()=>setIsCancleModalOpen(true)}
+              onClick={()=> {
+                setIsCancleModalOpen(true);
+              }}
               className="flex-1 py-4 bg-grayScale-100 text-grayScale-700 text-h3-sb rounded-full hover:bg-grayScale-200 transition-colors"
             >
               신청취소
             </button>
             <button
-            onClick={handleGoToChat}
+            
               className="flex-1 py-4 bg-grayScale-700 text-white rounded-full text-h3-sb hover:bg-grayScale-800 transition-colors"
             >
               채팅방으로 이동
@@ -308,7 +340,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
-        
+        shareUrl={`${window.location.origin}/matching/group/${groupId}`}
       />
       {/* 신청취소 모달 */}
       <CancelModal
@@ -321,6 +353,20 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         isOpen={isChatModalOpen}
         onClose={() => setIsChatModalOpen(false)}
         roomId={chatRoomId}
+      />
+
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastClassName="custom-toast"
       />
     </div>
   );

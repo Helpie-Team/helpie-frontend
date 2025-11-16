@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import arrow_left from "@/public/icons/arrow_left.png";
 import Image from 'next/image';
 import picture from '@/public/icons/picture.png';
@@ -22,10 +22,15 @@ const categoryDisplayNames: Record<GroupCategory, string> = {
   'SOCIAL': '사회·교류',
 };
 
-function ReviewPageContent() {
+interface PageProps {
+  params: {
+    groupId: string;
+  };
+}
+
+function ReviewPageContent({ params }: PageProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const groupId = Number(searchParams.get('groupId'));
+  const groupId = Number(params.groupId);
 
   // 소모임 상세 정보 조회
   const { data: groupData, isLoading: isLoadingGroup } = useGroupDetail(groupId);
@@ -39,8 +44,6 @@ function ReviewPageContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // API 호출
     createReview(
       {
         groupId,
@@ -52,8 +55,7 @@ function ReviewPageContent() {
         images: images.length > 0 ? images : undefined,
       },
       {
-        onSuccess: (data) => {
-          console.log('리뷰 작성 성공:', data);
+        onSuccess: () => {
           alert('리뷰가 성공적으로 등록되었습니다!');
           router.push('/matching');
         },
@@ -282,7 +284,7 @@ function ReviewPageContent() {
   );
 }
 
-export default function Page() {
+export default function Page({ params }: PageProps) {
   return (
     <Suspense
       fallback={
@@ -291,7 +293,7 @@ export default function Page() {
         </div>
       }
     >
-      <ReviewPageContent />
+      <ReviewPageContent params={params} />
     </Suspense>
   );
 }

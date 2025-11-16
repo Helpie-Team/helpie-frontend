@@ -78,7 +78,7 @@ export default function RecommendCarousel({
       : recommendData?.page?.content || [];
 
   // 한 번에 보여줄 카드 개수
-  const cardsPerView = 5;
+  const cardsPerView = 4;
 
   // 잠김 여부 확인
   const isLocked = recommendData?.isLocked && !forceRender;
@@ -123,17 +123,18 @@ export default function RecommendCarousel({
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
-
+ 
   return (
     <div className="w-full flex flex-col gap-4">
       <h2 className="text-h1 text-black">헬피가 당신에게 추천하는 소모임</h2>
 
       {/* 피그마 스타일 캐러셀 컨테이너 */}
-      <div className="relative mt-1 w-full h-[244px] rounded-[15px] border border-grayScale-100 bg-white overflow-hidden">
+      <div className="relative mt-1 w-full h-[244px] ">
+        <div className="w-full h-full rounded-[15px]  bg-white overflow-hidden">
         {/* 실제 캐러셀 영역 */}
         <div className="overflow-hidden w-full h-full">
           <div
-            className={`flex gap-3 h-full items-center transition-transform duration-300 ease-in-out px-6 ${
+            className={`flex gap-3 h-full items-center transition-transform duration-300 ease-in-out  ${
               isLocked ? "opacity-40 blur-[1px] pointer-events-none" : ""
             }`}
             style={{
@@ -150,9 +151,11 @@ export default function RecommendCarousel({
                   key={meeting.id}
                   className="w-[231px] h-[220px] flex-shrink-0 rounded-2xl flex flex-col cursor-pointer"
                 >
+                  
                   <div className="flex flex-col rounded-2xl border border-grayScale-100 h-full overflow-hidden">
                     {/* 썸네일 */}
                     <div className="relative w-full h-[135px]">
+                      
                       <Image
                         src={
                           !meeting.thumbnail
@@ -213,6 +216,7 @@ export default function RecommendCarousel({
                       </div>
                     </div>
                   </div>
+                  
                 </div>
               );
             })}
@@ -243,36 +247,37 @@ export default function RecommendCarousel({
             </button>
           </div>
         )}
-
+        </div>
+           {/* 이전 버튼 */}
+           {currentIndex > 0 && (
+           <button
+          title="이전"
+          onClick={handlePrev}
+          disabled={isLocked || currentIndex <= 0}
+          className="absolute -left-[50px] top-1/2 -translate-y-1/2
+          flex h-9 w-9 items-center justify-center
+          rounded-full bg-black/5 border border-black/5 shadow-sm
+          hover:bg-black/10 transition-colors"
+          type="button"
+        >
+      <span className="text-[20px] leading-none text-black">‹</span>
+        </button>
+        )}
         {/* 다음 버튼 – 잠겨 있어도 보이지만 잠금 시 비활성화 느낌 */}
         <button
           title="다음"
           onClick={handleNext}
           disabled={isLocked || currentIndex >= Math.max(0, displayData.length - cardsPerView)}
-          className={`absolute right-10 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${
-            isLocked || currentIndex >= Math.max(0, displayData.length - cardsPerView)
-              ? "text-gray-300 cursor-default"
-              : "hover:bg-gray-50 text-gray-700"
-          }`}
+          className="absolute right-[-50px] top-1/2 -translate-y-1/2
+          flex h-9 w-9 items-center justify-center
+          rounded-full bg-black/5 border border-black/5 shadow-sm
+          hover:bg-black/10 transition-colors"
           type="button"
         >
-          ›
+     <span className="text-[20px] leading-none text-black">›</span>
         </button>
 
-        {/* 이전 버튼 */}
-        <button
-          title="이전"
-          onClick={handlePrev}
-          disabled={isLocked || currentIndex <= 0}
-          className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${
-            isLocked || currentIndex <= 0
-              ? "text-gray-300 cursor-default"
-              : "hover:bg-gray-50 text-gray-700"
-          }`}
-          type="button"
-        >
-          ‹
-        </button>
+     
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ export interface MyGroupInfoItem {
   meetingDate?: string;
   thumbnailUrl?: string | null;
 }
+export type PageData<T> = PaginatedResponse & { content: T[] };
 
 export interface MyBookmarkItem {
   id: number;
@@ -37,7 +38,6 @@ export interface BookmarkToggleResponse {
 }
 
 export interface PaginatedResponse {
-
   totalPages: number;
   totalElements: number;
   number: number;

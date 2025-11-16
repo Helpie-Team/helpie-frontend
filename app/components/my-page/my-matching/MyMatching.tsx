@@ -27,7 +27,13 @@ type GroupVariant = 'UPCOMING' | 'PAST';
 
 type EmptyStateVariant = 'UPCOMING' | 'PAST' | 'bookmark';
 
-const getGroupIdentifier = (group: MyGroupInfoItem) => group.id ?? group.groupId;
+const getGroupIdentifier = (group: MyGroupInfoItem) => group.groupId;
+
+// 백엔드 응답에 포함될 수 있는 선택 필드를 안전하게 사용하기 위한 확장 타입
+type ExtendedMyGroupInfoItem = MyGroupInfoItem & {
+  chatUrl?: string | null;
+  reviewWritten?: boolean;
+};
 
 const generateGroupKey = (prefix: string, group: MyGroupInfoItem, index: number) => {
   const identifier = getGroupIdentifier(group);
@@ -39,6 +45,8 @@ const generateBookmarkKey = (bookmark: MyBookmarkItem, index: number) => {
   const uniqueSource = bookmark.id ?? `${bookmark.title ?? ''}-${bookmark.city ?? ''}`.trim();
   return `bookmark-${uniqueSource || 'fallback'}-${index}`;
 };
+
+type PageData<T> = PaginatedResponse & { content: T[] };
 
 const MyMatching = () => {
   const router = useRouter();
@@ -55,7 +63,7 @@ const MyMatching = () => {
     },
     onSuccess: (_, groupId) => {
       if (typeof groupId === 'number') {
-        queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyGroupInfoItem>>>(
+        queryClient.setQueriesData<InfiniteData<PageData<MyGroupInfoItem>>>(
           { queryKey: MY_GROUP_INFO_QUERY_KEY },
           (old) => {
             if (!old) return old;
@@ -64,7 +72,7 @@ const MyMatching = () => {
               ...old,
               pages: old.pages.map((page) => ({
                 ...page,
-                content: page.content.filter((item) => getGroupIdentifier(item) !== groupId),
+                content: page.content.filter((item: MyGroupInfoItem) => getGroupIdentifier(item) !== groupId),
               })),
             };
           },
@@ -94,7 +102,7 @@ const MyMatching = () => {
         }));
 
         if (data.status === 'REMOVED') {
-          queryClient.setQueriesData<InfiniteData<PaginatedResponse<MyBookmarkItem>>>(
+          queryClient.setQueriesData<InfiniteData<PageData<MyBookmarkItem>>>(
             { queryKey: MY_BOOKMARK_INFO_QUERY_KEY },
             (old) => {
               if (!old) return old;
@@ -102,7 +110,7 @@ const MyMatching = () => {
                 ...old,
                 pages: old.pages.map((page) => ({
                   ...page,
-                  content: page.content.filter((item) => item.id !== groupId),
+                  content: page.content.filter((item: MyBookmarkItem) => item.id !== groupId),
                 })),
               };
             },
@@ -404,7 +412,7 @@ const GroupCard = ({
   onCancel,
   isCancelling = false,
 }: {
-  group: MyGroupInfoItem;
+  group: ExtendedMyGroupInfoItem;
   variant: GroupVariant;
   onCancel?: () => void;
   isCancelling?: boolean;
@@ -413,19 +421,12 @@ const GroupCard = ({
   const isPAST = variant === 'PAST';
   const meetingDate = formatDate(group.meetingDate);
   const headLabel = isPAST ? '모임완료' : '참여 중인 모임';
-  const rightLabel = isPAST
-    ? meetingDate ?? '모임 일정 미확인'
-    : meetingDate ?? (group.meetingType === 'OFFLINE' ? '오프라인 모임 일시' : '모임 일정 준비 중');
+  const rightLabel = isPAST ? (meetingDate ?? '모임 일정 미확인') : (meetingDate ?? '모임 일정 준비 중');
 
-  const memberText = `${group.currentMemberCount ?? 0}/${group.totalMemberCount ?? 0}`;
+  const memberText = `${group.currentMember ?? 0}/${group.maxMember ?? 0}`;
   const categoryText = group.category ?? '카테고리';
-  const locationText = group.city ?? '지역 정보 없음';
-
-  const handleChatClick = () => {
-    if (group.chatUrl) {
-      window.open(group.chatUrl, '_blank', 'noopener,noreferrer');
-    }
-  };
+  const locationText = group.cityName ?? '지역 정보 없음';
+  const chatUrl = typeof group.chatUrl === 'string' && group.chatUrl.trim() !== '' ? group.chatUrl : null;
 
   return (
     <div className="rounded-[24px] bg-white px-6 py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
@@ -449,7 +450,7 @@ const GroupCard = ({
           <div className="flex flex-1 flex-col gap-2">
             <div>
               <p className="text-body1 text-grayScale-title">{group.title ?? '이름'}</p>
-              <p className="text-body2 text-grayScale-500">{group.summary ?? '본문'}</p>
+              <p className="text-body2 text-grayScale-500">{group.description ?? '본문'}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-caption1-regular text-grayScale-500">
             <MapPin className="w-4 h-4" />
@@ -468,11 +469,16 @@ const GroupCard = ({
         </div>
 
         <div className="flex gap-3 pt-2">
+          {/* 채팅방 이동 버튼 (chatUrl 있을 때만 활성) */}
           <button
             type="button"
-            onClick={handleChatClick}
-            className="flex-1 rounded-full border border-grayScale-300 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-100"
-            disabled={!group.chatUrl}
+            onClick={() => {
+              if (chatUrl) {
+                window.open(chatUrl, '_blank', 'noopener,noreferrer');
+              }
+            }}
+            className="flex-1 rounded-full border border-grayScale-300 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-100 disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={!chatUrl}
           >
             채팅방 이동
           </button>

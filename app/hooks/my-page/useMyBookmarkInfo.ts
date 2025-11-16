@@ -10,11 +10,12 @@ export const MY_BOOKMARK_INFO_QUERY_KEY = ['myBookmarkInfo'] as const;
 interface UseMyBookmarkInfoOptions extends MyBookmarkParams {
   enabled?: boolean;
 }
+type PageData<T> = PaginatedResponse & { content: T[] };
 
 export function useMyBookmarkInfo(options: UseMyBookmarkInfoOptions) {
   const { enabled = true, size = 12, sort = '', ...params } = options;
 
-  return useInfiniteQuery<PaginatedResponse<MyBookmarkItem>>({
+  return useInfiniteQuery<PageData<MyBookmarkItem>>({
     queryKey: [...MY_BOOKMARK_INFO_QUERY_KEY, { ...params, size, sort }],
     queryFn: ({ pageParam = 0 }) =>
       getMyBookmarkInfo({ ...params, page: pageParam as number, size, sort }),

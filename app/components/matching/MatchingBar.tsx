@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation";
 import { useCountries } from "@/app/hooks/location/useLocations";
+import { isAuthenticated } from "@/app/lib/utils/token";
 
 interface MatchingBarProps {
   onCountrySelect?: (code: string) => void;
@@ -16,6 +17,7 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
   const [selectedCountry, setSelectedCountry] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isLoggedIn = isAuthenticated();
 
   // "전체" 옵션을 포함한 국가 목록
   const countries = [
@@ -48,7 +50,6 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
 
   const handleSearch = () => {
     if (searchKeyword.trim()) {
-      console.log('matching bar searchKeywrod: ', searchKeyword.trim());
       onSearch?.(searchKeyword.trim());
     }
   };
@@ -103,7 +104,14 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
         </div>
         <p>소모임</p>
       </div>
-      <button className="flex items-center justify-center w-[119px] h-[43px] px-4 py-3 rounded-[55px] bg-grayScale-700 text-grayScale-white text-body1-sb whitespace-nowrap" onClick={()=>{router.push('/matching/create')}}>소모임 만들기</button>
+      {isLoggedIn && (
+        <button
+          className="flex items-center justify-center w-[119px] h-[43px] px-4 py-3 rounded-[55px] bg-grayScale-700 text-grayScale-white text-body1-sb whitespace-nowrap cursor-pointer"
+          onClick={()=>{router.push('/matching/create')}}
+        >
+          소모임 만들기
+        </button>
+      )}
     </div>
 
     {/* 검색 입력창 */}

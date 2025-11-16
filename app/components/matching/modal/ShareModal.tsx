@@ -6,16 +6,15 @@ import Image from "next/image";
 import instagram from '@/public/icons/instagram.png';
 import x from '@/public/icons/x.png';
 import kakao from '@/public/icons/kakaoTalk.png';
-import blog from '@/public/icons/blog.png';
-import whatsapp from '@/public/icons/whatsApp.png';
+import { ToastContainer, toast } from "react-toastify";
 
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  
+  shareUrl: string;
 }
 
-export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
+export default function ShareModal({ isOpen, onClose, shareUrl  }: ShareModalProps) {
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -27,20 +26,17 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
   const shareOptions = [
     { name: "카카오톡", icon: kakao, size: 56  },
     { name: "X", icon: x, size: 56},
-    { name: "블로그", icon: blog, size: 56},
-    { name: "왓츠앱", icon: whatsapp, size: 56},
     { name: "인스타그램", icon: instagram, size: 56},
   ];
 
-  // const handleCopyLink = async () => {
-  //   try {
-  //     await navigator.clipboard.writeText(shareUrl);
-  //     alert("링크가 복사되었습니다!");
-  //   } catch (err) {
-  //     console.error("클립보드 복사 실패:", err);
-  //     alert("링크 복사에 실패했습니다. 다시 시도해주세요.");
-  //   }
-  // };
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("링크가 복사되었습니다!");
+    } catch {
+      toast.warn("링크 복사에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   return (
     <div
@@ -66,11 +62,11 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
           <h2 className="text-h2 ml-1">공유하기</h2>
         </div>
 
-        {/* 공유 아이콘 (지금은 클릭하면 아무것도 안 함, 추후 연결용) */}
+        {/* 공유 아이콘 */}
         <div className="flex justify-around items-center">
           {shareOptions.map((option, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
-              <button title={option.name} type="button">
+              <button title={option.name} type="button" onClick={handleCopyLink}>
                 <Image
                   src={option.icon}
                   alt={option.name}
@@ -89,18 +85,32 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
           <input
             title="링크"
             type="text"
-            // value={shareUrl}
+            value={shareUrl}
             readOnly
             className="flex-1 bg-transparent text-body3-regular text-grayScale-700 outline-none"
           />
           <button
-            // onClick={handleCopyLink}
+            onClick={handleCopyLink}
             className="h-[35px] px-4 bg-white border border-grayScale-200 rounded-full text-body1 flex items-center justify-center"
           >
             복사
           </button>
         </div>
       </div>
+     
+            <ToastContainer
+              position="top-center"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              toastClassName="custom-toast"
+            />
     </div>
   );
 }
