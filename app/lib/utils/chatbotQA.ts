@@ -1,6 +1,6 @@
 export type ChatbotItemKey =
   | 'account_email_verification'
-  | 'account_password_reset'
+  | 'account_sns_info'
   | 'account_profile_photo'
   | 'account_language_change'
   | 'meetup_join'
@@ -91,7 +91,7 @@ export const chatbotCategories: Record<
 export const chatbotTopQuestions: ChatbotItemKey[] = [
   'meetup_recommendation',
   'meetup_join',
-  'account_password_reset',
+  'account_sns_info',
 ];
 
 export const chatbotQuestions: Record<ChatbotCategoryKey, ChatbotQuestion[]> = {
@@ -103,10 +103,8 @@ export const chatbotQuestions: Record<ChatbotCategoryKey, ChatbotQuestion[]> = {
       ctaTarget: 'signup-step-1-1',
     },
     {
-      key: 'account_password_reset',
-      label: '“비밀번호를 잊어버렸어요.”',
-      ctaLabel: '비밀번호 재설정',
-      ctaTarget: 'account-recovery-8-1',
+      key: 'account_sns_info',
+      label: '“SNS 계정이 궁금해요.”',
     },
     {
       key: 'account_profile_photo',
@@ -239,10 +237,9 @@ export const chatbotAnswers: Record<ChatbotCategoryKey, ChatbotAnswer[]> = {
       ctaTarget: 'signup-step-1-1',
     },
     {
-      key: 'account_password_reset',
-      message: '비밀번호 재설정 페이지로 안내해드릴게요. ( •̀∀•́ )✧',
-      ctaLabel: '비밀번호 재설정',
-      ctaTarget: 'account-recovery-8-1',
+      key: 'account_sns_info',
+      message:
+        '헬피를 팔로우 해주시면 여러 소식과 이벤트들을 더욱 빨리 받아보실 수 있어요.(,,• •,,)♥\n\ninstagram : @your_helpie\n\nX : @your_helpie',
     },
     {
       key: 'account_profile_photo',
