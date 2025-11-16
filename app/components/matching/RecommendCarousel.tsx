@@ -113,16 +113,6 @@ export default function RecommendCarousel({
     });
   };
 
-  // D-day 계산 함수
-  const calculateDday = (meetingDate: string) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const meeting = new Date(meetingDate);
-    meeting.setHours(0, 0, 0, 0);
-    const diffTime = meeting.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
  
   return (
     <div className="w-full flex flex-col gap-4">
@@ -142,7 +132,6 @@ export default function RecommendCarousel({
             }}
           >
             {displayData.map((meeting) => {
-              const dday = calculateDday(meeting.meetingDate);
               const categoryColor = categoryColors[meeting.category];
               const categoryDisplay = categoryDisplayNames[meeting.category];
 
@@ -170,11 +159,6 @@ export default function RecommendCarousel({
                         sizes="(max-width: 768px) 100vw, 220px"
                         className="object-cover"
                       />
-
-                      {/* D-day 배지 */}
-                      <div className="absolute top-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-caption1 font-semibold">
-                        D-{dday}
-                      </div>
 
                       {/* 하트 버튼 (로그인 상태에서만 표시) */}
                       {isLoggedIn && (

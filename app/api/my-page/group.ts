@@ -72,16 +72,6 @@ export async function getMyBookmarkInfo(
       },
     });
 
-    const calculateDday = (dday: number) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const meeting = new Date(dday);
-      meeting.setHours(0, 0, 0, 0);
-      const diffTime = meeting.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
-    };
-
     const transformedData: PageResponse<MyBookmarkItem> = {
       ...response.data,
       content: response.data.content.map((item) => ({
@@ -89,13 +79,13 @@ export async function getMyBookmarkInfo(
         title: item.title,
         description: item.description,
         maxMembers: item.maxMembers,
-        isPopular:item.isPopular,
+        isPopular: item.isPopular,
         cityName: item.cityName,
-
         category: item.category,
-        meetingDate:item.meetingDate,
-        createdAt:item.createdAt,
-        dDay: item.dDay ? calculateDday(item.dDay) : undefined,
+        meetingDate: item.meetingDate,
+        createdAt: item.createdAt,
+        // 백엔드가 dDay(남은 일수)를 숫자로 내려주므로 그대로 사용
+        dDay: typeof item.dDay === 'number' ? item.dDay : undefined,
         thumbnailUrl:
           item.thumbnailUrl && item.thumbnailUrl !== 'NO_IMAGE' ? item.thumbnailUrl : null,
       })),
