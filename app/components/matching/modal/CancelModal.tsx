@@ -40,7 +40,7 @@ export default function CancelModal({ isOpen, onClose, onConfirm }: CancelModalP
       >
         {/* 헤더 */}
         <div className="flex flex-col gap-5">
-          <button onClick={onClose} className="flex items-start justify-start">
+          <button title="뒤로 가기" onClick={onClose} className="flex items-start justify-start">
             <Image
               src={arrow_left}
               alt="뒤로 가기"

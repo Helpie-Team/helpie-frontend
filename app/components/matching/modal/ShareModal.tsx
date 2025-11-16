@@ -55,7 +55,7 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
       >
         {/* 헤더 */}
         <div className="flex items-center">
-          <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
+          <button title="뒤로 가기" onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
             <Image
               src={arrow_left}
               alt="뒤로 가기"
@@ -70,7 +70,7 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
         <div className="flex justify-around items-center">
           {shareOptions.map((option, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
-              <button type="button">
+              <button title={option.name} type="button">
                 <Image
                   src={option.icon}
                   alt={option.name}
@@ -87,6 +87,7 @@ export default function ShareModal({ isOpen, onClose  }: ShareModalProps) {
         {/* 링크 복사 */}
         <div className="flex items-center justify-center gap-2.5 bg-[#FAF8F7] rounded-xl p-3">
           <input
+            title="링크"
             type="text"
             // value={shareUrl}
             readOnly

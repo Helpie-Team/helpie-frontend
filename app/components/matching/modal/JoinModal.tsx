@@ -14,6 +14,7 @@ import { GroupCategory, GroupDetail } from "@/app/api/types/matching/matching";
 import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
+import { ApiError, AxiosErrorResponse } from "@/app/api/types/axios";
 // 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   'ALL': '전체',
@@ -83,12 +84,13 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       // 가입 여부 즉시 refetch
       await refetchJoinStatus();
       alert('소모임 참여 신청이 완료되었습니다!');
-    } catch (error:any) {
+    } catch (error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
       console.error('소모임 가입 실패:', error);
       setIsModalOpen(false);
 
       // 에러 메시지 파싱
-      const errorMessage = error?.response?.data?.message || error?.message || '알 수 없는 오류가 발생했습니다.';
+      const errorMessage = axiosError?.response?.data?.message || axiosError?.message || '알 수 없는 오류가 발생했습니다.';
 
       // 중복 참여 에러 처리 - 가입 여부 다시 확인
       if (errorMessage.includes('이미') || errorMessage.includes('중복') || errorMessage.includes('Duplicate')) {
@@ -164,7 +166,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
+            <button title="뒤로 가기" onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
               <Image
                 src={arrow_left}
                 alt="뒤로 가기"
@@ -175,6 +177,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
             <h2 className="text-h2">모임요약</h2>
           </div>
           <button
+            title="공유하기"
             onClick={() => setIsShareModalOpen(true)}
             className="hover:bg-gray-100 p-2 rounded-full transition-colors"
           >

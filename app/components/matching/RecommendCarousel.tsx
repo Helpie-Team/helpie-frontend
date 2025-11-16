@@ -176,6 +176,7 @@ export default function RecommendCarousel({
                       {/* 하트 버튼 (로그인 상태에서만 표시) */}
                       {isLoggedIn && (
                         <button
+                          title="찜하기"
                           onClick={(e) => handleLikeClick(meeting.id, e)}
                           className="absolute bottom-1 right-2 w-[32px] h-[32px] z-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
                         >
@@ -233,6 +234,7 @@ export default function RecommendCarousel({
             </div>
 
             <button
+              title="프로필 작성하러 가기"
               onClick={() => (window.location.href = "/new-user-info")}
               className="inline-flex items-center gap-2 rounded-full bg-[#FF5C35] px-6 py-3 text-body1-sb text-white shadow-md hover:bg-[#FF4A1F] transition-colors"
             >
@@ -244,6 +246,7 @@ export default function RecommendCarousel({
 
         {/* 다음 버튼 – 잠겨 있어도 보이지만 잠금 시 비활성화 느낌 */}
         <button
+          title="다음"
           onClick={handleNext}
           disabled={isLocked || currentIndex >= Math.max(0, displayData.length - cardsPerView)}
           className={`absolute right-10 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${
@@ -258,6 +261,7 @@ export default function RecommendCarousel({
 
         {/* 이전 버튼 */}
         <button
+          title="이전"
           onClick={handlePrev}
           disabled={isLocked || currentIndex <= 0}
           className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-xl transition-colors ${

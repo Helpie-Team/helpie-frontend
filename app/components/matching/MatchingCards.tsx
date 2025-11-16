@@ -260,6 +260,7 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
                 {/* 하트 버튼 (로그인 상태에서만 표시) */}
                 {isLoggedIn && (
                   <button
+                    title="찜하기"
                     type="button"
                     aria-pressed={likedGroups.has(meeting.id)}
                     onClick={(e) => handleLikeClick(meeting.id, e)}

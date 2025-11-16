@@ -95,7 +95,7 @@ function ReviewPageContent() {
     <div className="flex flex-col w-[1000px] mx-auto pt-8 pb-20">
       {/* 헤더 */}
       <div className="w-full flex flex-col gap-6 mb-8 pb-8 border-b border-grayScale-100">
-        <button type="button" onClick={() => router.push('/matching')}>
+        <button title="뒤로가기" type="button" onClick={() => router.push('/matching')}>
           <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
         </button>
         <div className="flex items-center justify-between">

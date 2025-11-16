@@ -36,7 +36,7 @@ export default function JoinConfirm({isOpen, onClose, onConfirm}: JoinConfirmPro
         >
           {/* 헤더 - 뒤로가기 버튼 */}
           <div className="flex items-start justify-start w-full">
-            <button onClick={onClose}>
+            <button title="뒤로 가기" onClick={onClose}>
               <Image
                 src={arrow_left}
                 alt="뒤로 가기"
