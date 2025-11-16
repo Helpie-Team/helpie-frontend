@@ -42,7 +42,7 @@ const generateGroupKey = (prefix: string, group: MyGroupInfoItem, index: number)
 };
 
 const generateBookmarkKey = (bookmark: MyBookmarkItem, index: number) => {
-  const uniqueSource = bookmark.id ?? `${bookmark.title ?? ''}-${bookmark.city ?? ''}`.trim();
+  const uniqueSource = bookmark.id ?? `${bookmark.title ?? ''}-${bookmark.cityName ?? ''}`.trim();
   return `bookmark-${uniqueSource || 'fallback'}-${index}`;
 };
 
@@ -156,7 +156,7 @@ const MyMatching = () => {
       const next: Record<number, boolean> = {};
 
       bookmarkedGroups.forEach((item) => {
-        next[item.id] = prev[item.id] ?? item.liked ?? true;
+        next[item.id] = prev[item.id] ?? true;
       });
 
       return next;
@@ -255,7 +255,7 @@ const MyMatching = () => {
               bookmark={item}
               onToggleBookmark={() => handleToggleBookmark(item.id)}
               isToggling={bookmarkTargetId === item.id && toggleBookmarkMutation.isPending}
-              isLiked={bookmarkStates[item.id] ?? item.liked ?? true}
+              isLiked={bookmarkStates[item.id] ?? true}
             />
           ))}
         </div>
@@ -417,6 +417,7 @@ const GroupCard = ({
   onCancel?: () => void;
   isCancelling?: boolean;
 }) => {
+  const router=useRouter();
   const actionGroupId = getGroupIdentifier(group);
   const isPAST = variant === 'PAST';
   const meetingDate = formatDate(group.meetingDate);
@@ -486,13 +487,12 @@ const GroupCard = ({
           {isPAST ? (
             <button
               type="button"
-              className={`flex-1 rounded-full py-2 text-body2 transition ${
-                group.reviewWritten
-                  ? 'border border-grayScale-300 text-grayScale-title hover:bg-grayScale-100'
-                  : 'bg-[var(--color-key-100)] text-white hover:opacity-90'
+              className={`flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90'
               }`}
+            onClick={()=> {router.push(`/review/create/${actionGroupId}`);
+          }}
             >
-              {group.reviewWritten ? '작성한 후기 보기' : '후기 작성하기'}
+              후기 작성하기
             </button>
           ) : (
             <button
@@ -522,7 +522,7 @@ const BookmarkCard = ({
   isLiked: boolean;
 }) => {
   const router = useRouter();
-  const meetingDDay = typeof bookmark.dday === 'number' ? bookmark.dday : undefined;
+  const meetingDDay = typeof bookmark.dDay === 'number' ? bookmark.dDay : undefined;
 
   // 카테고리 색상 매핑
   const categoryColors: Record<string, string> = {
@@ -596,9 +596,9 @@ const BookmarkCard = ({
           <div className={`${categoryColor} text-white px-2 py-1 rounded-full text-caption1-b whitespace-nowrap flex-shrink-0`}>
             {categoryDisplay}
           </div>
-          <span className="whitespace-nowrap">{bookmark.city ?? '지역'}</span>
+          <span className="whitespace-nowrap">{bookmark.cityName ?? '도시'}</span>
         </div>
-        <h3 className="text-body2 text-black line-clamp-1 break-words">{bookmark.title ?? '소모임 제목'}</h3>
+        <h3 className="text-body2 text-black line-clamp-1 break-words">{bookmark.title ?? '제목'}</h3>
         <p className="text-body3-regular text-grayScale-600 line-clamp-2 break-words">
           {bookmark.description ?? '설명'}
         </p>

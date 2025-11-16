@@ -87,14 +87,17 @@ export async function getMyBookmarkInfo(
       content: response.data.content.map((item) => ({
         id: item.id,
         title: item.title,
-        summary: item.description,
+        description: item.description,
+        maxMembers: item.maxMembers,
+        isPopular:item.isPopular,
+        cityName: item.cityName,
+
+        category: item.category,
+        meetingDate:item.meetingDate,
+        createdAt:item.createdAt,
+        dDay: item.dDay ? calculateDday(item.dDay) : undefined,
         thumbnailUrl:
           item.thumbnailUrl && item.thumbnailUrl !== 'NO_IMAGE' ? item.thumbnailUrl : null,
-        city: item.city,
-        category: item.category,
-        dday: item.dday ? calculateDday(item.dday) : undefined,
-        tags: item.tags || [],
-        liked: true,
       })),
     };
 

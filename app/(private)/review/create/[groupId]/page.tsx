@@ -11,7 +11,7 @@ import { useCreateReview } from '@/app/hooks/review/useReview';
 import { useGroupDetail } from '@/app/hooks/matching/useMatching';
 import noImage from "@/public/images/noImage.png";
 import { GroupCategory } from '@/app/api/types/matching/matching';
-
+import {  MapPin, Users, Tag } from "lucide-react";
 // 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   'ALL': '전체',
@@ -120,7 +120,7 @@ function ReviewPageContent({ params }: PageProps) {
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8 border border-grayScale-200 bg-[#FAF8F7] rounded-[20px] p-6">
         {/* 모임완료 섹션 */}
         <div className="bg-grayScale-50 rounded-2xl p-6">
-          <h2 className="text-body1-medium mb-4">모임완료</h2>
+          <h2 className="text-h2 mb-4">모임완료</h2>
           {isLoadingGroup ? (
             <div className="text-body2-regular text-grayScale-500">모임 정보를 불러오는 중...</div>
           ) : groupData ? (
@@ -139,18 +139,27 @@ function ReviewPageContent({ params }: PageProps) {
               </div>
               <div className="flex-1 flex flex-col gap-2">
                 <div className="flex items-start justify-between">
-                  <h3 className="text-body1-medium">{groupData.title}</h3>
+                  <h3 className="text-h3">{groupData.title}</h3>
                   <span className="text-caption1-regular text-grayScale-500">
                     {new Date(groupData.meetingDate).toLocaleDateString('ko-KR')}
                   </span>
                 </div>
-                <p className="text-body3-regular text-grayScale-700 line-clamp-2">
+                <p className="text-body1-regular text-grayScale-700 line-clamp-2">
                   {groupData.description}
                 </p>
-                <div className="flex items-center gap-3 text-caption1-regular text-grayScale-500">
-                  <span className="flex items-center gap-1">📍 {groupData.cityName}</span>
-                  <span className="flex items-center gap-1">👥 {groupData.maxMember}명</span>
-                  <span className="flex items-center gap-1">🏷️ {categoryDisplayNames[groupData.category]}</span>
+                <div className="flex flex-row items-center gap-3 text-body3 text-grayScale-500 ">
+                  <div className="flex flex-row items-center gap-1">
+                     <MapPin className="w-4 h-4 " />
+                      <span>{groupData.cityName}</span>
+                      </div>
+                      <div className="flex flex-row items-center gap-1">
+                    <Users  className="w-4 h-4"/>
+                <span> {groupData.maxMember}명</span>
+                </div>
+                <div className="flex flex-row items-center gap-1">
+                  <Tag className="w-4 h-4" />
+                 {categoryDisplayNames[groupData.category]}
+                  </div>
                 </div>
               </div>
             </div>
