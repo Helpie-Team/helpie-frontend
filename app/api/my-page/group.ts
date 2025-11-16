@@ -20,37 +20,34 @@ export interface MyBookmarkParams {
   sort?: string;
 }
 
-export async function getMyGroupInfo(params: MyGroupInfoParams): Promise<PaginatedResponse<MyGroupInfoItem>> {
+type PageResponse<T> = PaginatedResponse & { content: T[] };
+
+export async function getMyGroupInfo(
+  params: MyGroupInfoParams
+): Promise<PageResponse<MyGroupInfoItem>> {
   try {
-    const response = await apiClient.get<PaginatedResponse<MyGroupInfoItem>>('/my-page/group-info', {
+    const response = await apiClient.get<PageResponse<MyGroupInfoItem>>('/my-page/group-info', {
       params: {
         status: params.status,
         page: params.page ?? 0,
         size: params.size ?? 10,
-        sort: params.sort ?? '',
+        sort: params.sort ?? 'createdAt,desc',
       },
     });
 
-    // 백엔드 응답 필드명을 프론트엔드 형식으로 변환
-    const transformedData: PaginatedResponse<MyGroupInfoItem> = {
+    const transformedData: PageResponse<MyGroupInfoItem> = {
       ...response.data,
-      content: response.data.content.map((item: MyGroupInfoItem) => ({
-        id: item.groupId,
+      content: response.data.content.map((item) => ({
         groupId: item.groupId,
         title: item.title,
-        summary: item.summary,
-        thumbnailUrl: item.thumbnailUrl || null,
-        city: item.city,
+        description: item.description,
+        cityName: item.cityName,
+        currentMember: item.currentMember,
+        maxMember: item.maxMember,
         category: item.category,
         meetingDate: item.meetingDate,
-        meetingType: item.meetingType || null,
-        status: item.status || null,
-        currentMemberCount: item.currentMemberCount,
-        totalMemberCount: item.totalMemberCount,
-        dday: item.dday,
-        chatUrl: item.chatUrl || null,
-        reviewWritten: item.reviewWritten || false,
-        tags: item.tags || [],
+        thumbnailUrl:
+          item.thumbnailUrl && item.thumbnailUrl !== 'NO_IMAGE' ? item.thumbnailUrl : null,
       })),
     };
 
@@ -63,40 +60,41 @@ export async function getMyGroupInfo(params: MyGroupInfoParams): Promise<Paginat
   }
 }
 
-export async function getMyBookmarkInfo(params: MyBookmarkParams): Promise<PaginatedResponse<MyBookmarkItem>> {
+export async function getMyBookmarkInfo(
+  params: MyBookmarkParams
+): Promise<PageResponse<MyBookmarkItem>> {
   try {
-    const response = await apiClient.get<PaginatedResponse<MyBookmarkItem>>('/my-page/bookmark-info', {
+    const response = await apiClient.get<PageResponse<MyBookmarkItem>>('/my-page/bookmark-info', {
       params: {
         page: params.page ?? 0,
         size: params.size ?? 12,
-        sort: params.sort ?? '',
+        sort: params.sort ?? 'createdAt,desc',
       },
     });
 
-    // D-day 계산 함수
-    const calculateDday = (meetingDate: string) => {
+    const calculateDday = (dday: number) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const meeting = new Date(meetingDate);
+      const meeting = new Date(dday);
       meeting.setHours(0, 0, 0, 0);
       const diffTime = meeting.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays;
     };
 
-    // 백엔드 응답 필드명을 프론트엔드 형식으로 변환
-    const transformedData: PaginatedResponse<MyBookmarkItem> = {
+    const transformedData: PageResponse<MyBookmarkItem> = {
       ...response.data,
-      content: response.data.content.map((item: MyBookmarkItem) => ({
+      content: response.data.content.map((item) => ({
         id: item.id,
         title: item.title,
-        summary: item.summary,
-        thumbnailUrl: item.thumbnailUrl || null,
+        summary: item.description,
+        thumbnailUrl:
+          item.thumbnailUrl && item.thumbnailUrl !== 'NO_IMAGE' ? item.thumbnailUrl : null,
         city: item.city,
         category: item.category,
-        dday: item.dday || 0,
+        dday: item.dday ? calculateDday(item.dday) : undefined,
         tags: item.tags || [],
-        liked: true, // 북마크 목록이므로 항상 true
+        liked: true,
       })),
     };
 
@@ -130,5 +128,4 @@ export async function toggleGroupBookmark(groupId: number): Promise<BookmarkTogg
     }
     throw error;
   }
-}
-
+} 

@@ -5,6 +5,7 @@ export const ROUTE_CONFIG = {
   protected: [
     '/my-page',
     '/new-user-info',
+    '/matching/create'
   ] as const,
   
   // 인증 관련 라우트 (이미 로그인된 사용자는 접근 불가)

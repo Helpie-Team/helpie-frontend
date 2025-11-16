@@ -1,20 +1,20 @@
+export interface MyGroupInfoArray {
+  content: MyGroupInfoItem[];
+}
+
+export interface MyBookmarkArray {
+  content: MyBookmarkItem[];
+}
 export interface MyGroupInfoItem {
-  id?: number;
   groupId?: number;
   title: string;
-  summary?: string;
-  thumbnailUrl?: string | null;
-  city?: string;
+  description?: string;
+  cityName?: string;
   category?: string;
-  meetingDate?: string | null;
-  meetingType?: string | null;
-  status?: string | null;
-  currentMemberCount?: number;
-  totalMemberCount?: number;
-  dday?: number;
-  chatUrl?: string | null;
-  reviewWritten?: boolean;
-  tags?: string[];
+  currentMember?: number;
+  maxMember?: number;
+  meetingDate?: string;
+  thumbnailUrl?: string | null;
 }
 
 export interface MyBookmarkItem {
@@ -36,8 +36,8 @@ export interface BookmarkToggleResponse {
   status: BookmarkToggleStatus;
 }
 
-export interface PaginatedResponse<T> {
-  content: T[];
+export interface PaginatedResponse {
+
   totalPages: number;
   totalElements: number;
   number: number;
