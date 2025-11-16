@@ -594,7 +594,7 @@ const BookmarkCard = ({
         </div>
         <h3 className="text-body2 text-black line-clamp-1 break-words">{bookmark.title ?? '소모임 제목'}</h3>
         <p className="text-body3-regular text-grayScale-600 line-clamp-2 break-words">
-          {bookmark.summary ?? '설명'}
+          {bookmark.description ?? '설명'}
         </p>
       </div>
     </div>

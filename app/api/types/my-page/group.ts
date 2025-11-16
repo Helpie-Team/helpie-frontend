@@ -25,6 +25,7 @@ export interface MyBookmarkItem {
   city?: string;
   category?: string;
   dday?: number;
+  description?: string;
   tags?: string[];
   liked?: boolean;
 }
