@@ -4,10 +4,9 @@
 import React, { useState } from "react";
 import arrow_left from '@/public/icons/arrow_left.png';
 import Image from "next/image";
-import { Share2, MapPin, Users, Tag, Clock } from "lucide-react";
+import {  MapPin, Users, Tag, Clock } from "lucide-react";
 import noImage from "@/public/images/noImage.png";
 import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
-import ShareModal from '@/app/components/matching/modal/ShareModal';
 import CancelModal from "./CancelModal";
 import ChatModal from "./ChatModal";
 import { useGroupDetail, useJoinGroup, useCancelGroup, useJoinStatus } from "@/app/hooks/matching/useMatching";
@@ -75,7 +74,6 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   const cancelGroupMutation = useCancelGroup();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isCancleModalOpen, setIsCancleModalOpen] = useState(false);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [chatRoomId, setChatRoomId] = useState<number | undefined>(undefined);
@@ -207,12 +205,12 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
             </button>
             <h2 className="text-h2">모임요약</h2>
           </div>
-          <button
+          {/* <button
             onClick={() => setIsShareModalOpen(true)}
             className="hover:bg-gray-100 p-2 rounded-full transition-colors"
           >
             <Share2 className="w-6 h-6" />
-          </button>
+          </button> */}
         </div>
 
         {/* 이미지  */}
@@ -336,12 +334,6 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         onConfirm={handleConfirm}
       />
 
-      {/* 공유 모달 */}
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        shareUrl={`${window.location.origin}/matching/group/${groupId}`}
-      />
       {/* 신청취소 모달 */}
       <CancelModal
         isOpen={isCancleModalOpen}
