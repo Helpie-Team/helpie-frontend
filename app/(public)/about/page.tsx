@@ -1,44 +1,126 @@
+"use client";
+
 import React from 'react';
 import Image from 'next/image';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, ChevronDown } from 'lucide-react';
 import { aboutImageMap } from '@/app/lib/utils/aboutImagePaths';
 import community from '@/public/icons/community.png'
 import people from '@/public/icons/people.png'
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+
 export default function AboutPage() {
+    const router = useRouter();
+
+    // 애니메이션 variants
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 60 },
+        visible: { opacity: 1, y: 0 }
+    };
+
+    const fadeIn = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 }
+    };
+
+    const slideInLeft = {
+        hidden: { opacity: 0, x: -60 },
+        visible: { opacity: 1, x: 0 }
+    };
+
+    const slideInRight = {
+        hidden: { opacity: 0, x: 60 },
+        visible: { opacity: 1, x: 0 }
+    };
+
     return (
-        <div className="min-h-screen bg-white">
+        <>
             {/* Hero Section - 메인 이미지와 텍스트 */}
-            <section className="relative">
-                {/* 배경 이미지 자리 (피그마 상단 이미지) */}
-                <div className="w-full h-[600px] bg-gradient-to-r from-orange-400 to-orange-500 flex items-center justify-center">
-                    <div className="text-center text-white">
-                        <h1 className="text-5xl font-bold mb-4">당신의 글로벌 라이프스타일 헬퍼</h1>
-                        <div className="flex justify-center">
-                            <div className="text-2xl font-bold bg-white text-orange-500 px-6 py-2 rounded-lg">
-                                HELPie
-                            </div>
-                        </div>
-                    </div>
+            <section className="relative w-screen h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
+                {/* 배경 이미지 */}
+                <Image
+                    src={aboutImageMap.cover}
+                    alt="HELPie Cover"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+                {/* 오버레이 (텍스트 가독성을 위한 반투명 레이어) */}
+                <div className="absolute inset-0 bg-black/20" />
+
+                {/* 텍스트 컨텐츠 */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <motion.div
+                        className="text-center text-white z-10"
+                        initial="hidden"
+                        animate="visible"
+                        variants={fadeIn}
+                        transition={{ duration: 0.8 }}
+                    >
+                    </motion.div>
                 </div>
+
+                {/* 아래 화살표 - 스크롤 유도 */}
+                <motion.div
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
+                    transition={{
+                        duration: 1,
+                        delay: 1,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        repeatDelay: 0.5
+                    }}
+                >
+                    <ChevronDown className="w-12 h-12 text-white" strokeWidth={2} />
+                </motion.div>
             </section>
 
+        <div className="min-h-screen bg-white">
         <div className= "flex flex-col py-6 gap-50">
             {/* HELPie 브랜딩 섹션 */}
-            <section className="py-16 bg-white text-center">
+            <motion.section
+                className="py-16 bg-white text-center"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6 }}
+                variants={fadeInUp}
+            >
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="mb-8">
                         <Image src={aboutImageMap.hepie} alt="helpie width4" width={942} height={142} className="justify-center items-center mb-4 mx-auto"/>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Our Mission 섹션 */}
             <section className="w-[942px] h-[471.22px] gap-10">
                 <div className=" mx-auto">
-                    <h2 className="text-3xl font-bold text-center mb-12">Our Mission</h2>
+                    <motion.h2
+                        className="text-3xl font-bold text-center mb-12"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        variants={fadeInUp}
+                    >
+                        Our Mission
+                    </motion.h2>
                     <div className="flex flex-row gap-3">
                         {/* 함께 나누기 */}
-                        <div className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm">
+                        <motion.div
+                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                            variants={fadeInUp}
+                        >
                             <div className="p-6">
                                 {/* 체크 아이콘 */}
                                 <div className="flex items-center justify-start mb-4">
@@ -60,10 +142,17 @@ export default function AboutPage() {
                                     className="w-full h-full object-cover rounded-5"
                                 />
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* 삶을 전하기 */}
-                        <div className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm">
+                        <motion.div
+                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            variants={fadeInUp}
+                        >
                             <div className="p-6">
                                 {/* 체크 아이콘 */}
                                 <div className="flex items-center justify-start mb-4">
@@ -85,10 +174,17 @@ export default function AboutPage() {
                                     className="w-full h-full object-cover rounded-5"
                                 />
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* 세 번째 카드 */}
-                        <div className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm">
+                        <motion.div
+                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                            variants={fadeInUp}
+                        >
                             <div className="p-6">
                                 {/* 체크 아이콘 */}
                                 <div className="flex items-center justify-start mb-4">
@@ -110,7 +206,7 @@ export default function AboutPage() {
                                     className="w-full h-full object-cover rounded-[20px]"
                                 />
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
@@ -118,18 +214,34 @@ export default function AboutPage() {
             {/* Our Service 섹션 */}
             <section className="bg-white">
                 <div className="max-w-6xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center py-12">Our Service</h2>
+                    <motion.h2
+                        className="text-3xl font-bold text-center py-12"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        variants={fadeInUp}
+                    >
+                        Our Service
+                    </motion.h2>
 
-                    <div className="w-full h-[540px] flex flex-col gap-13 ">
+                    <div className="w-full h-[540px] flex flex-col gap-13">
                         {/* 소모임 서비스 */}
-                        <div className="w-full h-[244px] flex flex-row items-center gap-8">
+                        <motion.div
+                            className="w-full h-[244px] flex flex-row items-center gap-8"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{ duration: 0.6 }}
+                            variants={slideInLeft}
+                        >
                             <div className="flex-1 h-[244px] flex justify-center flex-col">
-                                <div className="flex items-start text-start flex-col gap-8">
+                                <div className="flex items-start text-start flex-col gap-16">
                                         <Image src={people} alt="사람아이콘" width={60} height={60}/>
                                         <div className='w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">소모임</h3>
-                                                <ExternalLink className="w-5 h-5 text-gray-400" />
+                                                <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/matching')} />
                                             </div>
                                             <p className="text-gray-600 text-h3 mb-0">
                                                 같은 관심사로 모인 사람들과 이야기하며<br />
@@ -139,22 +251,34 @@ export default function AboutPage() {
                                         </div>
                                 </div>
                             </div>
-                            <div className="flex-1 flex justify-end">
+                            <motion.div
+                                className="flex-1 flex justify-end"
+                                variants={slideInRight}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                            >
                                 <Image
                                     src={aboutImageMap.matching}
                                     alt="소모임 서비스"
                                     width={461}
                                     height={244}
                                     className="rounded-lg object-cover"
+
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
 
                         {/* 커뮤니티 서비스 */}
-                        <div className="w-full h-[244px] flex flex-row items-center gap-8">
+                        <motion.div
+                            className="w-full h-[244px] flex flex-row items-center gap-8"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            variants={slideInLeft}
+                        >
                             <div className=" h-[244px] flex justify-center flex-col">
-                                <div className="flex items-start text-start flex-col gap-8">
-                                        <Image src={community} alt="사람아이콘" width={60} height={60}/>
+                                <div className="flex items-start text-start flex-col gap-20">
+                                        <Image src={community} alt="지구 아이콘" width={60} height={60}/>
                                         <div className='w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">커뮤니티</h3>
@@ -167,7 +291,11 @@ export default function AboutPage() {
                                         </div>
                                 </div>
                             </div>
-                            <div className="flex-1 flex justify-end">
+                            <motion.div
+                                className="flex-1 flex justify-end"
+                                variants={slideInRight}
+                                transition={{ duration: 0.6, delay: 0.4 }}
+                            >
                                 <Image
                                     src={aboutImageMap.community}
                                     alt="커뮤티니 서비스"
@@ -175,121 +303,81 @@ export default function AboutPage() {
                                     height={244}
                                     className="rounded-lg object-cover"
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
 
             {/* Our Logo 섹션 */}
-            <section className="py-16 bg-gray-50">
+            <motion.section
+                className="py-16"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6 }}
+                variants={fadeInUp}
+            >
                 <div className="max-w-6xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold mb-4">Our Logo</h2>
-                    <p className="text-gray-600 mb-12 max-w-3xl mx-auto">
-                        이웃 개념이 적고 개인적인 소통이 부족한 환경에서 따뜻한 시각이 담긴 소통을 이어드리고
-                        정보와 대한 안내를 제공하고자 밝고 부드러운 오렌지 색상을 메인 색상으로 사용하였습니다.
-                    </p>
-
-                    <div className="mb-12">
-                        <p className="text-lg font-semibold mb-6">심볼</p>
-                        <div className="flex justify-center items-center gap-8">
-                            <div className="text-center">
-                                <div className="w-20 h-20 bg-gray-200 rounded-full mb-2 flex items-center justify-center">
-                                    <Image
-                                        src={aboutImageMap.simbol1}
-                                        alt="심볼 1"
-                                        width={60}
-                                        height={60}
-                                        className="object-contain"
-                                    />
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="w-20 h-20 bg-gray-200 rounded-full mb-2 flex items-center justify-center">
-                                    <Image
-                                        src={aboutImageMap.simbol2}
-                                        alt="심볼 2"
-                                        width={60}
-                                        height={60}
-                                        className="object-contain"
-                                    />
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="w-24 h-24 bg-orange-500 rounded-full mb-2 flex items-center justify-center">
-                                    <Image
-                                        src={aboutImageMap.simbol3}
-                                        alt="심볼 3"
-                                        width={70}
-                                        height={70}
-                                        className="object-contain"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="text-lg font-semibold mb-6">가로형</p>
-                        <div className="flex justify-center items-center gap-8">
-                            <div className="bg-gray-200 px-8 py-4 rounded">
-                                <span className="text-gray-700 font-semibold">HELPie</span>
-                            </div>
-                            <div className="bg-gray-200 px-8 py-4 rounded">
-                                <span className="text-orange-500 font-semibold">HELPie</span>
-                            </div>
-                            <div className="bg-orange-500 px-8 py-4 rounded">
-                                <span className="text-white font-semibold">HELPie</span>
-                            </div>
-                        </div>
-                    </div>
+                    <motion.h2
+                        className="text-head font-bold mb-4"
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6 }}
+                    >
+                        Our Logo
+                    </motion.h2>
+                    <motion.p
+                        className="text-gray-600 text-h3 mb-12 max-w-3xl mx-auto"
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                        전 세계에서 온 사람들이 손을 맞잡고 함께 정착을 돕는 글로벌 커뮤니티를 상징하며, <br />
+                        주황색의 따뜻함과 파란색의 신뢰가 공존하는 HELPie의 브랜드 철학을 시각적으로 담고 있습니다.
+                    </motion.p>
+                    <motion.div
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                    >
+                        <Image src={aboutImageMap.draft} alt="draft" width={952} height={537} />
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Our Character 섹션 */}
-            <section className="py-16 bg-white">
+            <motion.section
+                className="py-16 bg-white"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6 }}
+                variants={fadeInUp}
+            >
                 <div className="max-w-6xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold mb-4">Our Character</h2>
-                    <p className="text-gray-600 mb-12">
-                        서로 다른 곳에서 각자 살아가는 사람들 새로운 만남과<br />
-                        인연을 이어주는 역할을 하는 친근한 캐릭터로 제작하였습니다.
-                    </p>
-
-                    <div className="bg-gray-50 rounded-2xl p-12">
-                        <div className="grid md:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
-                            <div className="text-center">
-                                <h3 className="text-xl font-bold mb-4 text-orange-500">애리</h3>
-                                <p className="text-gray-600 mb-6">
-                                    따뜻함 + 밝음 + 희망성
-                                </p>
-                                <div className="w-48 h-64 bg-orange-200 rounded-full mx-auto flex items-center justify-center relative">
-                                    <div className="w-32 h-48 bg-orange-500 rounded-full flex items-center justify-center">
-                                        <span className="text-white text-4xl">👋</span>
-                                    </div>
-                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 bg-white px-3 py-1 rounded-full text-sm font-semibold text-orange-500">
-                                        애리
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-xl font-bold mb-4 text-blue-500">지파</h3>
-                                <p className="text-gray-600 mb-6">
-                                    신뢰 + 안정감 + 차분함
-                                </p>
-                                <div className="w-48 h-64 bg-blue-200 rounded-full mx-auto flex items-center justify-center relative">
-                                    <div className="w-32 h-48 bg-blue-500 rounded-full flex items-center justify-center">
-                                        <span className="text-white text-4xl">👋</span>
-                                    </div>
-                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 bg-white px-3 py-1 rounded-full text-sm font-semibold text-blue-500">
-                                        지파
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <motion.h2
+                        className="text-3xl font-bold mb-4"
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6 }}
+                    >
+                        Our Character
+                    </motion.h2>
+                    <motion.p
+                        className="text-gray-600 text-h3 mb-12"
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                        HELPie의 &apos;H&apos;에서 탄생한 에피와 치피는<br />
+                        서로 다른 문화를 잇고, 함께 돕고 어울리는 글로벌 메이트를 상징합니다.
+                    </motion.p>
+                    <motion.div
+                        variants={fadeInUp}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                    >
+                        <Image src={aboutImageMap.character} alt="캐릭터" width={952} height={537}/>
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
             </div>
         </div>
+        </>
     );
 }

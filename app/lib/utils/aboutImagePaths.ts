@@ -2,6 +2,7 @@
 
 // 이미지 경로 배열
 export const aboutImagePaths = [
+  '/images/about/cover.png',
   '/images/about/aboutCharacter.png',
   '/images/about/aboutCharacterGrid.png',
   '/images/about/community.png',
@@ -18,12 +19,15 @@ export const aboutImagePaths = [
   '/images/about/width3.png',
   '/images/about/width4.png',
   '/images/about/check_icon.png',
-  '/images/about/helpieDes.png'
+  '/images/about/helpieDes.png',
+  '/images/about/draft.png',
+  '/images/about.ourCharacter.png'
   
 ] as const;
 
 // 이미지 이름과 경로를 매핑한 객체
 export const aboutImageMap = {
+  cover: '/images/about/cover.png',
   aboutCharacter: '/images/about/aboutCharacter.png',
   aboutCharacterGrid: '/images/about/aboutCharacterGrid.png',
   community: '/images/about/community.png',
@@ -40,7 +44,9 @@ export const aboutImageMap = {
   width3: '/images/about/width3.png',
   width4: '/images/about/width4.png',
   checkIcon: '/images/about/check_icon.png',
-  hepie: '/images/about/helpieDes.png'
+  hepie: '/images/about/helpieDes.png',
+  draft: '/images/about/draft.png',
+  character: '/images/about/ourCharacter.png'
 
 } as const;
 
