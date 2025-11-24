@@ -87,9 +87,9 @@ const Header = () => {
                     <li className="flex flex-row items-center gap-4">
                       <LanguageSelector />
 
-                      <button type="button" className="cursor-pointer text-sm text-grayScale-600">
+                      <Link href="/chat" className="cursor-pointer text-sm text-grayScale-600">
                         채팅
-                      </button>
+                      </Link>
 
                       <button type="button" className="cursor-pointer text-sm text-grayScale-600">
                         알림

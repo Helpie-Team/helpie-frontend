@@ -8,6 +8,7 @@
 # API 설정
 NEXT_PUBLIC_API_BASE_URL=http://49.50.132.119:8080/api/v1
 NEXT_PUBLIC_API_TIMEOUT=10000
+NEXT_PUBLIC_API_SOCKET_URL=wss://helpie.duckdns.org/ws/chat
 
 # Google OAuth 설정
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=611533793095-9i01qb97imtjetpse05b186qu9f5h46o.apps.googleusercontent.com
@@ -29,6 +30,7 @@ NODE_ENV=development
 ### API 설정
 - `NEXT_PUBLIC_API_BASE_URL`: 백엔드 API 기본 URL
 - `NEXT_PUBLIC_API_TIMEOUT`: API 요청 타임아웃 (밀리초)
+- `NEXT_PUBLIC_API_SOCKET_URL`: WebSocket 연결 URL (설정하지 않으면 NEXT_PUBLIC_API_BASE_URL 기반으로 자동 생성)
 
 ### Google OAuth 설정
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`: Google OAuth 클라이언트 ID
