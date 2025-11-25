@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import Layout from '@/app/components/my-page/Layout';
 import MyActivity from '@/app/components/my-page/my-activity/MyActivity';
@@ -19,7 +20,30 @@ const menuComponentMap: Record<MenuKey, React.ReactNode> = {
 };
 
 export default function MyPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<MenuKey>('profile');
+  const isInitialMount = useRef(true);
+
+  // 초기 마운트 시에만 query parameter 확인
+  useEffect(() => {
+    if (isInitialMount.current) {
+      const tab = searchParams.get('tab');
+      if (tab === 'settings') {
+        setActiveMenu('settings');
+      }
+      isInitialMount.current = false;
+    }
+  }, [searchParams]);
+
+  // 메뉴 변경 핸들러 - query parameter 제거
+  const handleMenuChange = (menu: MenuKey) => {
+    setActiveMenu(menu);
+    // query parameter가 있으면 제거
+    if (searchParams.get('tab')) {
+      router.replace('/my-page');
+    }
+  };
 
   const activeComponent = useMemo(() => menuComponentMap[activeMenu], [activeMenu]);
 
@@ -31,7 +55,7 @@ export default function MyPage() {
           <p className='h-[1px] w-full bg-grayScale-200' />
         </div>
         <div className='flex flex-row gap-8'>
-        <SideMenu activeMenu={activeMenu} onSelectMenu={setActiveMenu} />
+        <SideMenu activeMenu={activeMenu} onSelectMenu={handleMenuChange} />
         <section className="flex-1  bg-white ">{activeComponent}</section>
         </div>
       </div>
