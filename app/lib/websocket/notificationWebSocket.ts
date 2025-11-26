@@ -71,7 +71,6 @@ class NotificationWebSocket {
 
   connect(userId: number): void {
     if (this.client?.connected && this.userId === userId) {
-      console.log(`[NotificationWebSocket] 이미 연결되어 있음: user ${userId}`);
       return;
     }
 
@@ -81,7 +80,6 @@ class NotificationWebSocket {
 
     const token = this.getAuthToken();
     if (!token) {
-      console.error('[NotificationWebSocket] 인증 토큰이 없습니다.');
       return;
     }
 
@@ -105,48 +103,40 @@ class NotificationWebSocket {
         },
         onConnect: () => {
           this.reconnectAttempts = 0;
-          console.log(`[NotificationWebSocket] STOMP 연결 성공: user ${userId}`);
 
           this.subscribeToNotifications(userId);
           this.subscribeToCount(userId);
         },
         onStompError: (frame) => {
           const errorMessage = frame.headers['message'] || 'STOMP 연결 오류';
-          console.error('[NotificationWebSocket] STOMP 오류:', errorMessage, frame);
           this.errorHandlers.forEach((handler) => handler(errorMessage));
         },
         onWebSocketError: (event) => {
           const errorMessage = this.getErrorMessage(event);
-          console.error('[NotificationWebSocket] WebSocket 오류:', errorMessage, event);
           this.errorHandlers.forEach((handler) => handler(errorMessage));
 
           if (this.isFatalError(event)) {
             this.hasFatalError = true;
-            console.error('[NotificationWebSocket] 치명적 오류 발생, 재연결 중단');
           }
         },
         onDisconnect: () => {
-          console.log('[NotificationWebSocket] 연결 해제됨');
           this.closeHandlers.forEach((handler) => handler());
 
           if (!this.isManualDisconnect && !this.hasFatalError && userId) {
             this.attemptReconnect(userId);
           } else if (this.hasFatalError) {
-            console.error('[NotificationWebSocket] 치명적 오류로 인해 재연결을 중단합니다.');
           }
         },
       });
 
       this.client.activate();
     } catch (error) {
-      console.error('[NotificationWebSocket] 연결 생성 실패:', error);
       this.attemptReconnect(userId);
     }
   }
 
   private subscribeToNotifications(userId: number): void {
     if (!this.client?.connected) {
-      console.error('[NotificationWebSocket] STOMP 클라이언트가 연결되지 않았습니다.');
       return;
     }
 
@@ -158,19 +148,15 @@ class NotificationWebSocket {
     this.notificationSubscription = this.client.subscribe(destination, (message: IMessage) => {
       try {
         const notification: Notification = JSON.parse(message.body);
-        console.log('[NotificationWebSocket] 알림 수신:', notification);
         this.notificationHandlers.forEach((handler) => handler(notification));
       } catch (error) {
-        console.error('[NotificationWebSocket] 알림 파싱 실패:', error, message.body);
       }
     });
 
-    console.log(`[NotificationWebSocket] 알림 구독 완료: ${destination}`);
   }
 
   private subscribeToCount(userId: number): void {
     if (!this.client?.connected) {
-      console.error('[NotificationWebSocket] STOMP 클라이언트가 연결되지 않았습니다.');
       return;
     }
 
@@ -183,26 +169,21 @@ class NotificationWebSocket {
       try {
         const data = JSON.parse(message.body);
         const count = typeof data === 'number' ? data : data.count || 0;
-        console.log('[NotificationWebSocket] 알림 개수 수신:', count);
         this.countHandlers.forEach((handler) => handler(count));
       } catch (error) {
-        console.error('[NotificationWebSocket] 알림 개수 파싱 실패:', error, message.body);
       }
     });
 
-    console.log(`[NotificationWebSocket] 알림 개수 구독 완료: ${destination}`);
   }
 
   private attemptReconnect(userId: number): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('[NotificationWebSocket] 최대 재연결 시도 횟수 초과');
       return;
     }
 
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
-    console.log(`[NotificationWebSocket] ${delay}ms 후 재연결 시도 (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
     this.reconnectTimer = setTimeout(() => {
       if (!this.isManualDisconnect && !this.hasFatalError) {
@@ -237,7 +218,6 @@ class NotificationWebSocket {
       this.client = null;
     }
 
-    console.log('[NotificationWebSocket] 연결 해제 완료');
   }
 
   onNotification(handler: NotificationHandler): () => void {
