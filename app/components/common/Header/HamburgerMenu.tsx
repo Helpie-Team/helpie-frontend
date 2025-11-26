@@ -67,7 +67,6 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
         <div className="flex gap-4 mb-6">
           <Link
             href="/matching"
-            onClick={onClose}
             className="flex flex-col items-center gap-2"
           >
             <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
@@ -76,18 +75,15 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
             <span className="text-xs font-semibold text-gray-900">소모임</span>
           </Link>
 
-          <button
-            type="button"
-            onClick={() => {
-              onClose();
-            }}
+          <Link
+            href="/community"
             className="flex flex-col gap-2"
           >
             <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
               <Globe size={24} className="text-key-200" />
             </div>
             <span className="text-xs font-semibold text-gray-900">커뮤니티</span>
-          </button>
+          </Link>
         </div>
 
         {/* 구분선 */}
@@ -98,7 +94,6 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
           <h3 className="text-xs font-medium text-gray-500 mb-3">About</h3>
           <Link
             href="/about"
-            onClick={onClose}
             className="flex items-center gap-3 py-2"
           >
             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -113,7 +108,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
           <h3 className="text-xs font-medium text-gray-500 mb-3">고객센터</h3>
           <div className="flex flex-col gap-1">
             <Link
-              href="/support/notice"
+              href="/cs"
               className="flex items-center gap-3 py-2"
             >
               <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -134,7 +129,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
           </div>
         </div>
       </div>
-      </div>
+    </div>
   );
 };
 
