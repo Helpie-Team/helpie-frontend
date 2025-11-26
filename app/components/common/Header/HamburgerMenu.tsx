@@ -77,7 +77,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRe
 
           <Link
             href="/community"
-            className="flex flex-col gap-2"
+            className="flex flex-col items-center gap-2"
           >
             <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
               <Globe size={24} className="text-key-200" />
