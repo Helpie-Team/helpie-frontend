@@ -4,12 +4,15 @@ import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { cancelGroupApplication, toggleGroupBookmark } from '@/app/api/my-page/group';
 import { getAccessibleChatRooms } from '@/app/api/chat/chat';
 import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
 import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
 import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
+import { useReviewCheck } from '@/app/hooks/review/useReview';
 import PlaceholderGroupImage from "@/public/images/noImage.png";
 import heart from '@/public/icons/heart.png';
 import noHeart from '@/public/icons/noHeart.png';
@@ -288,6 +291,21 @@ const MyMatching = () => {
       </nav>
 
       {renderContent()}
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastClassName="custom-toast"
+      />
     </div>
   );
 };
@@ -425,9 +443,33 @@ const GroupCard = ({
   const headLabel = isPAST ? '모임완료' : '참여 중인 모임';
   const rightLabel = isPAST ? (meetingDate ?? '모임 일정 미확인') : (meetingDate ?? '모임 일정 준비 중');
 
+  // 지난모임일 때만 리뷰 체크 수행
+  const { data: reviewCheck } = useReviewCheck(isPAST && actionGroupId ? actionGroupId : 0);
+
   const memberText = `${group.currentMember ?? 0}/${group.maxMember ?? 0}`;
   const categoryText = group.category ?? '카테고리';
   const locationText = group.cityName ?? '지역 정보 없음';
+
+  const handleReviewSubmit = () => {
+    if (!actionGroupId) {
+      toast.error('모임 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    if (reviewCheck?.hasReview) {
+      // 이미 리뷰를 작성한 경우 toast로 안내
+      toast.warn(reviewCheck.message || '이미 리뷰를 작성했습니다.');
+      return;
+    }
+
+    if (reviewCheck?.canWrite) {
+      // 리뷰 작성 가능한 경우 리뷰 작성 페이지로 이동
+      router.push(`/review/create/${actionGroupId}`);
+    } else {
+      // 리뷰 작성 불가한 경우 안내
+      toast.error(reviewCheck?.message || '리뷰 작성이 불가능합니다.');
+    }
+  };
 
   const handleChatRoomNavigation = async () => {
     if (isNavigatingToChat) return;
@@ -512,9 +554,7 @@ const GroupCard = ({
             <button
               type="button"
               className="flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90"
-              onClick={() => {
-                router.push(`/review/create/${actionGroupId}`);
-          }}
+              onClick={handleReviewSubmit}
             >
               후기 작성하기
             </button>

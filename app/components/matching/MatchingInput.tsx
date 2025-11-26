@@ -37,6 +37,7 @@ interface MatchingInputProps {
   maxLength?: number;
   minLength?: number;
   showCharCount?: boolean;
+  min?:number;
   max?: number;
   selectedTags?: string[];
   tags?: string[];
@@ -204,11 +205,12 @@ const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, place
 };
 
 // 숫자 입력
-const NumberInput: React.FC<MatchingInputProps> = ({ value = 0, onChange, placeholder }) => (
+const NumberInput: React.FC<MatchingInputProps> = ({ value = 0, onChange, placeholder,min }) => (
   <div>
     <input
       type="number"
-      value={value || ''}
+      min={min}
+      value={value as number}
       onChange={(e) => onChange?.(parseInt(e.target.value) || 0)}
       placeholder={placeholder}
       className={INPUT_CLASS}

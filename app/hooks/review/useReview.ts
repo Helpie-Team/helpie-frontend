@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPublicReviewList } from '@/app/api/public/review';
-import { createReview } from '@/app/api/matching/review/review';
+import { createReview, getReviewCheck } from '@/app/api/matching/review/review';
 import { ReviewListParams, CreateReviewRequest } from '@/app/api/types/review/review';
 
 /**
@@ -36,5 +36,18 @@ export const useCreateReview = () => {
       // 리뷰 목록 쿼리 무효화하여 재조회
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
+  });
+};
+
+/**
+ * 리뷰 작성 가능 여부 확인 query hook
+ * @param groupId - 그룹 ID
+ */
+export const useReviewCheck = (groupId: number) => {
+  return useQuery({
+    queryKey: ['review', 'check', groupId],
+    queryFn: () => getReviewCheck(groupId),
+    staleTime: 5 * 60 * 1000, // 5분간 캐시
+    enabled: !!groupId, // groupId가 있을 때만 실행
   });
 };

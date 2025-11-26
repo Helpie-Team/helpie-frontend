@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,6 +15,27 @@ export default function Footer() {
   const isUserInfoPage = pathname === "/new-user-info";
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState<"ko" | "en">("ko");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   // 해당 페이지에서는 푸터 숨김
   if (isUserInfoPage) return null;
@@ -152,7 +173,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-4">
             {/* 언어 선택 - 커스텀 드롭다운 */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsOpen((prev) => !prev)}
