@@ -1,304 +1,398 @@
-"use client"
-import React, { useState, useRef, useEffect, useCallback } from "react";
+"use client";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { isAuthenticated } from "@/app/lib/utils/token";
-import { useCommunities } from "@/app/hooks/community/useCommunity";
-import type { CommunityCategory } from "@/app/api/types/community/community";
+import {
+  useCommunities,
+  useSearchCommunities,
+  useToggleCommunityLikeMutation,
+} from "@/app/hooks/community/useCommunity";
+import type { CommunityCategory, CommunityPost } from "@/app/api/types/community/community";
+import { PopularBar } from "../../components/community/PopularBar";
+import { CommunityCreateModal } from "@/app/components/community/CommunityCreateModal";
+import { PostImageCarousel } from "@/app/components/community/PostImageCarousel";
+import { LoadingSpinner } from "@/app/components/common/LoadingSpinner";
+import { ThumbsUp, MessageCircle } from "lucide-react";
 
 export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<HTMLDivElement>(null);
-  const isLoggedIn = isAuthenticated();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { mutate: toggleLike } = useToggleCommunityLikeMutation();
+  const [searchInput, setSearchInput] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [postList, setPostList] = useState<CommunityPost[]>([]);
+  // 무한스크롤용 페이지 번호 + 옵저버 ref
   const [page, setPage] = useState(0);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const category = [
-    { name: "전체"},
+    { name: "전체" },
     { name: "정보공유" },
-    { name: "자유게시판"},
+    { name: "자유게시판" },
   ];
 
-  // 카테고리를 API 형식으로 변환
-  const getApiCategory = (categoryName: string): CommunityCategory | undefined => {
+
+  const getApiCategory = (categoryName: string): CommunityCategory => {
     switch (categoryName) {
-      case "정보공유": return "INFO_SHARE";
-      case "자유게시판": return "FREE_BOARD";
-      default: return undefined;
+      case "정보공유":
+        return "INFO_SHARE";
+      case "자유게시판":
+        return "FREE_BOARD";
+      case "전체":
+      default:
+        return "ALL";
     }
   };
 
-  // 커뮤니티 데이터 호출
   const apiCategory = getApiCategory(selectedCategory);
+
+  // 기본 커뮤니티 리스트 (무한스크롤용)
   const requestParams = {
-    ...(apiCategory && { category: apiCategory }), // category가 undefined면 파라미터에서 제외
+    category: apiCategory,
     page,
-    size: 10
+    size: 10,
   };
 
-  console.log('Request params:', {
-    selectedCategory,
-    apiCategory,
-    requestParams,
-    isLoggedIn,
-    accessToken: typeof window !== 'undefined' ? window.sessionStorage.getItem('accessToken') : null
-  });
+  const {
+    posts,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+  } = useCommunities(requestParams);
 
-  const { posts, loading, loadingMore, error, hasMore } = useCommunities(requestParams);
+ 
 
-  // Infinite scroll logic
-  const loadMore = useCallback(() => {
-    if (!loadingMore && hasMore) {
-      setPage(prev => prev + 1);
-    }
-  }, [loadingMore, hasMore]);
-
+  // 클라이언트에서만 인증 상태 확인 (Hydration 에러 방지)
   useEffect(() => {
-    const observer = observerRef.current;
-    if (!observer) return;
+    setIsLoggedIn(isAuthenticated());
+  }, []);
 
-    const intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
+    // 서버에서 가져온 posts 가 바뀔 때마다 로컬 상태 갱신
+    useEffect(() => {
+      setPostList(posts);
+    }, [posts]);
 
-    intersectionObserver.observe(observer);
-    return () => intersectionObserver.disconnect();
-  }, [loadMore]);
+  // 📡 검색 API (검색 키워드 + 카테고리)
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+  } = useSearchCommunities(searchKeyword, apiCategory, 0, 10);
 
+  // 지금 검색 중인지 여부 (검색 키워드가 있을 때)
+  const isSearching = searchKeyword.trim().length > 0;
+
+  // 실제로 렌더링할 게시글 리스트
+  const postsToRender = isSearching
+    ? searchData?.content ?? []
+    : postList;
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
 
   const handleCategorySelect = (name: string) => {
     setSelectedCategory(name);
     setIsDropdownOpen(false);
-    setPage(0); // 페이지 리셋
+    setPage(0); // 카테고리 바뀌면 페이지 리셋
   };
 
+  const handleToggleLike = (postId: number) => {
+    toggleLike(postId, {
+      onSuccess: (isLiked) => {
+        // API 응답: true → 좋아요한 상태, false → 취소된 상태
+        setPostList((prev) =>
+          prev.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  isLiked,
+                  likesCount: post.likesCount + (isLiked ? 1 : -1),
+                }
+              : post
+          )
+        );
+      },
+      onError: () => {
+        // 필요하면 에러 토스트 등
+        alert("좋아요 처리에 실패했어요. 다시 시도해 주세요.");
+      },
+    });
+  };
+
+  const handleSearchSubmit = () => {
+    const trimmed = searchInput.trim();
+    setPage(0);
+
+    // 입력이 비어있으면 검색 해제 → 전체 리스트 모드
+    if (!trimmed) {
+      setSearchKeyword("");
+      return;
+    }
+
+    // 검색 모드로 전환
+    setSearchKeyword(trimmed);
+  };
+
+  useEffect(() => {
+    if (isSearching) return; // 검색 중에는 무한스크롤 비활성화
+
+    const target = observerRef.current;
+    if (!target) return;
+    if (!hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMore && !loading && !loadingMore) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, loading, loadingMore, isSearching]);
+
+
+  const showLoading =
+    (isSearching && isSearchLoading && !searchData) ||
+    (!isSearching && loading && posts.length === 0);
+
+  const showError = isSearching ? isSearchError : error;
 
   return (
-    <div className="flex flex-col items-center gap-8 px-8">
-     <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200">
-         <div className="flex items-center justify-between  w-[1000px] h-11 ">
-           <div className="w-[531px] h-[43px] flex items-center gap-4 text-[32px] font-semibold leading-none text-black">
-             <div className="relative" ref={dropdownRef}>
-               <div
-                 className="flex items-center gap-2 cursor-pointer"
-                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-               >
-                 <p>{selectedCategory}</p>
-                 <Image
-                   src="/icons/down.png"
-                   alt="dropdown"
-                   width={34}
-                   height={34}
-                   className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                 />
-               </div>
-     
-               {/* 드롭다운 메뉴 */}
-               {isDropdownOpen && (
-                 <div className="absolute top-[calc(100%+16px)] left-0 w-[200px] bg-white rounded-lg shadow-lg border border-grayScale-200 overflow-hidden z-50">
-                   {loading ? (
-                     <div className="px-6 py-4 text-body1-regular text-grayScale-500">
-                       로딩 중...
-                     </div>
-                   ) : (
-                     category.map((categoryItem, index) => (
-                       <div
-                         key={categoryItem.name}
-                         className={`px-6 py-4 cursor-pointer hover:bg-grayScale-50 text-body1-regular ${
-                           categoryItem.name === selectedCategory ? 'text-grayScale-700 font-semibold' : 'text-grayScale-500'
-                         } ${index !== category.length - 1 ? 'border-b border-grayScale-100' : ''}`}
-                         onClick={() => handleCategorySelect(categoryItem.name)}
-                       >
-                        {categoryItem.name}
-                       </div>
-                     ))
-                   )}
-                 </div>
-               )}
-             </div>
-             <p>커뮤니티</p>
-           </div>
-           {isLoggedIn && (
-             <button
-               className="flex items-center justify-center w-[119px] h-[43px] px-4 py-3 rounded-[55px] bg-grayScale-700 text-grayScale-white text-body1-sb whitespace-nowrap cursor-pointer"
-              
-             >
-               게시글 작성하기
-             </button>
-           )}
-         </div>
-     
-         {/* 검색 입력창 */}
-         <div className="relative w-[1000px] items-center justify-center">
-           <input
-             type="text"
-        
-             className="w-full h-[44px] py-2 pl-3 pr-12 rounded-full border border-grayScale-filter text-body2-regular placeholder:text-grayScale-300"
-             placeholder="전체 소모임 검색"
-           />
-           <Image
-             src="/icons/searchIcon.png"
-             alt="search"
-             width={24}
-             height={24}
-             className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
-             
-           />
-         </div>
-       </div>
+    <div className="flex flex-col items-center gap-8 px-8 ">
+      {/* 상단 헤더 영역 */}
+      <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200">
+        <div className="flex items-center justify-between w-[1000px] h-11 ">
+          <div className="flex h-[43px] w-[531px] items-center gap-4 text-[32px] font-semibold leading-none text-black">
+            <div className="relative" ref={dropdownRef}>
+              <div
+                className="flex cursor-pointer items-center gap-2"
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+              >
+                <p>{selectedCategory}</p>
+                <Image
+                  src="/icons/down.png"
+                  alt="dropdown"
+                  width={34}
+                  height={34}
+                  className={`transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
 
-       <div className="flex flex-row gap-8 w-[1000px]">
-        {/* 메인 콘텐츠 - 게시글 목록 */}
-        <div className="flex-1">
-          {/* 브레드크럼 */}
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-h1 text-black">전체</span>
+              {/* 드롭다운 */}
+              {isDropdownOpen && (
+                <div className="absolute top-[calc(100%+16px)] left-0 z-50 w-[200px] overflow-hidden rounded-lg border border-grayScale-200 bg-white shadow-lg">
+                  {category.map((categoryItem, index) => (
+                    <div
+                      key={categoryItem.name}
+                      className={`cursor-pointer px-6 py-4 text-body1-regular ${
+                        categoryItem.name === selectedCategory
+                          ? "font-semibold text-grayScale-700"
+                          : "text-grayScale-500"
+                      } ${
+                        index !== category.length - 1
+                          ? "border-b border-grayScale-100"
+                          : ""
+                      } hover:bg-grayScale-50`}
+                      onClick={() => handleCategorySelect(categoryItem.name)}
+                    >
+                      {categoryItem.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p>커뮤니티</p>
           </div>
 
-          {/* 게시글 목록 */}
+          {/* 게시글 작성 버튼 */}
+          {isLoggedIn && (
+            <button
+              className="flex h-[43px] w-[133px] items-center justify-center rounded-full bg-grayScale-700 px-3 py-4 text-body1-sb text-grayScale-white"
+              onClick={() => setIsModalOpen(true)}
+            >
+              게시글 작성하기
+            </button>
+          )}
+        </div>
+
+        {/* 🔎 검색창 */}
+        <div className="relative w-[1000px] items-center justify-center">
+          <input
+            type="text"
+            className="h-[44px] w-full rounded-full border border-grayScale-filter py-2 pl-3 pr-12 text-body2-regular placeholder:text-grayScale-300"
+            placeholder="게시글 제목 또는 내용을 검색해보세요"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchSubmit();
+              }
+            }}
+          />
+          <Image
+            src="/icons/searchIcon.png"
+            alt="search"
+            width={24}
+            height={24}
+            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+            onClick={handleSearchSubmit}
+          />
+        </div>
+      </div>
+
+      {/* 메인 영역 */}
+      <div className="flex w-[1000px] flex-row gap-8">
+        {/* 게시글 리스트 */}
+        <div className="flex-1">
+          {/* 선택된 카테고리 타이틀 */}
+          <div className="mb-6 flex items-center gap-2">
+            <span className="text-h1 text-black">
+              {selectedCategory}
+              {isSearching && searchKeyword && (
+                <span className="ml-2 text-body2-regular text-grayScale-500">
+                  ‘{searchKeyword}’ 검색 결과
+                </span>
+              )}
+            </span>
+          </div>
+
+          {/* 상태 처리 */}
+          {showLoading && (
+            <LoadingSpinner
+              size="large"
+              showText={true}
+              text="게시글을 불러오는 중..."
+            />
+          )}
+
+          {showError && (
+            <div className="py-8 text-center text-red-500">
+              오류가 발생했습니다. 다시 시도해주세요.
+            </div>
+          )}
+
+          {!showLoading && !showError && postsToRender.length === 0 && (
+            <div className="py-8 text-center text-gray-500">
+              {isSearching
+                ? "검색 결과가 없습니다."
+                : "아직 작성된 게시글이 없습니다."}
+            </div>
+          )}
+
+          {/* 게시글 카드들 */}
           <div className="space-y-6">
-            {loading ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">로딩 중...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-8">
-                <p className="text-red-500">오류가 발생했습니다: {error}</p>
-              </div>
-            ) : posts.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">아직 작성된 게시글이 없습니다.</p>
-                <p className="text-sm text-gray-400 mt-2">첫 번째 게시글을 작성해보세요!</p>
-              </div>
-            ) : (
-              posts.map((post, index) => (
-                <div key={`${post.id}-${index}`} className="bg-white gap-6 py-4 px-6">
-                  <div className="flex flex-col items-start gap-3">
-                    <h3 className="text-h2 text-black">{post.title}</h3>
-                    <div className="flex flex-row justify-between w-full pb-6">
-                      <div className="flex flex-row items-center gap-3">
-                        <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-gray-600">
-                            {post.username?.charAt(0) || 'U'}
-                          </span>
-                        </div>
-                        <p className="text-body3-regular">{post.username}</p>
-                        <div className="text-body3-regular text-grayScale-500">
-                          {post.categoryDisplayName}
-                        </div>
+            {postsToRender.map((post) => (
+              <div key={post.id} className="bg-white py-4 px-6">
+                {/* 제목 + 작성자 정보 */}
+                <div className="flex flex-col items-start gap-3">
+                  <h3 className="text-h2 text-black">{post.title}</h3>
+                  <div className="flex w-full flex-row justify-between pb-6">
+                    <div className="flex flex-row items-center gap-3">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300">
+                        <span className="text-xs font-medium text-gray-600">
+                          {post.username?.charAt(0) || "U"}
+                        </span>
                       </div>
-                      <p className="text-body3-regular text-grayScale-500">
-                        {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-                      </p>
+                      <p className="text-body3-regular">{post.username}</p>
+                      <div className="text-body3-regular text-grayScale-500">
+                        {post.categoryDisplayName}
+                      </div>
                     </div>
+                    <p className="text-body3-regular text-grayScale-500">
+                      {formatDate(post.createdAt)}
+                    </p>
                   </div>
-
-                  {/* 이미지 */}
-                  {post.imageUrls && post.imageUrls.length > 0 && (
-                    <div className="w-full h-64 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                      <span className="text-gray-500">이미지 첨부됨</span>
-                    </div>
-                  )}
-
-                  {/* 게시글 액션 */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span className="text-gray-600">{post.likesCount}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <span className="text-gray-600">{post.commentsCount}</span>
-                    </div>
-                  </div>
-
-                  {/* 게시글 내용 */}
-                  <p className="text-gray-700">{post.content}</p>
                 </div>
-              ))
-            )}
 
-            {/* 무한 스크롤을 위한 Observer 요소 */}
-            {hasMore && (
+                {/* 이미지 캐러셀 */}
+                <PostImageCarousel
+                  imageUrls={post.imageUrls}
+                  title={post.title}
+                />
+
+                {/* 좋아요 / 댓글 */}
+                <div className="mb-4 flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleLike(post.id)}
+                    className="flex items-center gap-2"
+                    disabled={!isLoggedIn}
+                  >
+                    <ThumbsUp
+                      className={`w-6 h-6 transition-colors ${
+                        post.isLiked
+                          ? "text-key-100"
+                          : "text-grayScale-700"
+                      }`}
+                    />
+                    <span className="text-grayScale-700">
+                      {post.likesCount}
+                    </span>
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-6 h-6 text-grayScale-700" />
+                    <span className="text-grayScale-700">
+                      {post.commentsCount}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 내용 */}
+                <p className="text-gray-700">{post.content}</p>
+              </div>
+            ))}
+
+            {/* 무한스크롤 sentinel - 검색 중이 아닐 때만 */}
+            {!isSearching && hasMore && (
               <div ref={observerRef} className="py-4 text-center">
                 {loadingMore ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-grayScale-700"></div>
-                    <span className="ml-2 text-grayScale-500">더 많은 게시글을 불러오는 중...</span>
-                  </div>
+                  <LoadingSpinner
+                    size="medium"
+                    showText={true}
+                    text="더 많은 게시글을 불러오는 중..."
+                    className="py-2"
+                  />
                 ) : (
-                  <div className="h-1"></div>
+                  <div className="h-1" />
                 )}
               </div>
             )}
           </div>
         </div>
 
-        {/* 우측 사이드바 - 실시간 인기글 */}
-        <div className="w-80">
-          <h3 className="text-lg font-bold mb-4">실시간 인기글</h3>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer">
-              <span className="text-orange-500 font-bold text-sm">1</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium line-clamp-2 text-black mb-1">
-                  Christmas Party in my uni
-                </h4>
-                <p className="text-xs text-gray-500">Buon Natale ! Oggi alla nostra università abbiamo</p>
-              </div>
-            </div>
+        {/* 우측 인기글 바 */}
+        <PopularBar />
+      </div>
 
-            <div className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer">
-              <span className="text-orange-500 font-bold text-sm">2</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium line-clamp-2 text-black mb-1">
-                  이태리 대학교 크리스마스
-                </h4>
-                <p className="text-xs text-gray-500">왠만에서 이태리 현지 요리 클래스 소모임에서 알게든</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer">
-              <span className="text-orange-500 font-bold text-sm">3</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium line-clamp-2 text-black mb-1">
-                  뉴욕 겨울 아이스링크 오픈
-                </h4>
-                <p className="text-xs text-gray-500">록펠러 센터 앞 크리스마스 트리 밑 아이스링크장 어제 개장</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer">
-              <span className="text-orange-500 font-bold text-sm">4</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium line-clamp-2 text-black mb-1">
-                  Wiener Philharmoniker
-                </h4>
-                <p className="text-xs text-gray-500">Das Neujahrskonzert der Wiener Philharmoniker</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded cursor-pointer">
-              <span className="text-orange-500 font-bold text-sm">5</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium line-clamp-2 text-black mb-1">
-                  경북궁 한복 소모임에서 만
-                </h4>
-                <p className="text-xs text-gray-500">저번주 주말에 경복궁 한복대고 어제 킨이 간적 중국인 친구</p>
-              </div>
-            </div>
-          </div>
-        </div>
-       </div>
+      {/* 게시글 작성 모달 */}
+      <CommunityCreateModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          // 성공 시 새로고침 (간단 처리)
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
