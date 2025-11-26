@@ -12,7 +12,6 @@ export default function ChatRoomPage() {
 
   return (
     <div className="flex h-[755px] px-[14rem] translate-y-[10rem] bg-white flex-row gap-4 justify-center">
-      {/* 왼쪽: 채팅방 목록 */}
       <div className="w-[270px] border border-gray-200 flex flex-col bg-white rounded-[0.8rem]">
         <div className="flex-1 overflow-y-auto">
           <Suspense fallback={<div className="p-4 text-center text-gray-500">로딩 중...</div>}>
@@ -21,7 +20,6 @@ export default function ChatRoomPage() {
         </div>
       </div>
 
-      {/* 오른쪽: 채팅방 또는 빈 상태 */}
       <div className="flex flex-col bg-gray-50 w-[672px] h-full justify-center rounded-[0.8rem] border-[1px] border-gray-200 overflow-hidden">
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center">
@@ -33,7 +31,7 @@ export default function ChatRoomPage() {
           {roomId ? (
             <ChatRoom key={roomId} />
           ) : (
-            <EmptyChatState />
+            <EmptyChatState hasNoRooms={true} />
           )}
         </Suspense>
       </div>

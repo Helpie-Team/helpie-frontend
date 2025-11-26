@@ -2,16 +2,15 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useChatStore } from '@/app/lib/stores/chatStore';
 import ChatRoomList from '@/app/components/chat/ChatRoomList';
 import ChatRoom from '@/app/components/chat/ChatRoom';
 import EmptyChatState from '@/app/components/chat/EmptyChatState';
 
 export default function ChatPage() {
   const pathname = usePathname();
+  const { chatRooms, isLoadingRooms } = useChatStore();
   
-  // URL 경로에서 roomId 추출
-  // /chat/23 -> roomId = 23
-  // /chat -> roomId = null
   const [roomId, setRoomId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -34,9 +33,8 @@ export default function ChatPage() {
   }, [pathname]);
 
   return (
-    <div className="flex h-[755px] px-[14rem] translate-y-[10rem] bg-white flex-row gap-4 justify-center translate-y- ">
-      {/* 왼쪽: 채팅방 목록 */}
-      <div className="w-[270px] border border-gray-200 flex flex-col bg-white rounded-[0.8rem]">
+    <div className="flex h-[755px] px-[14rem] translate-y-[10rem] bg-white flex-row gap-4 justify-center  ">
+      <div className={`w-[270px] border border-gray-200 flex flex-col bg-white rounded-[0.8rem] ${!isLoadingRooms && chatRooms.length === 0 ? 'hidden' : ''}`}>
         <div className="flex-1 overflow-y-auto">
           <Suspense fallback={<div className="p-4 text-center text-gray-500">로딩 중...</div>}>
             <ChatRoomList />
@@ -44,8 +42,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* 오른쪽: 채팅방 또는 빈 상태 */}
-      <div className="flex bg-gray-50 w-[672px] justify-center rounded-[0.8rem] border-[0.1px]  border-gray-200">
+      <div className={`flex bg-gray-50 ${!isLoadingRooms && chatRooms.length === 0 ? 'w-full ' : 'w-[672px]'} justify-center rounded-[0.8rem] border-[0.1px] border-gray-200`}>
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -56,7 +53,7 @@ export default function ChatPage() {
           {roomId ? (
             <ChatRoom key={roomId} />
           ) : (
-            <EmptyChatState />
+            <EmptyChatState hasNoRooms={!isLoadingRooms && chatRooms.length === 0} />
           )}
         </Suspense>
       </div>
