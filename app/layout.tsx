@@ -4,6 +4,7 @@ import './globals.css';
 import Header from './components/common/Header/Header';
 import Footer from './components/common/Footer/Footer';
 import { QueryProvider } from './lib/query/QueryProvider';
+import TokenRefreshProvider from './components/auth/TokenRefreshProvider';
 
 const ensureEnv = (value: string | undefined, key: string) => {
   if (!value) {
@@ -57,6 +58,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${pretendard.variable} font-pretendard antialiased`}>
         <QueryProvider>
+          <TokenRefreshProvider />
           <Header />
           {children}
           <div className='h-[600px]'/>

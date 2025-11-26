@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
-import { syncAuthCookie } from '@/app/lib/utils/token';
+import { syncAuthCookie, setTokens, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 if (!apiBaseUrl) {
@@ -72,19 +72,38 @@ apiClient.interceptors.response.use(
       try {
         const refreshToken = getSessionValue('refreshToken');
         if (refreshToken) {
-          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${apiBaseUrl}/auth/refresh`, {
+          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${apiBaseUrl}/auth/token`, {
             refreshToken,
           });
 
-          const { accessToken } = response.data;
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          
+          // accessToken 저장
           setSessionValue('accessToken', accessToken);
-          syncAuthCookie(true);
+          
+          // refreshToken이 응답에 포함되어 있으면 업데이트 (만료 3일 전인 경우)
+          if (newRefreshToken) {
+            setSessionValue('refreshToken', newRefreshToken);
+            setTokens(accessToken, newRefreshToken);
+          } else {
+            // refreshToken이 없으면 기존 refreshToken 유지하고 accessToken만 업데이트
+            syncAuthCookie(true);
+            // 토큰 변경 이벤트 발생 (다른 컴포넌트들이 토큰 변경을 감지할 수 있도록)
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new Event(TOKEN_CHANGE_EVENT));
+            }
+          }
 
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        
+        // 리프레시 토큰도 만료된 경우 로그아웃 처리
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.removeItem('accessToken');
+          window.sessionStorage.removeItem('refreshToken');
+          syncAuthCookie(false);
+        }
         return Promise.reject(refreshError);
       }
     }

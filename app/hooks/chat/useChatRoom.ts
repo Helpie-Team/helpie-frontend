@@ -51,13 +51,11 @@ export function useChatRoom() {
   // 채팅방 상세 정보 및 메시지 로드
   useEffect(() => {
     if (!roomId || isLoadingProfile || !profileInfo?.username) {
-      console.log('[ChatRoom] roomId 또는 profileInfo가 없습니다:', { roomId, isLoadingProfile, profileInfo });
       return;
     }
 
     // 이미 같은 roomId로 입장 중이거나 입장 완료된 경우 중복 호출 방지
     if (enteringRoomIdRef.current === roomId || (currentRoomIdRef.current === roomId && hasEnteredRef.current)) {
-      console.log(`[ChatRoom] 이미 입장 중이거나 입장 완료된 roomId: ${roomId}`);
       return;
     }
 
@@ -74,11 +72,8 @@ export function useChatRoom() {
 
     const loadChatRoom = async () => {
       try {
-        console.log(`[ChatRoom] 채팅방 로드 시작: roomId=${roomId}, username=${profileInfo.username}`);
-        
         // 요청이 취소되었는지 확인
         if (abortControllerRef.current?.signal.aborted || !isMounted) {
-          console.log(`[ChatRoom] 요청이 취소되었거나 컴포넌트가 언마운트됨: roomId=${roomId}`);
           return;
         }
 
@@ -134,7 +129,6 @@ export function useChatRoom() {
         errorUnsubscribeRef.current = chatWebSocket.onError((error) => {
           const errorMessage = typeof error === 'string' ? error : 'WebSocket 연결에 실패했습니다.';
           setConnectionError(errorMessage);
-          console.error('[ChatRoom] WebSocket 에러:', error);
         });
         
         // WebSocket 종료 핸들러 등록
@@ -146,11 +140,9 @@ export function useChatRoom() {
       } catch (error) {
         // AbortError는 정상적인 취소이므로 무시
         if (error instanceof Error && error.name === 'AbortError') {
-          console.log(`[ChatRoom] 요청 취소됨: roomId=${roomId}`);
           return;
         }
         
-        console.error('[ChatRoom] 채팅방 로드 실패:', error);
         if (isMounted && !abortControllerRef.current?.signal.aborted) {
           isEnteringRef.current = false;
           enteringRoomIdRef.current = null;
@@ -225,7 +217,6 @@ export function useChatRoom() {
       setHasMoreMessages(!messagesData.last);
       setCurrentPage(nextPage);
     } catch (error) {
-      console.error('Failed to load more messages:', error);
     } finally {
       isLoadingRef.current = false;
     }
@@ -255,7 +246,6 @@ export function useChatRoom() {
         }
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
     }
   };
 

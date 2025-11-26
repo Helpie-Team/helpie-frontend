@@ -50,7 +50,7 @@ export default function ChatRoomItem({ room }: ChatRoomItemProps) {
     
     const date = new Date(lastMessage.sentAt);
     if (isToday(date)) {
-      return format(date, '오전 HH:mm', { locale: ko });
+      return format(date, 'a h:mm', { locale: ko });
     } else if (isYesterday(date)) {
       return format(date, 'M월d일', { locale: ko });
     } else if (isThisYear(date)) {

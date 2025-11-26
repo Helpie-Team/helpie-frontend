@@ -70,7 +70,6 @@ export const useChatStore = create<ChatState>((set) => ({
       });
       
       if (isDuplicate) {
-        console.log('[ChatStore] 중복 메시지 감지, 추가하지 않음:', message);
         return state; // 상태 변경 없음
       }
       
