@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import { useChatStore } from '@/app/lib/stores/chatStore';
 import { getAccessibleChatRooms } from '@/app/api/chat/chat';
 import ChatRoomItem from './ChatRoomItem';
-import EmptyChatState from './EmptyChatState';
 
 export default function ChatRoomList() {
   const { chatRooms, isLoadingRooms, setChatRooms, setIsLoadingRooms } = useChatStore();
@@ -35,11 +34,7 @@ export default function ChatRoomList() {
   }
 
   if (chatRooms.length === 0) {
-    return (
-      <div className="flex flex-col justify-center items-center h-full text-gray-500 p-8">
-        <EmptyChatState />
-      </div>
-    );
+    return null;
   }
 
   return (

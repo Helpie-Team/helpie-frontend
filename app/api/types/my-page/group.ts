@@ -15,6 +15,7 @@ export interface MyGroupInfoItem {
   maxMember?: number;
   meetingDate?: string;
   thumbnailUrl?: string | null;
+  chatRoomId?: number;
 }
 export type PageData<T> = PaginatedResponse & { content: T[] };
 

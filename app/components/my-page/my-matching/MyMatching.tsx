@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { cancelGroupApplication, toggleGroupBookmark } from '@/app/api/my-page/group';
+import { getAccessibleChatRooms } from '@/app/api/chat/chat';
 import { MY_GROUP_INFO_QUERY_KEY, useMyGroupInfo } from '@/app/hooks/my-page/useMyGroupInfo';
 import { MY_BOOKMARK_INFO_QUERY_KEY, useMyBookmarkInfo } from '@/app/hooks/my-page/useMyBookmarkInfo';
 import { MyBookmarkItem, MyGroupInfoItem, PaginatedResponse } from '@/app/api/types/my-page/group';
@@ -31,8 +32,8 @@ const getGroupIdentifier = (group: MyGroupInfoItem) => group.groupId;
 
 // 백엔드 응답에 포함될 수 있는 선택 필드를 안전하게 사용하기 위한 확장 타입
 type ExtendedMyGroupInfoItem = MyGroupInfoItem & {
-  chatUrl?: string | null;
   reviewWritten?: boolean;
+  chatUrl?: string | null;
 };
 
 const generateGroupKey = (prefix: string, group: MyGroupInfoItem, index: number) => {
@@ -192,7 +193,6 @@ const MyMatching = () => {
           errorMessage={UPCOMINGQuery.error instanceof Error ? UPCOMINGQuery.error.message : undefined}
           isEmpty={!UPCOMINGQuery.isLoading && UPCOMINGGroups.length === 0}
           emptyVariant="UPCOMING"
-          onEmptyAction={() => router.push('/matching')}
           emptyActionLabel="소모임 둘러보기"
           onLoadMore={UPCOMINGQuery.hasNextPage ? () => UPCOMINGQuery.fetchNextPage() : undefined}
           isLoadingMore={UPCOMINGQuery.isFetchingNextPage}
@@ -417,7 +417,8 @@ const GroupCard = ({
   onCancel?: () => void;
   isCancelling?: boolean;
 }) => {
-  const router=useRouter();
+  const router = useRouter();
+  const [isNavigatingToChat, setIsNavigatingToChat] = useState(false);
   const actionGroupId = getGroupIdentifier(group);
   const isPAST = variant === 'PAST';
   const meetingDate = formatDate(group.meetingDate);
@@ -427,7 +428,34 @@ const GroupCard = ({
   const memberText = `${group.currentMember ?? 0}/${group.maxMember ?? 0}`;
   const categoryText = group.category ?? '카테고리';
   const locationText = group.cityName ?? '지역 정보 없음';
-  const chatUrl = typeof group.chatUrl === 'string' && group.chatUrl.trim() !== '' ? group.chatUrl : null;
+
+  const handleChatRoomNavigation = async () => {
+    if (isNavigatingToChat) return;
+
+    setIsNavigatingToChat(true);
+    try {
+      // 먼저 chatRoomId가 있으면 직접 사용
+      if (group.chatRoomId) {
+        router.push(`/chat/${group.chatRoomId}`);
+        return;
+      }
+
+      // chatRoomId가 없으면 getAccessibleChatRooms로 찾기
+      const accessibleRooms = await getAccessibleChatRooms();
+      const targetRoom = accessibleRooms.find((room) => room.groupId === actionGroupId);
+
+      if (targetRoom) {
+        router.push(`/chat/${targetRoom.id}`);
+      } else {
+        alert('채팅방 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('채팅방 이동 중 오류가 발생했습니다:', error);
+      alert('채팅방 이동에 실패했습니다.');
+    } finally {
+      setIsNavigatingToChat(false);
+    }
+  };
 
   return (
     <div className="rounded-[24px] bg-white px-6 py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
@@ -470,26 +498,22 @@ const GroupCard = ({
         </div>
 
         <div className="flex gap-3 pt-2">
-          {/* 채팅방 이동 버튼 (chatUrl 있을 때만 활성) */}
+          {/* 채팅방 이동 버튼 */}
           <button
             type="button"
-            onClick={() => {
-              if (chatUrl) {
-                window.open(chatUrl, '_blank', 'noopener,noreferrer');
-              }
-            }}
+            onClick={handleChatRoomNavigation}
+            disabled={isNavigatingToChat}
             className="flex-1 rounded-full border border-grayScale-300 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-100 disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={!chatUrl}
           >
-            채팅방 이동
+            {isNavigatingToChat ? '이동 중...' : '채팅방 이동'}
           </button>
 
           {isPAST ? (
             <button
               type="button"
-              className={`flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90'
-              }`}
-            onClick={()=> {router.push(`/review/create/${actionGroupId}`);
+              className="flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90"
+              onClick={() => {
+                router.push(`/review/create/${actionGroupId}`);
           }}
             >
               후기 작성하기
