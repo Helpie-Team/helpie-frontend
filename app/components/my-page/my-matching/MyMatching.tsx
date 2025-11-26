@@ -514,7 +514,7 @@ const GroupCard = ({
               className="flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90"
               onClick={() => {
                 router.push(`/review/create/${actionGroupId}`);
-              }}
+          }}
             >
               후기 작성하기
             </button>
