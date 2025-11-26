@@ -287,7 +287,7 @@ export default function FindAccountModal() {
                 disabled={!emailSent || !watchedCode || watchedCode.length !== 6 || isLoading}
                 className={`w-full py-4 rounded-3xl font-medium text-lg transition-colors ${
                   emailSent && watchedCode && watchedCode.length === 6 && !isLoading
-                    ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-black text-white hover:bg-gray-800'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >

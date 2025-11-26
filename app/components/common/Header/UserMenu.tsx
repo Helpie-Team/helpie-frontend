@@ -72,7 +72,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ profileImageUrl, onProfileClick }) 
         >
           알림
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-4 -right-4 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}

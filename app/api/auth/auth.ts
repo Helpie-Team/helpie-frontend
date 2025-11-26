@@ -179,7 +179,7 @@ export async function refreshToken(): Promise<AuthResult> {
       };
     }
 
-    const response = await apiClient.post('/auth/refresh', { refreshToken });
+    const response = await apiClient.post('/auth/token', { refreshToken });
     
     return {
       success: true,

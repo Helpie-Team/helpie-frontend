@@ -130,13 +130,13 @@ export default function AlertPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleDeleteAll}
-              className="px-4 py-2 text-sm text-black border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm text-black border border-gray-300 rounded-3xl cursor-pointer hover:bg-gray-50"
             >
               모두삭제
             </button>
             <button
               onClick={handleSettingsClick}
-              className="px-4 py-2 text-sm text-black border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm text-black border border-gray-300 rounded-3xl cursor-pointer hover:bg-gray-50"
             >
               설정
             </button>
@@ -144,7 +144,7 @@ export default function AlertPage() {
         </div>
       </div>
 
-      <div className="px-6 py-4">
+      <div className="px-16 py-4">
         {isLoading ? (
           <div className="text-center text-gray-500 py-8">로딩 중...</div>
         ) : notifications.length === 0 ? (
@@ -162,7 +162,7 @@ export default function AlertPage() {
                     <div className="flex-shrink-0 w-2 h-2 bg-orange-500 rounded-full mt-2" />
                   )}
 
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 cursor-pointer">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <h3 className={`font-bold ${getTypeColor(notification.type)}`}>
                         {notification.title}
@@ -172,7 +172,7 @@ export default function AlertPage() {
                           e.stopPropagation();
                           handleDelete(notification.id);
                         }}
-                        className="flex-shrink-0 text-gray-400 hover:text-gray-600"
+                        className="flex-shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer"
                         title="알림 삭제"
                         aria-label="알림 삭제"
                       >
