@@ -355,7 +355,7 @@ const MyProfile = () => {
 
    return (
      <div className="flex w-full flex-col items-center gap-14">
-       <div className="flex w-full max-w-[720px] flex-col items-center gap-10">
+       <div className="flex w-full flex-col gap-8">
          <h2 className="self-start text-[28px] font-semibold text-grayScale-title">나의 프로필</h2>
  
         <input

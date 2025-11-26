@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNotificationSettings, useUpdateNotificationSettings } from '@/app/hooks/notification/useNotification';
 
 const MyOption = () => {
   const [language, setLanguage] = useState<'한국어' | 'English'>('한국어');
@@ -8,10 +9,56 @@ const MyOption = () => {
   const [pushSubscription, setPushSubscription] = useState(false);
   const [locationSharing, setLocationSharing] = useState(true);
 
+  // 알림 설정
+  const { data: notificationSettings, isLoading: isLoadingSettings } = useNotificationSettings();
+  const updateSettingsMutation = useUpdateNotificationSettings();
+
+  const [allNotifications, setAllNotifications] = useState(true);
+  const [commentNotifications, setCommentNotifications] = useState(true);
+  const [likeNotifications, setLikeNotifications] = useState(true);
+
+  // 알림 설정 초기화
+  useEffect(() => {
+    if (notificationSettings) {
+      setAllNotifications(notificationSettings.allNotifications);
+      setCommentNotifications(notificationSettings.commentNotifications);
+      setLikeNotifications(notificationSettings.likeNotifications);
+    }
+  }, [notificationSettings]);
+
+  // 알림 설정 업데이트
+  const handleNotificationSettingChange = async (
+    setting: 'allNotifications' | 'commentNotifications' | 'likeNotifications',
+    value: boolean
+  ) => {
+    if (isLoadingSettings) return;
+
+    const newSettings = {
+      allNotifications: setting === 'allNotifications' ? value : allNotifications,
+      commentNotifications: setting === 'commentNotifications' ? value : commentNotifications,
+      likeNotifications: setting === 'likeNotifications' ? value : likeNotifications,
+    };
+
+    // allNotifications가 false면 다른 설정도 false로
+    if (setting === 'allNotifications' && !value) {
+      newSettings.commentNotifications = false;
+      newSettings.likeNotifications = false;
+    }
+
+    try {
+      await updateSettingsMutation.mutateAsync(newSettings);
+      setAllNotifications(newSettings.allNotifications);
+      setCommentNotifications(newSettings.commentNotifications);
+      setLikeNotifications(newSettings.likeNotifications);
+    } catch (error) {
+      console.error('알림 설정 업데이트 실패:', error);
+    }
+  };
+
   return (
     <div className="flex w-full flex-col gap-10">
       <header>
-        <h2 className="text-[28px] font-semibold text-grayScale-title">나의 설정</h2>
+        <h2 className="text-[28px] font-semibold text-grayScale-title">설정</h2>
       </header>
 
       <section className="flex w-full flex-col gap-5">
@@ -21,21 +68,49 @@ const MyOption = () => {
             <LanguageSegmentedControl value={language} onChange={setLanguage} />
           </div>
         </SettingCard>
-
+        <h3 className="text-[20px] font-medium text-grayScale-title mb-4">기본 알림</h3>
         <SettingCard>
-          <ToggleRow
-            label="이메일 수신"
-            value={emailSubscription}
-            onChange={setEmailSubscription}
-          />
-          <Divider />
-          <ToggleRow label="앱푸시" value={pushSubscription} onChange={setPushSubscription} />
-          <Divider />
-          <ToggleRow
-            label="위치 정보 수집"
-            value={locationSharing}
-            onChange={setLocationSharing}
-          />
+          <div className="mb-4">  
+            <ToggleRow
+              label="전체 알림"
+              value={allNotifications}
+              onChange={(value) => handleNotificationSettingChange('allNotifications', value)}
+              disabled={isLoadingSettings}
+            />
+            <Divider />
+            <ToggleRow
+              label="댓글"
+              value={commentNotifications}
+              onChange={(value) => handleNotificationSettingChange('commentNotifications', value)}
+              disabled={isLoadingSettings || !allNotifications}
+            />
+            <Divider />
+            <ToggleRow
+              label="공감"
+              value={likeNotifications}
+              onChange={(value) => handleNotificationSettingChange('likeNotifications', value)}
+              disabled={isLoadingSettings || !allNotifications}
+            />
+          </div>
+        </SettingCard>
+
+        <h3 className="text-[20px] font-medium text-grayScale-title mb-4 ">부가설정</h3>
+        <SettingCard>
+          <div>
+            <ToggleRow
+              label="이메일 수신"
+              value={emailSubscription}
+              onChange={setEmailSubscription}
+            />
+            <Divider />
+            <ToggleRow label="앱푸시" value={pushSubscription} onChange={setPushSubscription} />
+            <Divider />
+            <ToggleRow
+              label="위치 정보 수집"
+              value={locationSharing}
+              onChange={setLocationSharing}
+            />
+          </div>
         </SettingCard>
       </section>
     </div>
@@ -90,30 +165,39 @@ const ToggleRow = ({
   label,
   value,
   onChange,
+  disabled = false,
 }: {
   label: string;
   value: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }) => (
   <div className="flex items-center justify-between py-2">
-    <span className="text-body1 text-grayScale-title">{label}</span>
-    <ToggleSwitch value={value} onChange={onChange} />
+    <span className={`text-body1 ${disabled ? 'text-grayScale-400' : 'text-grayScale-title'}`}>{label}</span>
+    <ToggleSwitch value={value} onChange={onChange} disabled={disabled} />
   </div>
 );
 
 const ToggleSwitch = ({
   value,
   onChange,
+  disabled = false,
 }: {
   value: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }) => (
   <button
     type="button"
     aria-label={value ? '토글 끄기' : '토글 켜기'}
-    onClick={() => onChange(!value)}
+    onClick={() => !disabled && onChange(!value)}
+    disabled={disabled}
     className={`relative h-6 w-12 rounded-full border border-transparent transition-colors duration-300 ease-in-out ${
-      value ? 'bg-[var(--color-key-100)]' : 'bg-grayScale-300'
+      disabled
+        ? 'bg-grayScale-200 cursor-not-allowed'
+        : value
+          ? 'bg-[var(--color-key-100)]'
+          : 'bg-grayScale-300'
     }`}
   >
     <span
