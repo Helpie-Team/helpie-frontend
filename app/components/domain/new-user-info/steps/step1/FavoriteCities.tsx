@@ -66,22 +66,18 @@ export default function FavoriteCities({
           <span className="text-body2 text-grayScale-500">로딩 중...</span>
         </div>
       ) : (
-        <div className="flex gap-4 w-full pb-2">
+        <div className="flex flex-wrap gap-4 w-full pb-2">
           {favoriteCities.map((city) => {
             const isSelected = selectedCity?.id === city.id;
             return (
               <button
                 key={city.id}
                 onClick={() => onCityClick(city)}
-                className={`flex-shrink-0 rounded-lg overflow-hidden relative transition-all ${
+                className={`w-[calc((100%-2rem)/3)] sm:w-[7.125rem] h-[6.8125rem] rounded-lg overflow-hidden relative transition-all ${
                   isSelected
                     ? 'ring-2 ring-[var(--color-key-100)] ring-offset-2'
                     : ''
                 }`}
-                style={{
-                  width: '7.125rem',
-                  height: '6.8125rem',
-                }}
               >
                 <Image
                   src={getCityImage(city.code)}
