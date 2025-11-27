@@ -36,7 +36,7 @@ export default function AboutPage() {
     return (
         <>
             {/* Hero Section - 메인 이미지와 텍스트 */}
-            <section className="relative w-screen h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
+            <section className="relative w-screen h-[516px] md:h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
                 {/* 배경 이미지 */}
                 <Image
                     src={aboutImageMap.cover}
@@ -99,8 +99,8 @@ export default function AboutPage() {
             </motion.section>
 
             {/* Our Mission 섹션 */}
-            <section className="w-[942px] h-[471.22px] gap-10">
-                <div className=" mx-auto">
+            <section className="w-full max-w-6xl mx-auto px-4 py-8">
+                <div className="mx-auto">
                     <motion.h2
                         className="text-3xl font-bold text-center mb-12"
                         initial="hidden"
@@ -111,10 +111,10 @@ export default function AboutPage() {
                     >
                         Our Mission
                     </motion.h2>
-                    <div className="flex flex-row gap-3">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-3 justify-center items-center">
                         {/* 함께 나누기 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[280px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -146,7 +146,7 @@ export default function AboutPage() {
 
                         {/* 삶을 전하기 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[280px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -178,7 +178,7 @@ export default function AboutPage() {
 
                         {/* 세 번째 카드 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[280px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -238,7 +238,7 @@ export default function AboutPage() {
                             <div className="flex-1 h-[244px] flex justify-center flex-col">
                                 <div className="flex items-start text-start flex-col gap-16">
                                         <Image src={people} alt="사람아이콘" width={60} height={60}/>
-                                        <div className='w-[461px] flex flex-col gap-4'>
+                                        <div className='w-full max-w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">소모임</h3>
                                                 <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/matching')} />
@@ -279,7 +279,7 @@ export default function AboutPage() {
                             <div className=" h-[244px] flex justify-center flex-col">
                                 <div className="flex items-start text-start flex-col gap-20">
                                         <Image src={community} alt="지구 아이콘" width={60} height={60}/>
-                                        <div className='w-[461px] flex flex-col gap-4'>
+                                        <div className='w-full max-w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">커뮤니티</h3>
                                                 <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/community')} />
