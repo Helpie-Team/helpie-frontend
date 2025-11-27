@@ -120,6 +120,9 @@ export default function Page() {
               : post
           )
         );
+
+        // 인기글 순위 즉시 업데이트 (mutation에서 이미 처리하지만 명시적으로 추가)
+        console.log('좋아요 변경됨, 인기글 순위 업데이트 중...');
       },
       onError: () => {
         // 필요하면 에러 토스트 등

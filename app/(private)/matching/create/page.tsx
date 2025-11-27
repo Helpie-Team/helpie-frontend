@@ -228,20 +228,35 @@ export default function Page() {
           }
         />
 
-        {/* 모임인원 */}
-        <MatchingInput
-          type="number"
-          label="모임인원"
-          required
-          value={formData.maxParticipants}
-          onChange={(value) =>
-            setFormData({
-              ...formData,
-              maxParticipants: value as number,
-            })
-          }
-          placeholder="숫자만 입력해 주세요."
-        />
+       {/* 모임인원 */}
+<MatchingInput
+  type="number"
+  label="모임인원"
+  required
+  value={formData.maxParticipants}
+  min={3}
+  onChange={(value) => {
+    const num = Number(value);
+    
+    if (isNaN(num)) return; // 숫자 아닌 입력 무시
+    
+    // 3 미만 입력이 들어오면 즉시 3으로 설정
+    if (num < 3) {
+      setFormData({
+        ...formData,
+        maxParticipants: 3,
+      });
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      maxParticipants: num,
+    });
+  }}
+  placeholder="숫자만 입력해주세요."
+ />
+
 
         {/* 카테고리 설정 */}
         <MatchingInput

@@ -62,3 +62,11 @@ export interface CreateReviewResponse {
   description: string;
   imageUrls: string[];
 }
+
+
+//리뷰 작성 가능 여부 확인
+export interface ReviewCheckResponse{
+  canWrite: boolean,
+  hasReview: boolean,
+  message: string,
+}

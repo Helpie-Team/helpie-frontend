@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Inquiry() {
-  const [copied, setCopied] = useState(false);
   const email = "lifestylehelpie@gmail.com";
 
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // 2초 후 원래 상태로 복구
+      toast.success("복사되었습니다!");
     } catch (err) {
       console.error("복사 실패:", err);
+      toast.error("복사에 실패했습니다.");
     }
   };
 
@@ -26,9 +27,24 @@ export default function Inquiry() {
           onClick={handleCopyEmail}
           className="w-[60px] h-[35px] rounded-full text-body1 text-black bg-white border border-grayScale-200 cursor-pointer"
         >
-          {copied ? "복사됨!" : "복사"}
+          복사
         </button>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastClassName="custom-toast"
+      />
     </div>
   );
 }

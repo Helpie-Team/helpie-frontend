@@ -282,7 +282,7 @@ export default function AboutPage() {
                                         <div className='w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">커뮤니티</h3>
-                                                <span className="px-3 py-1 rounded-full bg-grayScale-100 text-grayScale-400 text-sm">준비중</span>
+                                                <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/community')} />
                                             </div>
                                             <p className="text-gray-600 text-h3 mb-0">
                                                 관심 있는 주제나 지역의 사람들과 일상을 자유롭게 소통해요.<br />
