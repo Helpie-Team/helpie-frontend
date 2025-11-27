@@ -105,8 +105,11 @@ export const useCommunitiesPopularQuery = () => {
   return useQuery<communitiesPopular>({
     queryKey: POPULAR_COMMUNITIES_QUERY_KEY,
     queryFn: getCommunitiesPopular,
-    staleTime: 1000 * 60,
+    staleTime: 0, // 항상 최신 데이터로 업데이트
     gcTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 10, // 10초마다 자동 refetch (더 자주)
+    refetchOnWindowFocus: true, // 윈도우 포커스 시 refetch
+    refetchIntervalInBackground: false, // 백그라운드에서는 refetch 안함 (성능 고려)
   })
 }
 
@@ -130,10 +133,20 @@ export const useToggleCommunityLikeMutation = () => {
   return useMutation<boolean, Error, number>({
     mutationFn: (communityId:number) => toggleCommunityLike(communityId),
     onSuccess: () => {
-      // 1) 리스트 / 인기글 다시 불러오고 싶을 때
+      // 1) 캐시 즉시 무효화
       queryClient.invalidateQueries({ queryKey: ["communities", "list"] });
-      queryClient.invalidateQueries({ queryKey: ["communities", "popular"] });
+      queryClient.invalidateQueries({ queryKey: POPULAR_COMMUNITIES_QUERY_KEY });
 
+      // 2) 인기글 즉시 강제 refetch (새로운 조회수/좋아요 데이터 반영)
+      queryClient.fetchQuery({
+        queryKey: POPULAR_COMMUNITIES_QUERY_KEY,
+        queryFn: getCommunitiesPopular,
+        staleTime: 0,
+      });
+    },
+    onMutate: () => {
+      // 3) mutation 시작과 동시에도 인기글 refetch
+      queryClient.refetchQueries({ queryKey: POPULAR_COMMUNITIES_QUERY_KEY });
     },
   });
 };
