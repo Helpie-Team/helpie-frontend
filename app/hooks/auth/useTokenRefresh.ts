@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { getRefreshToken, getAccessToken, setTokens, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
+import { getRefreshToken, getAccessToken, setTokens, updateAccessToken, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
 import axios from 'axios';
 
 const TOKEN_REFRESH_INTERVAL = 30 * 60 * 1000; // 30분 (밀리초)
@@ -43,9 +43,7 @@ export function useTokenRefresh() {
         setTokens(accessToken, newRefreshToken);
       } else {
         // refreshToken이 없으면 기존 refreshToken 유지하고 accessToken만 업데이트
-        const storage = window.sessionStorage;
-        storage.setItem('accessToken', accessToken);
-        window.dispatchEvent(new Event(TOKEN_CHANGE_EVENT));
+        updateAccessToken(accessToken);
       }
     } catch (error) {
       console.error('자동 토큰 갱신 실패:', error);
