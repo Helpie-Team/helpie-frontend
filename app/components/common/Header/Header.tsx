@@ -197,7 +197,6 @@ const Header = () => {
       <HamburgerMenu 
         isOpen={isMobileMenuOpen} 
         onClose={handleCloseMobileMenu}
-        anchorRef={hamburgerButtonRef}
       />
       
       {/* 모바일 알림 */}
