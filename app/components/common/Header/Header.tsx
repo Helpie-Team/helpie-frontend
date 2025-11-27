@@ -123,40 +123,44 @@ const Header = () => {
                 </Link>
               </li>
 
-              {/* 모바일: 햄버거 메뉴 및 알림 아이콘 */}
+              {/* 모바일: 로그인/회원가입 버튼 또는 햄버거 메뉴 및 알림 아이콘 */}
               <li className="flex flex-row items-center gap-3 sm:hidden">
                 {showSkeleton ? (
                   <div className="flex flex-row items-center gap-3" aria-hidden="true">
-                    <div className="w-6 h-6 rounded bg-gray-200 animate-pulse" />
-                    <div className="w-6 h-6 rounded bg-gray-200 animate-pulse" />
+                    <div className="w-12 h-5 rounded bg-gray-200 animate-pulse" />
+                    <div className="w-12 h-5 rounded bg-gray-200 animate-pulse" />
                   </div>
                 ) : (
                   <>
-                    {isLoggedIn && (
-                      <button
-                        ref={alertButtonRef}
-                        type="button"
-                        onClick={handleMobileAlertClick}
-                        className="relative p-2 cursor-pointer"
-                        aria-label="알림"
-                      >
-                        <Bell className="w-6 h-6 text-grayScale-700" />
-                        {unreadCount > 0 && (
-                          <span className="absolute top-0 right-0 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                            {unreadCount > 99 ? '99+' : unreadCount}
-                          </span>
-                        )}
-                      </button>
+                    {isLoggedIn ? (
+                      <>
+                        <button
+                          ref={alertButtonRef}
+                          type="button"
+                          onClick={handleMobileAlertClick}
+                          className="relative p-2 cursor-pointer"
+                          aria-label="알림"
+                        >
+                          <Bell className="w-6 h-6 text-grayScale-700" />
+                          {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                              {unreadCount > 99 ? '99+' : unreadCount}
+                            </span>
+                          )}
+                        </button>
+                        <button
+                          ref={hamburgerButtonRef}
+                          type="button"
+                          onClick={handleMobileMenuClick}
+                          className="p-2 cursor-pointer"
+                          aria-label="메뉴 열기"
+                        >
+                          <Menu className="w-6 h-6 text-grayScale-700" />
+                        </button>
+                      </>
+                    ) : (
+                      <AuthButtons onLoginClick={handleLoginClick} onSignupClick={handleSignupClick} />
                     )}
-                    <button
-                      ref={hamburgerButtonRef}
-                      type="button"
-                      onClick={handleMobileMenuClick}
-                      className="p-2 cursor-pointer"
-                      aria-label="메뉴 열기"
-                    >
-                      <Menu className="w-6 h-6 text-grayScale-700" />
-                    </button>
                   </>
                 )}
               </li>
