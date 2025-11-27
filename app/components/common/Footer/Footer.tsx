@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
-
+import { ChevronUp } from "lucide-react";
 import logoFooter from "@/public/logoFooter.png";
 import instagramFooter from "@/public/icons/instagramFooter.png";
 import twitterFooter from "@/public/icons/twitterFooter.png";
@@ -293,7 +293,7 @@ export default function Footer() {
                 className="flex items-center py-1 cursor-pointer hover:opacity-80"
               >
                 <span>{selectedLabel}</span>
-                <ChevronDown className="w-4 h-4 ml-1" />
+                {isOpen ?<ChevronUp className="text-grayScale-600" />: <ChevronDown className="text-grayScale-600" />}
               </button>
 
               {isOpen && (
