@@ -107,13 +107,13 @@ const MyActivity = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-8">
+    <div className="flex w-full flex-col gap-6 sm:gap-8">
       <header>
-        <h2 className="text-[28px] font-semibold text-grayScale-title">나의 활동</h2>
+        <h2 className="hidden sm:block text-[28px] font-semibold text-grayScale-title">나의 활동</h2>
       </header>
 
       <nav className="border-b border-grayScale-100">
-        <div className="relative mx-auto flex max-w-[720px] justify-between text-center text-body1 text-grayScale-500">
+        <div className="relative mx-auto flex max-w-[720px] justify-between text-center text-sm sm:text-body1 text-grayScale-500">
           {MAIN_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -137,7 +137,7 @@ const MyActivity = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveSubTab(tab.id)}
-              className={`rounded-full px-4 py-2 text-body2 transition-colors ${
+              className={`rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-body2 transition-colors ${
                 activeSubTab === tab.id
                    ? 'bg-black text-white'
                   : 'bg-white text-black border-grayScale-100 border-[1px] hover:bg-grayScale-200'
@@ -156,7 +156,7 @@ const MyActivity = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveSubTab(tab.id)}
-              className={`rounded-full px-4 py-2 text-body2 transition-colors ${
+              className={`rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-body2 transition-colors ${
                 activeSubTab === tab.id
                   ? 'bg-black text-white'
                   : 'bg-white text-black border-grayScale-100 border-[1px] hover:bg-grayScale-200'
@@ -247,8 +247,8 @@ const LikedReviewCard = ({ review }: { review: MyReviewItem }) => {
   const formattedMeetingDate = formatDate(review.meetingDate);
 
   return (
-    <div className="flex gap-4">
-      <div className="relative h-[92px] w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
+    <div className="flex gap-3 sm:gap-4">
+      <div className="relative h-[70px] w-[70px] sm:h-[92px] sm:w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
         <Image
           src={review.thumbnailUrl ?? PlaceholderGroupImage}
           alt={review.groupTitle}
@@ -257,26 +257,26 @@ const LikedReviewCard = ({ review }: { review: MyReviewItem }) => {
           className="object-cover"
         />
         <div className="absolute bottom-1 right-1">
-          <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+          <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-red-500 text-red-500" />
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2">
-        <h3 className="text-body1 text-grayScale-title">{review.groupTitle}</h3>
-        <div className="flex gap-1">
+      <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 min-w-0">
+        <h3 className="text-sm sm:text-body1 text-grayScale-title truncate">{review.groupTitle}</h3>
+        <div className="flex gap-0.5 sm:gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
-              className={`text-lg ${star <= review.rating ? 'text-[var(--color-key-100)]' : 'text-grayScale-200'}`}
+              className={`text-sm sm:text-lg ${star <= review.rating ? 'text-[var(--color-key-100)]' : 'text-grayScale-200'}`}
             >
               ★
             </span>
           ))}
         </div>
-        <p className="text-caption1-regular text-grayScale-500">
+        <p className="text-xs sm:text-caption1-regular text-grayScale-500 truncate">
           {review.reviewerName} {formattedMeetingDate}
         </p>
-        <p className="text-body2 text-grayScale-600 line-clamp-2">{review.contentPreview}</p>
+        <p className="text-xs sm:text-body2 text-grayScale-600 line-clamp-2">{review.contentPreview}</p>
       </div>
     </div>
   );
@@ -346,8 +346,8 @@ const CommentCard = ({ comment }: { comment: MyCommentItem }) => {
   const formattedDate = formatDate(comment.createdAt);
 
   return (
-    <div className="flex gap-4">
-      <div className="relative h-[50px] w-[50px] overflow-hidden rounded-full bg-grayScale-200 flex-shrink-0">
+    <div className="flex gap-3 sm:gap-4">
+      <div className="relative h-[40px] w-[40px] sm:h-[50px] sm:w-[50px] overflow-hidden rounded-full bg-grayScale-200 flex-shrink-0">
         <Image
           src={comment.thumbnailUrl ?? PlaceholderGroupImage}
           alt="프로필"
@@ -357,14 +357,14 @@ const CommentCard = ({ comment }: { comment: MyCommentItem }) => {
         />
       </div>
 
-      <div className="flex flex-1 flex-col gap-2">
-        <div className="flex items-center gap-2 text-caption1-regular text-grayScale-500">
+      <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-caption1-regular text-grayScale-500 flex-wrap">
           <span>{comment.categoryDisplayName}</span>
-          <span className="text-grayScale-title">{comment.title}</span>
+          <span className="text-grayScale-title truncate">{comment.title}</span>
           <span>에 남긴 댓글</span>
         </div>
-        <p className="text-body2 text-grayScale-600 line-clamp-2">{comment.contentPreview}</p>
-        <p className="text-caption1-regular text-grayScale-400">{formattedDate}</p>
+        <p className="text-xs sm:text-body2 text-grayScale-600 line-clamp-2">{comment.contentPreview}</p>
+        <p className="text-xs sm:text-caption1-regular text-grayScale-400">{formattedDate}</p>
       </div>
     </div>
   );
@@ -543,10 +543,10 @@ const GroupPostCard = ({ group }: { group: MyGroupPostItem }) => {
   const memberText = `${group.currentMember}/${group.maxMember}`;
 
   return (
-    <div className="rounded-[24px] bg-white px-6 py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
-      <div className="flex flex-col gap-4">
-        <div className="flex gap-4">
-          <div className="relative h-[92px] w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
+    <div className="rounded-[24px] bg-white px-4 sm:px-6 py-4 sm:py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex gap-3 sm:gap-4">
+          <div className="relative h-[80px] w-[80px] sm:h-[92px] sm:w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
             <Image
               src={group.thumbnailUrl ?? PlaceholderGroupImage}
               alt={group.title}
@@ -556,24 +556,24 @@ const GroupPostCard = ({ group }: { group: MyGroupPostItem }) => {
             />
           </div>
 
-          <div className="flex flex-1 flex-col gap-2">
+          <div className="flex flex-1 flex-col gap-2 min-w-0">
             <div>
-              <p className="text-body1 text-grayScale-title">{group.title}</p>
-              <p className="text-body2 text-grayScale-500">{group.description}</p>
+              <p className="text-sm sm:text-body1 text-grayScale-title truncate">{group.title}</p>
+              <p className="text-xs sm:text-body2 text-grayScale-500 line-clamp-2">{group.description}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-caption1-regular text-grayScale-500">
-              <MapPin className="w-4 h-4" />
-              <span>{group.cityName}</span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-caption1-regular text-grayScale-500">
+              <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="truncate">{group.cityName}</span>
               <SeparatorDot />
               <span className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
+                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                 {memberText}
               </span>
               <SeparatorDot />
-              <Tag className="w-4 h-4" />
-              <span>{group.category}</span>
+              <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="truncate">{group.category}</span>
             </div>
-            <p className="text-caption1-regular text-grayScale-500">{formattedDate}</p>
+            <p className="text-xs sm:text-caption1-regular text-grayScale-500">{formattedDate}</p>
           </div>
         </div>
       </div>
@@ -602,8 +602,8 @@ const PostCard = ({
   const formattedDate = formatDate(post.createdAt);
 
   return (
-    <div className="flex gap-4">
-      <div className="relative h-[92px] w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
+    <div className="flex gap-3 sm:gap-4">
+      <div className="relative h-[70px] w-[70px] sm:h-[92px] sm:w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
         <Image
           src={post.thumbnailUrl ?? PlaceholderGroupImage}
           alt={post.title}
@@ -613,12 +613,12 @@ const PostCard = ({
         />
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 relative" data-menu-container>
-        <div className="flex items-start justify-between">
-          <div className="flex flex-1 flex-col gap-1">
-            <p className="text-caption1-regular text-grayScale-500">{post.categoryDisplayName}</p>
-            <h3 className="text-body1 text-grayScale-title">{post.title}</h3>
-            <p className="text-body2 text-grayScale-500 line-clamp-2">{post.contentPreview}</p>
+      <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 relative min-w-0" data-menu-container>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-1 flex-col gap-1 min-w-0">
+            <p className="text-xs sm:text-caption1-regular text-grayScale-500">{post.categoryDisplayName}</p>
+            <h3 className="text-sm sm:text-body1 text-grayScale-title truncate">{post.title}</h3>
+            <p className="text-xs sm:text-body2 text-grayScale-500 line-clamp-2">{post.contentPreview}</p>
           </div>
           <button
             type="button"
@@ -626,14 +626,14 @@ const PostCard = ({
               e.stopPropagation();
               onMenuToggle();
             }}
-            className="ml-2 p-1 hover:bg-grayScale-100 rounded transition-colors"
+            className="ml-2 p-1 hover:bg-grayScale-100 rounded transition-colors flex-shrink-0"
             title="메뉴 열기"
             aria-label="메뉴 열기"
           >
-            <MoreVertical className="w-5 h-5 text-grayScale-400" />
+            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-grayScale-400" />
           </button>
         </div>
-        <p className="text-caption1-regular text-grayScale-400">{formattedDate}</p>
+        <p className="text-xs sm:text-caption1-regular text-grayScale-400">{formattedDate}</p>
 
         {isMenuOpen && (
           <div className="absolute top-8 right-0 bg-white border border-grayScale-200 rounded-lg shadow-lg z-10 min-w-[120px]">
