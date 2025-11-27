@@ -74,10 +74,10 @@ export default function Modal() {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 "
+      className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-[540px] bg-white rounded-[30px] p-8 mx-4 ">
+      <div className="w-full sm:max-w-[540px] bg-white rounded-t-[30px] sm:rounded-[30px] p-8 sm:mx-4 animate-slide-up">
         {/* 헤더 */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-xl font-bold text-black">
@@ -92,14 +92,20 @@ export default function Modal() {
         </div>
         
         {/* 로그인 버튼들 */}
-        <div className="flex flex-col gap-7 space-y-4 mb-8">
+        <div className="flex flex-col gap-4 mb-8">
           <div className='flex flex-col gap-2'>
-          <GoogleLoginButton socialType="GOOGLE" icon={GoogleIcon.src} />
-          <KakaoLoginButton socialType="KAKAO" icon={KakaoIcon.src} />
+            <GoogleLoginButton socialType="GOOGLE" icon={GoogleIcon.src} />
+            <KakaoLoginButton socialType="KAKAO" icon={KakaoIcon.src} />
+          </div>
+
+          {/* 구분선 */}
+          <div className="relative flex items-center my-2">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-sm text-gray-500">또는</span>
+            <div className="flex-1 border-t border-gray-300"></div>
           </div>
 
           {/* 이메일 버튼 */}
-          <div className="flex flex-col gap-2">
           <button 
             onClick={handleEmailButtonClick}
             className="w-full bg-white border border-gray-300 rounded-3xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
@@ -107,7 +113,6 @@ export default function Modal() {
             <Image src={EmailIcon} alt="Email" width={24} height={24} />
             <span className="text-black font-medium">E-mail로 {modalType === 'login' ? '로그인' : '이용하기'}</span>
           </button>
-        </div>
         </div>
         
         {/* 하단 링크들 */}
