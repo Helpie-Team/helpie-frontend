@@ -255,7 +255,7 @@ export const chatbotAnswers: Record<ChatbotCategoryKey, ChatbotAnswer[]> = {
     {
       key: 'account_language_change',
       message:
-        '언어 설정은 마이페이지 > 설정에서 수정할 수 있어요! 현재 헬피에서 지원하는 언어는 한국어/English 에요. ʚ(•”̮•)ɞ',
+        '언어 설정은 마이페이지 > 설정에서 수정할 수 있어요! 현재 헬피에서 지원하는 언어는 한국어/English 에요. ʚ(•"̮•)ɞ',
       ctaLabel: '마이페이지 > 설정 이동',
       ctaTarget: 'my-page/settings',
     },

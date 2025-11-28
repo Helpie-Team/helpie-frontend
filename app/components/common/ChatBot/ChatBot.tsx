@@ -44,12 +44,13 @@ type ChatBotState = {
 const routeMap: RouteMap = {
   'account-recovery-8-1': '/auth',
   'my-page/profile': '/my-page',
-  'my-page/settings': '/my-page',
+  'my-page/settings': '/my-page?tab=settings',
   'my-page/group': '/my-page',
+  'my-page/activity': '/my-page',
   'group/main-3-0': '/matching',
   'group/create-3-1': '/matching',
   'survey/2-1': '/new-user-info',
-  'support/contact-10-1': '/support/contact',
+  'support/contact-10-1': '/cs',
 };
 
 const modalTargetMap: Record<string, 'login' | 'signup'> = {

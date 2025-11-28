@@ -76,7 +76,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             <div
               className={`px-3 py-2 rounded-[0.8rem] ${
                 isMyMessage
-                  ? 'bg-key-200 text-white'
+                  ? 'bg-key-100 text-white'
                   : 'bg-white text-gray-900'
               }`}
             >
