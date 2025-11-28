@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Notice from "@/app/components/cs/Notice";
 import Promotion from "@/app/components/cs/Promotion";
@@ -12,7 +12,15 @@ export default function Page() {
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<"notice" | "inquiry">("notice");
   const [activeTab, setActiveTab] = useState<"notice" | "promotion">("notice");
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
 
+  useEffect(() => {
+    if (tab === 'inquiry') {
+      setActiveMenu('inquiry');
+    }
+  }, [tab]);
+  
   const sidebarMenus = [
     { id: "notice" as const, label: "공지사항" },
     { id: "inquiry" as const, label: "문의" },

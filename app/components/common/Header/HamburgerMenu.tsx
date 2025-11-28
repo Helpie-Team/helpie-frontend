@@ -66,7 +66,7 @@ const MENU_SECTIONS: MenuSection[] = [
         label: '공지사항',
       },
       {
-        href: '/cs',
+        href: '/cs?tab=inquiry',
         icon: Headset,
         label: '문의하기',
       },
