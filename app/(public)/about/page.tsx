@@ -8,7 +8,7 @@ import community from '@/public/icons/community.png'
 import people from '@/public/icons/people.png'
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-
+import mcover from "@/public/images/about/helpiemcover.png";
 export default function AboutPage() {
     const router = useRouter();
 
@@ -36,13 +36,22 @@ export default function AboutPage() {
     return (
         <>
             {/* Hero Section - 메인 이미지와 텍스트 */}
-            <section className="relative w-screen h-[516px] sm:h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
+            <section className="relative w-screen h-[667px] sm:h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
                 {/* 배경 이미지 */}
+                {/* PC 이미지 */}
                 <Image
                     src={aboutImageMap.cover}
                     alt="HELPie Cover"
                     fill
-                    className="object-cover"
+                    className="object-cover hidden sm:block"
+                    priority
+                />
+                {/* 모바일 이미지 */}
+                <Image
+                    src={mcover}
+                    alt="HELPie Mobile Cover"
+                    fill
+                    className="object-cover block sm:hidden"
                     priority
                 />
                 {/* 오버레이 (텍스트 가독성을 위한 반투명 레이어) */}
@@ -115,7 +124,7 @@ export default function AboutPage() {
                     <div className="flex flex-col sm:flex-row gap-6 sm:gap-3 justify-center items-center sm:items-stretch">
                         {/* 함께 나누기 */}
                         <motion.div
-                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[343px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -134,7 +143,7 @@ export default function AboutPage() {
                                 </p>
                             </div>
                             {/* 이미지 영역 */}
-                            <div className="w-full h-[217.22px]">
+                            <div className="w-full h-[218px] sm:h-[217.22px]">
                                 <Image
                                     src={aboutImageMap.seperate}
                                     alt="삶을 전하기"
@@ -147,7 +156,7 @@ export default function AboutPage() {
 
                         {/* 삶을 전하기 */}
                         <motion.div
-                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[343px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -166,7 +175,7 @@ export default function AboutPage() {
                                 </p>
                             </div>
                             {/* 이미지 영역 */}
-                            <div className="w-full h-[217px]">
+                            <div className="w-full h-[218px] sm:h-[217px]">
                                 <Image
                                     src={aboutImageMap.life}
                                     alt="삶을 전하기"
@@ -179,7 +188,7 @@ export default function AboutPage() {
 
                         {/* 세 번째 카드 */}
                         <motion.div
-                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[343px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -198,7 +207,7 @@ export default function AboutPage() {
                                 </p>
                             </div>
                             {/* 이미지 영역 */}
-                            <div className="w-full h-[217.22px]">
+                            <div className="w-full h-[218px] sm:h-[217.22px]">
                                 <Image
                                     src={aboutImageMap.life2}
                                     alt="마음을 잇기"

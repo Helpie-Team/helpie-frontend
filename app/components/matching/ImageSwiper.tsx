@@ -49,9 +49,7 @@ export default function ImageSwiper() {
   return (
     <div className="w-full flex justify-center">
       <div className="w-full max-w-[375px] sm:max-w-[1000px] flex flex-col items-start gap-3">
-        <h1 className="text-body1-sb sm:text-h1 text-grayScale-700">
-          다양한 소모임을 둘러보고 참여해보세요!
-        </h1>
+       
 
         <button
   type="button"
@@ -95,7 +93,9 @@ export default function ImageSwiper() {
     </div>
   ))}
 </button>
-
+        <h1 className="text-grayScale-700 text-[14px] sm:text-[24px] font-semibold">
+          다양한 소모임을 둘러보고 참여해보세요!
+        </h1>
       </div>
     </div>
   );
