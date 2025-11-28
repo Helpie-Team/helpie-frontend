@@ -29,41 +29,44 @@ const mockPromotionData: PromotionItem[] = [
 ];
 
 export default function Promotion() {
-  // 한달 이내인지 체크하는 함수
   const isWithinOneMonth = (dateString: string) => {
     const noticeDate = new Date(dateString);
     const currentDate = new Date();
-    const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
+    const oneMonthAgo = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      currentDate.getDate()
+    );
     return noticeDate >= oneMonthAgo;
   };
 
   return (
     <div className="w-full">
-      {/* 프로모션 목록 */}
-      <div className="w-full">
-        {mockPromotionData.map((promotion) => (
-          <div
-            key={promotion.id}
-            className="flex items-center justify-between py-4 border-b border-grayScale-100 hover:bg-grayScale-50 cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-body1 text-grayScale-800">
-                {promotion.title}
-                {isWithinOneMonth(promotion.date) && (
-                  <span className="ml-2 text-sm text-key-100">
-                    NEW
-                  </span>
-                )}
+      {mockPromotionData.map((promotion) => (
+        <div
+          key={promotion.id}
+          className="py-4 border-b border-grayScale-100 hover:bg-grayScale-50 cursor-pointer"
+        >
+          {/* 제목 + NEW 라인 */}
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-base md:text-body1 text-grayScale-800 font-normal leading-relaxed">
+              {promotion.title}
+            </span>
+            {isWithinOneMonth(promotion.date) && (
+              <span className="text-xs text-key-100 font-medium flex-shrink-0">
+                NEW
               </span>
-            </div>
-            <div className="flex items-center gap-4 text-caption text-grayScale-500">
-              <span>관리자</span>
-              <span>{promotion.date}</span>
-              <span>조회수 {promotion.views}</span>
-            </div>
+            )}
           </div>
-        ))}
-      </div>
+
+          {/* 메타 정보 라인 */}
+          <div className="mt-1 flex items-center gap-2 md:gap-4 text-xs md:text-caption text-grayScale-500">
+            <span>관리자</span>
+            <span>{promotion.date}</span>
+            <span>조회수 {promotion.views}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

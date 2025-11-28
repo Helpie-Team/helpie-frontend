@@ -7,7 +7,10 @@ import {
   useSearchCommunities,
   useToggleCommunityLikeMutation,
 } from "@/app/hooks/community/useCommunity";
-import type { CommunityCategory, CommunityPost } from "@/app/api/types/community/community";
+import type {
+  CommunityCategory,
+  CommunityPost,
+} from "@/app/api/types/community/community";
 import { PopularBar } from "../../components/community/PopularBar";
 import { CommunityCreateModal } from "@/app/components/community/CommunityCreateModal";
 import { PostImageCarousel } from "@/app/components/community/PostImageCarousel";
@@ -28,12 +31,7 @@ export default function Page() {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const category = [
-    { name: "전체" },
-    { name: "정보공유" },
-    { name: "자유게시판" },
-  ];
-
+  const category = [{ name: "전체" }, { name: "정보공유" }, { name: "자유게시판" }];
 
   const getApiCategory = (categoryName: string): CommunityCategory => {
     switch (categoryName) {
@@ -56,25 +54,18 @@ export default function Page() {
     size: 10,
   };
 
-  const {
-    posts,
-    loading,
-    loadingMore,
-    error,
-    hasMore,
-  } = useCommunities(requestParams);
-
- 
+  const { posts, loading, loadingMore, error, hasMore } =
+    useCommunities(requestParams);
 
   // 클라이언트에서만 인증 상태 확인 (Hydration 에러 방지)
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);
 
-    // 서버에서 가져온 posts 가 바뀔 때마다 로컬 상태 갱신
-    useEffect(() => {
-      setPostList(posts);
-    }, [posts]);
+  // 서버에서 가져온 posts 가 바뀔 때마다 로컬 상태 갱신
+  useEffect(() => {
+    setPostList(posts);
+  }, [posts]);
 
   // 📡 검색 API (검색 키워드 + 카테고리)
   const {
@@ -87,9 +78,7 @@ export default function Page() {
   const isSearching = searchKeyword.trim().length > 0;
 
   // 실제로 렌더링할 게시글 리스트
-  const postsToRender = isSearching
-    ? searchData?.content ?? []
-    : postList;
+  const postsToRender = isSearching ? searchData?.content ?? [] : postList;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -121,11 +110,9 @@ export default function Page() {
           )
         );
 
-        // 인기글 순위 즉시 업데이트 (mutation에서 이미 처리하지만 명시적으로 추가)
-        console.log('좋아요 변경됨, 인기글 순위 업데이트 중...');
+        console.log("좋아요 변경됨, 인기글 순위 업데이트 중...");
       },
       onError: () => {
-        // 필요하면 에러 토스트 등
         alert("좋아요 처리에 실패했어요. 다시 시도해 주세요.");
       },
     });
@@ -171,7 +158,6 @@ export default function Page() {
     };
   }, [hasMore, loading, loadingMore, isSearching]);
 
-
   const showLoading =
     (isSearching && isSearchLoading && !searchData) ||
     (!isSearching && loading && posts.length === 0);
@@ -179,11 +165,11 @@ export default function Page() {
   const showError = isSearching ? isSearchError : error;
 
   return (
-    <div className="flex flex-col items-center gap-8 px-8 ">
+    <div className="flex flex-col items-center gap-8 px-4 md:px-8">
       {/* 상단 헤더 영역 */}
-      <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200">
-        <div className="flex items-center justify-between w-[1000px] h-11 ">
-          <div className="flex h-[43px] w-[531px] items-center gap-4 text-[32px] font-semibold leading-none text-black">
+      <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200 w-full max-w-[1000px]">
+        <div className="flex items-center justify-between w-full h-11">
+          <div className="flex h-[43px] w-full md:w-[531px] items-center gap-4 text-[28px] md:text-[32px] font-semibold leading-none text-black">
             <div className="relative" ref={dropdownRef}>
               <div
                 className="flex cursor-pointer items-center gap-2"
@@ -224,13 +210,13 @@ export default function Page() {
                 </div>
               )}
             </div>
-            <p>커뮤니티</p>
+            <p className="hidden md:block">커뮤니티</p>
           </div>
 
           {/* 게시글 작성 버튼 */}
           {isLoggedIn && (
             <button
-              className="flex h-[43px] w-[133px] items-center justify-center rounded-full bg-grayScale-700 px-3 py-4 text-body1-sb text-grayScale-white"
+              className="flex h-[43px] w-[150px] md:w-[133px] items-center justify-center rounded-full bg-grayScale-700 px-3 py-4 text-xs md:text-base font-semibold text-grayScale-white"
               onClick={() => setIsModalOpen(true)}
             >
               게시글 작성하기
@@ -239,7 +225,7 @@ export default function Page() {
         </div>
 
         {/* 🔎 검색창 */}
-        <div className="relative w-[1000px] items-center justify-center">
+        <div className="relative w-full max-w-[1000px]">
           <input
             type="text"
             className="h-[44px] w-full rounded-full border border-grayScale-filter py-2 pl-3 pr-12 text-body2-regular placeholder:text-grayScale-300"
@@ -261,15 +247,16 @@ export default function Page() {
             onClick={handleSearchSubmit}
           />
         </div>
+
       </div>
 
       {/* 메인 영역 */}
-      <div className="flex w-[1000px] flex-row gap-8">
+      <div className="flex w-full max-w-[1000px] flex-col md:flex-row gap-6 md:gap-8">
         {/* 게시글 리스트 */}
         <div className="flex-1">
           {/* 선택된 카테고리 타이틀 */}
           <div className="mb-6 flex items-center gap-2">
-            <span className="text-h1 text-black">
+            <span className="text-h2 md:text-h1 text-black">
               {selectedCategory}
               {isSearching && searchKeyword && (
                 <span className="ml-2 text-body2-regular text-grayScale-500">
@@ -305,63 +292,72 @@ export default function Page() {
           {/* 게시글 카드들 */}
           <div className="space-y-6">
             {postsToRender.map((post) => (
-              <div key={post.id} className="bg-white py-4 px-6">
-                {/* 제목 + 작성자 정보 */}
-                <div className="flex flex-col items-start gap-3">
-                  <h3 className="text-h2 text-black">{post.title}</h3>
-                  <div className="flex w-full flex-row justify-between pb-6">
-                    <div className="flex flex-row items-center gap-3">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300">
-                        <span className="text-xs font-medium text-gray-600">
-                          {post.username?.charAt(0) || "U"}
-                        </span>
-                      </div>
-                      <p className="text-body3-regular">{post.username}</p>
-                      <div className="text-body3-regular text-grayScale-500">
-                        {post.categoryDisplayName}
+              <div key={post.id} className="bg-white py-4 px-4 md:px-6">
+                <div className="flex flex-col md:block">
+                  {/* 프로필 + 메타 */}
+                  <div className="flex w-full items-start gap-3 mb-3 order-1 md:order-1">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300">
+                      <span className="text-xs font-medium text-gray-600">
+                        {post.username?.charAt(0) || "U"}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-body3-regular text-black">
+                        {post.username}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1 text-caption1-regular text-grayScale-500">
+                        <span>{post.categoryDisplayName}</span>
+                        <span className="mx-1">·</span>
+                        <span>{formatDate(post.createdAt)}</span>
                       </div>
                     </div>
-                    <p className="text-body3-regular text-grayScale-500">
-                      {formatDate(post.createdAt)}
-                    </p>
                   </div>
-                </div>
 
-                {/* 이미지 캐러셀 */}
-                <PostImageCarousel
-                  imageUrls={post.imageUrls}
-                  title={post.title}
-                />
-
-                {/* 좋아요 / 댓글 */}
-                <div className="mb-4 flex items-center gap-4">
-                  <button
-                    type="button"
-                    onClick={() => handleToggleLike(post.id)}
-                    className="flex items-center gap-2"
-                    disabled={!isLoggedIn}
-                  >
-                    <ThumbsUp
-                      className={`w-6 h-6 transition-colors ${
-                        post.isLiked
-                          ? "text-key-100"
-                          : "text-grayScale-700"
-                      }`}
+                  {/* 이미지 캐러셀 - 모바일에서 먼저 */}
+                  <div className="order-2 md:order-3">
+                    <PostImageCarousel
+                      imageUrls={post.imageUrls}
+                      title={post.title}
                     />
-                    <span className="text-grayScale-700">
-                      {post.likesCount}
-                    </span>
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-6 h-6 text-grayScale-700" />
-                    <span className="text-grayScale-700">
-                      {post.commentsCount}
-                    </span>
+                  </div>
+
+                  {/* 제목 - 모바일에서 이미지 다음 */}
+                  <div className="order-3 md:order-2 pb-3">
+                    <h3 className="text-h3 text-body1-sb md:text-h2 text-black">
+                      {post.title}
+                    </h3>
+                  </div>
+
+                  {/* 내용 - 모바일에서 제목 다음 */}
+                  <p className="text-body2 md:text-body1 text-gray-700 order-4 md:order-5 mb-3">
+                    {post.content}
+                  </p>
+
+                  {/* 좋아요 / 댓글 - 모바일에서 마지막 */}
+                  <div className="flex items-center gap-4 order-5 md:order-4">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleLike(post.id)}
+                      className="flex items-center gap-2"
+                      disabled={!isLoggedIn}
+                    >
+                      <ThumbsUp
+                        className={`w-6 h-6 transition-colors ${
+                          post.isLiked ? "text-key-100" : "text-grayScale-700"
+                        }`}
+                      />
+                      <span className="text-grayScale-700">
+                        {post.likesCount}
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="w-6 h-6 text-grayScale-700" />
+                      <span className="text-grayScale-700">
+                        {post.commentsCount}
+                      </span>
+                    </div>
                   </div>
                 </div>
-
-                {/* 내용 */}
-                <p className="text-gray-700">{post.content}</p>
               </div>
             ))}
 
@@ -384,7 +380,9 @@ export default function Page() {
         </div>
 
         {/* 우측 인기글 바 */}
-        <PopularBar />
+        <div className="w-full md:w-auto mt-4 md:mt-0">
+          <PopularBar />
+        </div>
       </div>
 
       {/* 게시글 작성 모달 */}

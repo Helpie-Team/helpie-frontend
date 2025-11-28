@@ -16,19 +16,21 @@ export default function Inquiry() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 bg-grayScale-50 rounded-2xl">
-
-      {/* 문의 섹션 */}
-      <div className="w-[769px] h-[83px] flex flex-row justify-between items-center bg-[#FAF8F7] p-6 rounded-2xl ">
-        <div className="flex justify-center items-center gap-3">
-          <span className="text-body1 text-grayScale-800">{email}</span>
+    <div className="w-full flex flex-col items-center">
+      {/* 카드 래퍼: 모바일은 전체, PC는 769px로 가운데 정렬 */}
+      <div className="w-full max-w-[769px]">
+        <div className="mt-6 flex items-center justify-between rounded-2xl bg-[#FAF8F7] px-4 py-4 md:px-6 md:py-5">
+          <span className="text-body1 text-grayScale-800 break-all">
+            {email}
+          </span>
+          <button
+            type="button"
+            onClick={handleCopyEmail}
+            className="ml-4 flex h-9 min-w-[60px] items-center justify-center rounded-full border border-grayScale-200 bg-white px-4 text-body2-regular text-black"
+          >
+            복사
+          </button>
         </div>
-        <button
-          onClick={handleCopyEmail}
-          className="w-[60px] h-[35px] rounded-full text-body1 text-black bg-white border border-grayScale-200 cursor-pointer"
-        >
-          복사
-        </button>
       </div>
 
       {/* Toast Container */}
