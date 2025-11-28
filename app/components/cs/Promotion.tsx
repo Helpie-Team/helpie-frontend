@@ -49,7 +49,7 @@ export default function Promotion() {
         >
           {/* 제목 + NEW 라인 */}
           <div className="flex items-start justify-between gap-2">
-            <span className="text-base md:text-body1 text-grayScale-800 font-normal leading-relaxed">
+            <span className="text-base md:text-body1 w-[240px] text-grayScale-800 font-normal leading-relaxed">
               {promotion.title}
             </span>
             {isWithinOneMonth(promotion.date) && (

@@ -153,7 +153,7 @@ export default function Page() {
             ))}
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 w-[375px]">
             <h2 className="text-h2 text-black mb-6">
               {activeMenu === "notice" ? "공지사항" : "문의"}
             </h2>
