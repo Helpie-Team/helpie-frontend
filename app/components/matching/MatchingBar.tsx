@@ -63,12 +63,9 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
   };
 
   return (
-    // 🔹 전체를 가운데 정렬
-    <div className="w-full flex flex-col items-center border-b border-grayScale-200 gap-4 md:gap-6 py-4">
-      {/* 🔹 상단: 국가 드롭다운 + 타이틀 + 소모임 만들기 버튼 */}
-      <div className="w-full max-w-[375px] md:max-w-[1000px] flex items-center justify-between">
-        {/* 왼쪽: 국가 선택 + '소모임' 텍스트 */}
-        <div className="flex items-center gap-3 md:gap-4 text-[24px] md:text-[32px] font-semibold leading-none text-black">
+    <div className="w-full flex flex-col items-center border-b border-grayScale-200 gap-4 sm:gap-6 py-4">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] flex items-center justify-between">
+        <div className="flex items-center gap-3 sm:gap-4 text-[24px] sm:text-[32px] font-semibold leading-none text-black">
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
@@ -124,10 +121,10 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
             type="button"
             className="
               flex items-center justify-center
-              px-4 py-2 md:px-4 md:py-3
+              px-4 py-2 sm:px-4 sm:py-3
               rounded-[55px]
               bg-grayScale-700 text-grayScale-white
-              text-body2-sb md:text-body1-sb
+              text-body2-sb sm:text-body1-sb
               whitespace-nowrap cursor-pointer
             "
             onClick={() => {
@@ -140,7 +137,7 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
       </div>
 
       {/* 🔹 검색 입력창 */}
-      <div className="relative w-full max-w-[375px] md:max-w-[1000px]">
+      <div className="relative w-full max-w-[375px] sm:max-w-[1000px]">
         <input
           type="text"
           value={searchKeyword}
@@ -148,7 +145,7 @@ export default function MatchingBar({ onCountrySelect, onSearch }: MatchingBarPr
           onKeyDown={handleKeyDown}
           className="
             w-full
-            h-[40px] md:h-[44px]
+            h-[40px] sm:h-[44px]
             py-2 pl-3 pr-12
             rounded-full
             border border-grayScale-filter

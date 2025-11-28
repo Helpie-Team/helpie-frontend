@@ -13,7 +13,6 @@ interface ChatModalProps {
 
 export default function ChatModal({ isOpen, onClose, roomId }: ChatModalProps) {
   const router = useRouter();
-
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -25,12 +24,13 @@ export default function ChatModal({ isOpen, onClose, roomId }: ChatModalProps) {
   const handleMoveToChatRoom = () => {
     if (roomId) {
       // 채팅방 페이지로 이동
-      router.push(`/chat/${roomId}`);
+      router.push(`/chat/${roomId}/enter`);
     } else {
       alert('채팅방 정보를 찾을 수 없습니다.');
       onClose();
     }
   };
+
  
 
   return (

@@ -235,9 +235,9 @@ const TagsInput: React.FC<MatchingInputProps> = ({
       <div
         className="
           flex gap-3
-          overflow-x-auto md:overflow-visible
-          pb-2 md:pb-0
-          -mx-4 px-4 md:mx-0 md:px-0
+          overflow-x-auto sm:overflow-visible
+          pb-2 sm:pb-0
+          -mx-4 px-4 sm:mx-0 sm:px-0
         "
       >
         {options.map((option) => {
@@ -307,7 +307,7 @@ const TagInputComponent: React.FC<MatchingInputProps> = ({ tags = [], onChange, 
       {/* Input 창처럼 보이는 wrapper */}
       <div className="w-full px-4 py-3 border border-grayScale-200 rounded-xl focus-within:outline-none flex flex-wrap items-center gap-2">
         {tags.map((tag, index) => (
-          <div key={index} className="flex items-center gap-1 px-2 py-1 bg-key-100 text-white rounded-md">
+          <div key={index} className="flex items-center gap-1 px-2 py-1 bg-key-100 text-white rounded-sm">
             <span className="text-body2-medium"># {tag}</span>
             <button type="button" onClick={() => removeTag(index)} className="text-white hover:opacity-80 font-bold text-lg leading-none">×</button>
           </div>

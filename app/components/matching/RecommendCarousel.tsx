@@ -54,13 +54,13 @@ export default function RecommendCarousel({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // 🔹 모바일 여부
+  const [isMobile, setIsMobile] = useState(false);
 
   const { data: recommendData } = useRecommendedGroups(0);
   const queryClient = useQueryClient();
   const toggleMarkMutation = useToggleGroupMark();
 
-  // 🔹 모바일 여부 체크
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(max-width: 767px)");
@@ -211,7 +211,7 @@ export default function RecommendCarousel({
           <div
             className={
               isMobile
-                ? "w-full h-full overflow-x-auto overflow-y-hidden -mx-4 px-4" // 🔹 모바일 : 가로 스크롤
+                ? "w-full h-full overflow-x-auto overflow-y-hidden -mx-4 px-4" 
                 : "w-full h-full overflow-hidden" // PC : 기존처럼
             }
           >

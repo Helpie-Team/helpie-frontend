@@ -145,7 +145,7 @@ export function CommunityCreateModal({
         className="
           w-full max-w-[540px]
           rounded-[30px] bg-white
-          p-6 md:p-8
+          p-6 sm:p-8
           flex flex-col gap-6
           max-h-[90vh] overflow-y-auto
         "

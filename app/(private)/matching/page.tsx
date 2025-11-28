@@ -34,7 +34,7 @@ export default function Page() {
   return (
     <div className="flex flex-col items-center gap-8 pb-20">
       {/* 상단 필터/검색 바 */}
-      <div className="w-full max-w-[375px] md:max-w-[1000px] px-4 md:px-0">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0">
         <MatchingBar
           onCountrySelect={(code) => {
             setSelectedCountry(code);
@@ -45,20 +45,20 @@ export default function Page() {
 
       {/* 추천 소모임 캐러셀 (로그인 + 검색 중이 아닐 때만) */}
       {!searchKeyword && isLoggedIn && (
-        <div className="w-full max-w-[375px] md:max-w-[1000px] px-4 md:px-0 relative">
+        <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0 relative">
           <RecommendCarousel />
         </div>
       )}
 
       {/* 상단 배너 스와이퍼 (검색 중이 아닐 때만) */}
       {!searchKeyword && (
-        <div className="w-full max-w-[375px] md:max-w-[1000px] px-4 md:px-0">
+        <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0">
           <ImageSwiper />
         </div>
       )}
 
       {/* 소모임 리스트 영역 */}
-      <div className="w-full max-w-[375px] md:max-w-[1000px] px-4 md:px-0">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0">
         {searchKeyword ? (
           // 검색 모드
           <div className="flex flex-col gap-6">

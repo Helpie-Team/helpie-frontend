@@ -17,7 +17,7 @@ export function PostImageCarousel({
   // ---- 브레이크포인트 감지 (모바일 여부) ----
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // tailwind md 기준
+      setIsMobile(window.innerWidth < 768); // tailwind sm 기준
     };
 
     handleResize(); // 최초 1번
@@ -32,7 +32,7 @@ export function PostImageCarousel({
   if (imageUrls.length === 1) {
     return (
       <div className="mb-4 w-full">
-        <div className="relative h-64 md:h-80 w-full overflow-hidden rounded-[24px] bg-gray-100">
+        <div className="relative h-64 sm:h-80 w-full overflow-hidden rounded-[24px] bg-gray-100">
           <Image
             src={imageUrls[0]}
             alt={`${title} 이미지`}
@@ -45,9 +45,6 @@ export function PostImageCarousel({
     );
   }
 
-  /* ===========================
-   *  모바일: 한 장씩 캐러셀
-   * =========================== */
   if (isMobile) {
     const totalSlides = imageUrls.length;
 
