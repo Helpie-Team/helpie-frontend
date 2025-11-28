@@ -8,16 +8,16 @@ import {  MapPin, Users, Tag, Clock } from "lucide-react";
 import noImage from "@/public/images/noImage.png";
 import JoinConfirm from '@/app/components/matching/modal/JoinConfirm';
 import CancelModal from "./CancelModal";
-import ChatModal from "./ChatModal";
 import { useGroupDetail, useJoinGroup, useCancelGroup, useJoinStatus } from "@/app/hooks/matching/useMatching";
 import { GroupCategory, GroupDetail } from "@/app/api/types/matching/matching";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { MY_GROUP_INFO_QUERY_KEY } from "@/app/hooks/my-page/useMyGroupInfo";
 import { ToastContainer, toast } from "react-toastify";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
 import { isAuthenticated } from "@/app/lib/utils/token";
+import { getAccessibleChatRooms } from "@/app/api/chat/chat";
 // 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   'ALL': '전체',
@@ -35,7 +35,7 @@ interface JoinModalProps {
 }
 
 export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) {
-  // const router = useRouter();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const {data: groupDetailData, isLoading, error} = useGroupDetail(groupId);
 
@@ -75,8 +75,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancleModalOpen, setIsCancleModalOpen] = useState(false);
-  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-  const [chatRoomId, setChatRoomId] = useState<number | undefined>(undefined);
+  const [isNavigatingToChat, setIsNavigatingToChat] = useState(false);
 
   // API에서 가져온 가입 여부 (로그인한 경우에만)
   const isJoined = isLoggedIn ? (joinStatusData?.joinYn ?? false) : false;
@@ -97,11 +96,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   // JoinConfirm 모달에서 "좋아요!" 버튼 클릭 (실제 API 호출)
   const handleConfirm = async () => {
     try {
-      const response = await joinGroupMutation.mutateAsync(groupId);
-      // roomId 저장
-      if (response?.roomId) {
-        setChatRoomId(response.roomId);
-      }
+      await joinGroupMutation.mutateAsync(groupId);
       setIsModalOpen(false);
 
       // QueryClient를 사용하여 캐시 무효화
@@ -137,7 +132,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       }
     }
   };
-
+  
 
   // CancelModal에서 "신청 취소" 버튼 클릭 (실제 API 호출)
   const handleCancelConfirm = async () => {
@@ -148,6 +143,30 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
       toast.success('소모임 참여 신청이 취소되었습니다.');
     } catch {
       toast.warn('에러 발생');
+    }
+  };
+
+  // 채팅방으로 이동 (마이페이지와 동일한 로직)
+  const handleChatRoomNavigation = async () => {
+    if (isNavigatingToChat) return;
+
+    setIsNavigatingToChat(true);
+    try {
+      // 먼저 chatRoomId가 있으면 직접 사용 (가입 시 받은 roomId)
+      // 가입 시 받은 roomId는 현재 state에 없으므로 getAccessibleChatRooms로 찾기
+      const accessibleRooms = await getAccessibleChatRooms();
+      const targetRoom = accessibleRooms.find((room) => room.groupId === groupId);
+
+      if (targetRoom) {
+        router.push(`/chat/${targetRoom.id}`);
+      } else {
+        alert('채팅방 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('채팅방 이동 중 오류가 발생했습니다:', error);
+      alert('채팅방 이동에 실패했습니다.');
+    } finally {
+      setIsNavigatingToChat(false);
     }
   };
 
@@ -177,10 +196,6 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
   // API 응답 데이터 (직접 GroupDetail 반환)
   const groupData: GroupDetail = groupDetailData;
 
-  // const handleGoToChat = () => {
-  //   if (!chatRoomId) return;
-  //   router.push(`/chat/${chatRoomId}`);
-  // };
   return (
     <div
       id="모달 외부"
@@ -195,7 +210,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
+            <button title="뒤로 가기" onClick={onClose} className="hover:bg-gray-100 rounded-full transition-colors">
               <Image
                 src={arrow_left}
                 alt="뒤로 가기"
@@ -306,10 +321,11 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
               신청취소
             </button>
             <button
-            
-              className="flex-1 py-4 bg-grayScale-700 text-white rounded-full text-h3-sb hover:bg-grayScale-800 transition-colors"
+              onClick={handleChatRoomNavigation}
+              disabled={isNavigatingToChat}
+              className="flex-1 py-4 bg-grayScale-700 text-white rounded-full text-h3-sb hover:bg-grayScale-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              채팅방으로 이동
+              {isNavigatingToChat ? '이동 중...' : '채팅방으로 이동'}
             </button>
           </div>
         ) : (
@@ -342,12 +358,6 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         isOpen={isCancleModalOpen}
         onClose={() => setIsCancleModalOpen(false)}
         onConfirm={handleCancelConfirm}
-      />
-      {/* 채팅방으로 이동 모달 */}
-      <ChatModal
-        isOpen={isChatModalOpen}
-        onClose={() => setIsChatModalOpen(false)}
-        roomId={chatRoomId}
       />
 
       <ToastContainer
