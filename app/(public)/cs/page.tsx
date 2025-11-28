@@ -26,7 +26,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       {/* 모바일 헤더 - border-b 제거 */}
-      <div className="md:hidden flex items-center justify-between p-4">
+      <div className="sm:hidden flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
@@ -39,7 +39,7 @@ export default function Page() {
       </div>
 
       {/* PC 헤더 */}
-      <div className="hidden md:block">
+      <div className="hidden sm:block">
         <div className="max-w-[1200px] mx-auto px-4 py-8">
           <h1 className="text-head text-black mb-8 border-b border-grayScale-100 pb-4">
             고객센터
@@ -47,9 +47,9 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="md:max-w-[1200px] md:mx-auto md:px-4 md:pb-8">
+      <div className="sm:max-w-[1200px] sm:mx-auto sm:px-4 sm:pb-8">
         {/* 모바일 탭 네비게이션 */}
-        <div className="md:hidden flex border-b border-grayScale-200">
+        <div className="sm:hidden flex border-b border-grayScale-200">
           <button
             onClick={() => setActiveMenu("notice")}
             className={`flex-1 py-4 text-center transition-colors border-b-2 ${
@@ -73,7 +73,7 @@ export default function Page() {
         </div>
 
         {/* 모바일 콘텐츠 */}
-        <div className="md:hidden">
+        <div className="sm:hidden">
           {activeMenu === "notice" && (
             <div className="p-4">
               {/* 필터 버튼 */}
@@ -113,7 +113,7 @@ export default function Page() {
         </div>
 
         {/* PC 레이아웃 */}
-        <div className="hidden md:flex gap-8">
+        <div className="hidden sm:flex gap-8">
           <div className="w-[240px] flex flex-col">
             {sidebarMenus.map((menu, index) => (
               <button

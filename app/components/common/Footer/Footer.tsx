@@ -16,10 +16,9 @@ export default function Footer() {
   if (isUserInfoPage) return null;
 
   return (
-    <div className="w-full bg-[#FAF8F7] flex justify-center py-8 md:py-16 px-4 md:px-8">
-      <div className="w-full max-w-5xl flex flex-col gap-8 md:gap-12">
-        {/* ================= 상단 : 모바일 전용 ================= */}
-        <div className="flex w-full flex-col gap-6 md:hidden">
+    <div className="w-full bg-[#FAF8F7] flex justify-center py-8 sm:py-16 px-4 sm:px-8">
+      <div className="w-full max-w-5xl flex flex-col gap-8 sm:gap-12">
+        <div className="flex w-full flex-col gap-6 sm:hidden">
           {/* 로고 + SNS (모바일) */}
           <div className="flex w-full items-center justify-between">
             <Image
@@ -128,7 +127,7 @@ export default function Footer() {
         </div>
 
         {/* ================= 상단 : PC 전용 ================= */}
-        <div className="hidden md:flex w-full flex-row justify-between">
+        <div className="hidden sm:flex w-full flex-row justify-between">
           {/* 왼쪽 : 로고 + SNS(세로 정렬) */}
           <div className="flex flex-col gap-4">
             <Image
@@ -183,7 +182,7 @@ export default function Footer() {
           </div>
 
           {/* 오른쪽 : About / 탐색 / 고객센터 3컬럼 */}
-          <div className="flex flex-row gap-12 lg:gap-24">
+          <div className="flex flex-row gap-12 sm:gap-24">
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 text-grayScale-500">About</h3>
               <Link
@@ -235,16 +234,16 @@ export default function Footer() {
         <div
           className="
             w-full
-            flex flex-col-reverse md:flex-row
-            items-start md:items-center
-            justify-start md:justify-between
-            gap-4 md:gap-0
-            pt-6 md:pt-8
+            flex flex-col-reverse sm:flex-row
+            items-start sm:items-center
+            justify-start sm:justify-between
+            gap-4 sm:gap-0
+            pt-6 sm:pt-8
           "
         >
           <p className="text-h3-sb text-black">2025 helpie</p>
 
-          <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-2 md:gap-4">
+          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2 sm:gap-4">
             <button type="button" className="hover:underline">
               이용약관
             </button>
