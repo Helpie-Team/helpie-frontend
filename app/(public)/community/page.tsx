@@ -165,11 +165,11 @@ export default function Page() {
   const showError = isSearching ? isSearchError : error;
 
   return (
-    <div className="flex flex-col items-center gap-8 px-4 md:px-8">
+    <div className="flex flex-col items-center gap-8 px-4 sm:px-8">
       {/* 상단 헤더 영역 */}
       <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200 w-full max-w-[1000px]">
         <div className="flex items-center justify-between w-full h-11">
-          <div className="flex h-[43px] w-full md:w-[531px] items-center gap-4 text-[28px] md:text-[32px] font-semibold leading-none text-black">
+          <div className="flex h-[43px] w-full sm:w-[531px] items-center gap-4 text-[28px] sm:text-[32px] font-semibold leading-none text-black">
             <div className="relative" ref={dropdownRef}>
               <div
                 className="flex cursor-pointer items-center gap-2"
@@ -210,13 +210,13 @@ export default function Page() {
                 </div>
               )}
             </div>
-            <p className="hidden md:block">커뮤니티</p>
+            <p className="hidden sm:block">커뮤니티</p>
           </div>
 
           {/* 게시글 작성 버튼 */}
           {isLoggedIn && (
             <button
-              className="flex h-[43px] w-[150px] md:w-[133px] items-center justify-center rounded-full bg-grayScale-700 px-3 py-4 text-xs md:text-base font-semibold text-grayScale-white"
+              className="flex h-[43px] w-[150px] sm:w-[133px] items-center justify-center rounded-full bg-grayScale-700 px-3 py-4 text-xs sm:text-base font-semibold text-grayScale-white"
               onClick={() => setIsModalOpen(true)}
             >
               게시글 작성하기
@@ -251,12 +251,12 @@ export default function Page() {
       </div>
 
       {/* 메인 영역 */}
-      <div className="flex w-full max-w-[1000px] flex-col md:flex-row gap-6 md:gap-8">
+      <div className="flex w-full max-w-[1000px] flex-col sm:flex-row gap-6 sm:gap-8">
         {/* 게시글 리스트 */}
         <div className="flex-1">
           {/* 선택된 카테고리 타이틀 */}
           <div className="mb-6 flex items-center gap-2">
-            <span className="text-h2 md:text-h1 text-black">
+            <span className="text-h2 sm:text-h1 text-black">
               {selectedCategory}
               {isSearching && searchKeyword && (
                 <span className="ml-2 text-body2-regular text-grayScale-500">
@@ -292,10 +292,10 @@ export default function Page() {
           {/* 게시글 카드들 */}
           <div className="space-y-6">
             {postsToRender.map((post) => (
-              <div key={post.id} className="bg-white py-4 px-4 md:px-6">
-                <div className="flex flex-col md:block">
+              <div key={post.id} className="bg-white py-4 px-4 sm:px-6">
+                <div className="flex flex-col sm:block">
                   {/* 프로필 + 메타 */}
-                  <div className="flex w-full items-start gap-3 mb-3 order-1 md:order-1">
+                  <div className="flex w-full items-start gap-3 mb-3 order-1 sm:order-1">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300">
                       <span className="text-xs font-medium text-gray-600">
                         {post.username?.charAt(0) || "U"}
@@ -314,7 +314,7 @@ export default function Page() {
                   </div>
 
                   {/* 이미지 캐러셀 - 모바일에서 먼저 */}
-                  <div className="order-2 md:order-3">
+                  <div className="order-2 sm:order-3">
                     <PostImageCarousel
                       imageUrls={post.imageUrls}
                       title={post.title}
@@ -322,19 +322,19 @@ export default function Page() {
                   </div>
 
                   {/* 제목 - 모바일에서 이미지 다음 */}
-                  <div className="order-3 md:order-2 pb-3">
-                    <h3 className="text-h3 text-body1-sb md:text-h2 text-black">
+                  <div className="order-3 sm:order-2 pb-3">
+                    <h3 className="text-h3 text-body1-sb sm:text-h2 text-black">
                       {post.title}
                     </h3>
                   </div>
 
                   {/* 내용 - 모바일에서 제목 다음 */}
-                  <p className="text-body2 md:text-body1 text-gray-700 order-4 md:order-5 mb-3">
+                  <p className="text-body2 sm:text-body1 text-gray-700 order-4 sm:order-5 mb-3">
                     {post.content}
                   </p>
 
                   {/* 좋아요 / 댓글 - 모바일에서 마지막 */}
-                  <div className="flex items-center gap-4 order-5 md:order-4">
+                  <div className="flex items-center gap-4 order-5 sm:order-4">
                     <button
                       type="button"
                       onClick={() => handleToggleLike(post.id)}
@@ -380,7 +380,7 @@ export default function Page() {
         </div>
 
         {/* 우측 인기글 바 */}
-        <div className="w-full md:w-auto mt-4 md:mt-0">
+        <div className="w-full sm:w-auto mt-4 sm:mt-0">
           <PopularBar />
         </div>
       </div>

@@ -35,9 +35,9 @@ export default function MatchingFilter({ selectedCategory, onCategoryChange }: M
   };
 
   return (
-    <div className="w-full md:w-[200px] md:h-full md:flex md:flex-col md:gap-8">
+    <div className="w-full sm:w-[200px] sm:h-full sm:flex sm:flex-col sm:gap-8">
       {/* ===== 모바일: 가로 스크롤 pill ===== */}
-      <div className="md:hidden w-full overflow-x-auto scrollbar-hide">
+      <div className="sm:hidden w-full overflow-x-auto scrollbar-hide">
         <div className="flex gap-3 pb-3">
           {categories.map((category) => {
             const apiCategory = categoryMap[category];
@@ -62,10 +62,10 @@ export default function MatchingFilter({ selectedCategory, onCategoryChange }: M
         </div>
       </div>
 
-    <div className="hidden md:flex md:flex-col md:w-[180px] h-full md:gap-8 items-ceter justify-start">
+    <div className="hidden sm:flex sm:flex-col sm:w-[180px] h-full sm:gap-8 items-ceter justify-start">
       {/* 카테고리 */}
       <div>
-        <h2 className="hidden md:flex text-[18px] font-semibold text-black mb-6">카테고리</h2>
+        <h2 className="hidden sm:flex text-[18px] font-semibold text-black mb-6">카테고리</h2>
 
         <div className="flex flex-col gap-5">
           {categories.map((category) => {

@@ -121,7 +121,7 @@ export default function ReviewList() {
   return (
     <div className="w-full flex flex-col gap-8">
       {/* ✅ PC / 태블릿 헤더 */}
-      <div className="hidden md:flex items-start gap-4">
+      <div className="hidden sm:flex items-start gap-4">
         <Image
           src={chatIcon}
           alt="채팅 아이콘"
@@ -164,7 +164,7 @@ export default function ReviewList() {
       </div>
 
       {/* 모바일 헤더 : 정렬 버튼만 노출 */}
-      <div className="flex md:hidden justify-start gap-3 text-body1 px-1">
+      <div className="flex sm:hidden justify-start gap-3 text-body1 px-1">
         <button
           onClick={() => handleSortChange("latest")}
           className={
@@ -185,7 +185,7 @@ export default function ReviewList() {
       </div>
 
       {/* 구분선 (PC 전용) */}
-      <hr className="hidden md:block border-grayScale-100" />
+      <hr className="hidden sm:block border-grayScale-100" />
 
       {/* 리뷰 리스트 */}
       <div className="flex flex-col gap-6">
@@ -218,10 +218,10 @@ export default function ReviewList() {
                 </h3>
 
 {/* 소모임 제목 & 날짜 & 별점 */}
-<div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-3">
+<div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
   {/* 제목 + 날짜 묶음 (모바일/PC 모두 한 줄) */}
   <div className="flex items-center gap-2">
-    <span className="text-body3-regular text-grayScale-600 line-clamp-1 md:line-clamp-none">
+    <span className="text-body3-regular text-grayScale-600 line-clamp-1 sm:line-clamp-none">
       {review.groupTitle}
     </span>
     <span className="text-caption1-regular text-grayScale-500">
@@ -230,7 +230,7 @@ export default function ReviewList() {
   </div>
 
   {/* ⭐ 별점 : 모바일에서는 아래 줄, PC에선 옆으로 */}
-  <div className="mt-1 md:mt-0 md:ml-3">
+  <div className="mt-1 sm:mt-0 sm:ml-3">
     {renderStars(review.rate)}
   </div>
 </div>

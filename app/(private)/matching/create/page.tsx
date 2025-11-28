@@ -119,9 +119,9 @@ export default function Page() {
   return (
     // 바깥에서 가운데 정렬 + PC에서 최대 1000px
     <div className="w-full flex justify-center">
-      <div className="w-full max-w-[375px] md:max-w-[1000px] px-4 md:px-0 pt-8 pb-24 flex flex-col gap-8">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0 pt-8 pb-24 flex flex-col gap-8">
         {/* ===== 모바일 헤더 (375px 시안용) ===== */}
-        <div className="w-full border-b border-grayScale-100 pb-4 md:hidden">
+        <div className="w-full border-b border-grayScale-100 pb-4 sm:hidden">
           <div className="flex items-center justify-between">
             {/* 왼쪽 : 뒤로가기 + 타이틀 */}
             <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export default function Page() {
         </div>
 
         {/* ===== PC 헤더 (현재 디자인 유지) ===== */}
-        <div className="w-full h-[149px] flex-col gap-6 border-b border-grayScale-100 hidden md:flex">
+        <div className="w-full h-[149px] flex-col gap-6 border-b border-grayScale-100 hidden sm:flex">
           <button type="button" onClick={() => router.push("/matching")}>
             <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
           </button>

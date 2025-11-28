@@ -35,12 +35,12 @@ export default function CancelModal({ isOpen, onClose, onConfirm }: CancelModalP
     >
       <div
         id="공유 모달 내부"
-        className="w-[350px] md:w-[500px] h-[178px] md:h-[298px] bg-white rounded-[30px] px-7 py-8 flex flex-col gap-4 md:gap-12"
+        className="w-[350px] sm:w-[500px] h-[178px] sm:h-[298px] bg-white rounded-[30px] px-7 py-8 flex flex-col gap-4 sm:gap-12"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 헤더 */}
         <div className="flex flex-col gap-5">
-          <button title="뒤로 가기" onClick={onClose} className="hidden md:flex items-start justify-start">
+          <button title="뒤로 가기" onClick={onClose} className="hidden sm:flex items-start justify-start">
             <Image
               src={arrow_left}
               alt="뒤로 가기"
@@ -50,11 +50,11 @@ export default function CancelModal({ isOpen, onClose, onConfirm }: CancelModalP
           </button>
           <div className="w-full gap-2 flex flex-col items-center justify-center text-center">
             <h2 className="text-h2">소모임 참여 신청을 취소하시겠어요?</h2>
-            <p className="text-body3 md:text-body1-regular text-grayScale-700">신청이 취소되면 해당 모임에 참여할 수 없습니다.</p>
+            <p className="text-body3 sm:text-body1-regular text-grayScale-700">신청이 취소되면 해당 모임에 참여할 수 없습니다.</p>
           </div>
         </div>
 
-            <div className="w-full flex flex-row gap-2 md:gap-3">
+            <div className="w-full flex flex-row gap-2 sm:gap-3">
             <button
               onClick={()=>onClose()}
               className="flex-1 py-4 w-[240px] h-[53px] bg-white text-grayScale-700 text-h3-sb rounded-full border border-grayScale-600 "

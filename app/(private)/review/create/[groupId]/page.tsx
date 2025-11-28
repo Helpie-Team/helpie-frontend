@@ -94,9 +94,9 @@ function ReviewPageContent({ params }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col w-[375px] md:w-[1000px] mx-auto pt-8 pb-20">
+    <div className="flex flex-col w-[375px] sm:w-[1000px] mx-auto pt-8 pb-20">
 {/* 모바일 헤더 */}
-      <div className="w-full flex flex-row justify-between items-center md:hidden p-4 border-b border-grayScale-100">
+      <div className="w-full flex flex-row justify-between items-center sm:hidden p-4 border-b border-grayScale-100">
         <div className="flex flex-row items-center gap-2">
           <button title="뒤로가기" type="button" onClick={() => router.push('/matching')}>
             <Image src={arrow_left} alt="뒤로가기" width={40} height={40} className="w-[14px] h-[14px]"/>
@@ -118,7 +118,7 @@ function ReviewPageContent({ params }: PageProps) {
         </button>
       </div>
       {/* pc 헤더 */}
-      <div className="w-full hidden md:flex md:flex-col gap-6 mb-8 pb-8 border-b border-grayScale-100">
+      <div className="w-full hidden sm:flex sm:flex-col gap-6 mb-8 pb-8 border-b border-grayScale-100">
         <button title="뒤로가기" type="button" onClick={() => router.push('/matching')}>
           <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
         </button>

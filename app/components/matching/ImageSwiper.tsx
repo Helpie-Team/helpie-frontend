@@ -48,8 +48,8 @@ export default function ImageSwiper() {
 
   return (
     <div className="w-full flex justify-center">
-      <div className="w-full max-w-[375px] md:max-w-[1000px] flex flex-col items-start gap-3">
-        <h1 className="text-body1-sb md:text-h1 text-grayScale-700">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] flex flex-col items-start gap-3">
+        <h1 className="text-body1-sb sm:text-h1 text-grayScale-700">
           다양한 소모임을 둘러보고 참여해보세요!
         </h1>
 
@@ -57,7 +57,7 @@ export default function ImageSwiper() {
   type="button"
   className="
     relative w-full
-    h-[120px] md:h-[90px]
+    h-[120px] sm:h-[90px]
     rounded-2xl overflow-hidden
     border-none outline-none cursor-pointer
   "
@@ -81,7 +81,7 @@ export default function ImageSwiper() {
         src={slide.imagePc}
         alt={slide.alt}
         fill
-        className="hidden md:block object-cover rounded-2xl"
+        className="hidden sm:block object-cover rounded-2xl"
         priority={index === 0}
       />
       {/* Mobile */}
@@ -89,7 +89,7 @@ export default function ImageSwiper() {
         src={slide.imageMobile}
         alt={slide.alt}
         fill
-        className="block md:hidden object-contain"
+        className="block sm:hidden object-contain"
         priority={index === 0}
       />
     </div>

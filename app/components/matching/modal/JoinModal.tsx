@@ -185,7 +185,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
     <div
       id="모달 외부"
       onClick={handleBackdropClick}
-      className="fixed inset-0 top-0 left-0 w-full h-full bg-black/70 flex justify-center items-end md:items-center z-50"
+      className="fixed inset-0 top-0 left-0 w-full h-full bg-black/70 flex justify-center items-end sm:items-center z-50"
     >
       <div
         id="모달 내부"
@@ -235,8 +235,8 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
 
         {/* 모임 정보 */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-          <h1 className="text-h3-sb md:text-h1 ">{groupData.title}</h1>
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <h1 className="text-h3-sb sm:text-h1 ">{groupData.title}</h1>
 
           {/* 아이콘 정보 */}
           <div className="flex items-center gap-3 text-body3 text-grayScale-500">
@@ -261,7 +261,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
           </div>
 
           {/* 날짜/시간 */}
-          <div className="flex items-center gap-3 text-caption1-b md:text-h3-regular text-grayScale-600">
+          <div className="flex items-center gap-3 text-caption1-b sm:text-h3-regular text-grayScale-600">
             <Clock className="w-5 h-5" />
             <span>{new Date(groupData.meetingDate).toLocaleString('ko-KR', {
               year: 'numeric',
@@ -275,7 +275,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
           </div>
 
           {/* 설명 */}
-          <p className="text-body3-regular md:text-h3-regular text-grayScale-600 whitespace-pre-line">
+          <p className="text-body3-regular sm:text-h3-regular text-grayScale-600 whitespace-pre-line">
             {groupData.description}
           </p>
 
