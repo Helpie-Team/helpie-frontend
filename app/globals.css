@@ -141,28 +141,15 @@
     font-size: 12px;
     line-height: 1.5;
     font-weight: 400;
-  .text-h1-sb { font: var(--font-size-h1-sb); }
-  .text-h2-sb { font: var(--font-size-h2-sb); }
-  .text-h2 { font: var(--font-size-h2); }
-  .text-h2-regular { font: var(--font-size-h2-regular); }
-  .text-h3-sb { font: var(--font-size-h3-sb); }
-  .text-h3 { font: var(--font-size-h3); }
-  .text-h3-regular { font: var(--font-size-h3-regular); }
-  .text-body1-sb { font: var(--font-size-body1-sb); }
-  .text-body1 { font: var(--font-size-body1); }
-  .text-body1-regular { font: var(--font-size-body1-regular); }
-  .text-body2-sb { font: var(--font-size-body2-sb); }
-  .text-body2 { font: var(--font-size-body2); }
-  .text-body2-regular { font: var(--font-size-body2-regular); }
-  .text-body3-sb { font: var(--font-size-body3-sb); }
-  .text-body3 { font: var(--font-size-body3); }
-  .text-body3-regular { font: var(--font-size-body3-regular); }
-  .text-caption1-sb { font: var(--font-size-caption1-sb); }
-  .text-caption1-b { font: var(--font-size-caption1-b); }
-  .text-caption1-regular { font: var(--font-size-caption1-regular); }
+  }
 }
+  .text-mcaption1{
+  font-size:10px;
+  font-weight:500;
 }
-
+.text-mcaption1-sb{
+font-size:10px;
+font-weight:600;}
 @layer base {
   @keyframes chatbot-panel-enter {
     0% {
@@ -220,6 +207,33 @@
     }
   }
 
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   @keyframes chatbot-button-float {
     0%,
     100% {
@@ -258,4 +272,25 @@
   .chatbot-launcher {
     animation: chatbot-button-float 3.2s ease-in-out infinite;
   }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 200ms ease-in;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 200ms ease-in;
+  }
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari */
 }

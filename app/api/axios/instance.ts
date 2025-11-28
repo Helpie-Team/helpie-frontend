@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
-import { syncAuthCookie } from '@/app/lib/utils/token';
+import { syncAuthCookie, setTokens, updateAccessToken, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 if (!apiBaseUrl) {
@@ -72,19 +72,31 @@ apiClient.interceptors.response.use(
       try {
         const refreshToken = getSessionValue('refreshToken');
         if (refreshToken) {
-          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${apiBaseUrl}/auth/refresh`, {
+          const response: AxiosResponse<TokenRefreshResponse> = await axios.post(`${apiBaseUrl}/auth/token`, {
             refreshToken,
           });
 
-          const { accessToken } = response.data;
-          setSessionValue('accessToken', accessToken);
-          syncAuthCookie(true);
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          
+          // refreshToken이 응답에 포함되어 있으면 업데이트 (만료 3일 전인 경우)
+          if (newRefreshToken) {
+            setSessionValue('refreshToken', newRefreshToken);
+            setTokens(accessToken, newRefreshToken);
+          } else {
+            // refreshToken이 없으면 기존 refreshToken 유지하고 accessToken만 업데이트
+            updateAccessToken(accessToken);
+          }
 
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        
+        // 리프레시 토큰도 만료된 경우 로그아웃 처리
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.removeItem('accessToken');
+          window.sessionStorage.removeItem('refreshToken');
+          syncAuthCookie(false);
+        }
         return Promise.reject(refreshError);
       }
     }

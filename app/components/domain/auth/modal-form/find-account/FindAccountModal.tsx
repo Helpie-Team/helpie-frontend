@@ -174,11 +174,11 @@ export default function FindAccountModal() {
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50"
         onClick={handleBackdropClick}
       >
         <div 
-          className="bg-white rounded-[30px] p-6 w-full max-w-[540px] mx-4 h-[535px] flex flex-col"
+          className="bg-white rounded-t-[30px] sm:rounded-[30px] p-6 w-full sm:max-w-[540px] sm:mx-4 h-[535px] sm:h-auto sm:max-h-[90vh] flex flex-col animate-slide-up"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 헤더 */}
@@ -287,7 +287,7 @@ export default function FindAccountModal() {
                 disabled={!emailSent || !watchedCode || watchedCode.length !== 6 || isLoading}
                 className={`w-full py-4 rounded-3xl font-medium text-lg transition-colors ${
                   emailSent && watchedCode && watchedCode.length === 6 && !isLoading
-                    ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-black text-white hover:bg-gray-800'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >

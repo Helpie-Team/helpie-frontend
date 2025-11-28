@@ -7,8 +7,11 @@ import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import Image from 'next/image';
 import DefaultProfileImage from '@/public/images/helpie.png';
-
+// import { EllipsisVertical } from 'lucide-react';
+import { MapPinIcon, UsersIcon, TagIcon, AlertTriangleIcon, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 export default function ChatRoom() {
+  const router = useRouter();
   const {
     roomId,
     roomTitle,
@@ -57,13 +60,26 @@ export default function ChatRoom() {
 
   const filteredMessages = filterDuplicateMessages(roomMessages);
 
+  const handleBack = () => {
+    router.push('/chat');
+  };
+
   return (
     <div className="flex flex-col h-full bg-white w-full overflow-hidden">
       {/* 헤더 */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-        <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+          {/* 모바일 뒤로가기 버튼 */}
+          <button
+            onClick={handleBack}
+            className="sm:hidden p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            aria-label="뒤로가기"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
+          </button>
+          
           {/* 프로필 이미지 */}
-          <div className="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex-shrink-0 overflow-hidden">
             <Image 
               src={roomInfo.profileImageUrl && roomInfo.profileImageUrl !== 'NO_IMAGE' ? roomInfo.profileImageUrl : DefaultProfileImage} 
               alt={roomTitle}
@@ -72,45 +88,31 @@ export default function ChatRoom() {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold text-gray-900 mb-2">{roomTitle}</h1>
-            <div className="flex items-center gap-3 text-sm text-gray-500">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2 truncate">{roomTitle}</h1>
+            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 flex-wrap">
               <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>{roomInfo.location || '서울'}</span>
+                <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="truncate">{roomInfo.location || '서울'}</span>
               </div>
               <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+                <UsersIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>{roomInfo.participants || 0}/{roomInfo.maxParticipants || 0}</span>
               </div>
-              <span>{roomInfo.activityType || '액티비티·라이프'}</span>
+              <div className="flex items-center gap-1">
+                <TagIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="truncate">{roomInfo.activityType || '액티비티·라이프'}</span>
+              </div>
             </div>
           </div>
         </div>
-        <button
+        {/* <button
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           title="메뉴"
           aria-label="메뉴"
         >
-          <svg
-            className="w-6 h-6 text-gray-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-            />
-          </svg>
-        </button>
+          <EllipsisVertical size={24} className="text-gray-600" />
+        </button> TODO: 추 후 작업 예정*/}
       </div>
 
       {/* 연결 오류 알림 */}
@@ -118,17 +120,7 @@ export default function ChatRoom() {
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-2 rounded">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <svg
-                className="w-5 h-5 text-yellow-400 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <AlertTriangleIcon className="w-4 h-4 text-yellow-400 mr-2" />
               <p className="text-sm text-yellow-700">{connectionError}</p>
             </div>
             <button
@@ -152,7 +144,7 @@ export default function ChatRoom() {
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 bg-gray-50"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 bg-gray-50"
       >
         {hasMoreMessages && (
           <div className="flex justify-center mb-4">
@@ -171,7 +163,9 @@ export default function ChatRoom() {
       </div>
 
       {/* 입력 영역 */}
-      <ChatInput onSend={handleSendMessage} disabled={!isConnected} />
+      <div className="sm:block">
+        <ChatInput onSend={handleSendMessage} disabled={!isConnected} />
+      </div>
     </div>
   );
 }

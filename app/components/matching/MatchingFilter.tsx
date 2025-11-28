@@ -18,14 +18,6 @@ const categoryMap: Record<string, GroupCategory> = {
   '사회 · 교류': 'SOCIAL',
 };
 
-const categoryDisplayMap: Record<GroupCategory, string> = {
-  'ALL': '전체',
-  'HOBBY': '문화 · 취미',
-  'ART': '예술 · 창작',
-  'LIFE': '액티비티 · 라이프',
-  'STUDY': '자기계발 · 성장',
-  'SOCIAL': '사회 · 교류',
-};
 
 export default function MatchingFilter({ selectedCategory, onCategoryChange }: MatchingFilterProps) {
   const categories = [
@@ -43,10 +35,37 @@ export default function MatchingFilter({ selectedCategory, onCategoryChange }: M
   };
 
   return (
-    <div className="w-[200px] h-full gap-8 flex flex-col items-ceter justify-start">
+    <div className="w-full sm:w-[200px] sm:h-full sm:flex sm:flex-col sm:gap-8">
+      {/* ===== 모바일: 가로 스크롤 pill ===== */}
+      <div className="sm:hidden w-full overflow-x-auto scrollbar-hide">
+        <div className="flex gap-3 pb-3">
+          {categories.map((category) => {
+            const apiCategory = categoryMap[category];
+            const isSelected = selectedCategory === apiCategory;
+
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => handleCategoryClick(category)}
+                className={`shrink-0 py-[10px] px-[14px] rounded-full border text-body2 transition-colors
+                  ${
+                    isSelected
+                      ? "bg-grayScale-700  text-white border-grayScale-900"
+                      : "bg-white text-black border-grayScale-200"
+                  }`}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+    <div className="hidden sm:flex sm:flex-col sm:w-[180px] h-full sm:gap-8 items-ceter justify-start">
       {/* 카테고리 */}
       <div>
-        <h2 className="text-[18px] font-semibold text-black mb-6">카테고리</h2>
+        <h2 className="hidden sm:flex text-[18px] font-semibold text-black mb-6">카테고리</h2>
 
         <div className="flex flex-col gap-5">
           {categories.map((category) => {
@@ -76,6 +95,7 @@ export default function MatchingFilter({ selectedCategory, onCategoryChange }: M
           })}
         </div>
       </div>
+    </div>
     </div>
   );
 }

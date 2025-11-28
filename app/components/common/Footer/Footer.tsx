@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,88 +12,68 @@ import blogFooter from "@/public/icons/blogFooter.png";
 export default function Footer() {
   const pathname = usePathname();
   const isUserInfoPage = pathname === "/new-user-info";
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState<"ko" | "en">("ko");
 
-  // 해당 페이지에서는 푸터 숨김
   if (isUserInfoPage) return null;
 
-  const languages: { label: string; value: "ko" | "en"; display: string }[] = [
-    { label: "한국어", value: "ko", display: "한국어" },
-    { label: "English", value: "en", display: "English" },
-  ];
-
-
-
-  const handleSelect = (value: "ko" | "en") => {
-    setSelectedLang(value);
-    setIsOpen(false);
-    // TODO: 여기서 실제 언어 변경 로직(i18n 등) 연결하면 됨
-  };
-
-  const selectedLabel =
-    languages.find((lang) => lang.value === selectedLang)?.display ??
-    "한국어 (KR)";
-
   return (
-    <div className="w-full min-w-[900px] bg-[#FAF8F7] flex flex-col items-center justify-center py-16 px-8">
-      <div className="w-[1000px] flex flex-col gap-12">
-        {/* 상단 영역 */}
-        <div className="flex flex-row justify-between items-start">
-          {/* 로고 및 SNS */}
-          <div className="flex flex-col gap-6">
-            <Image src={logoFooter} alt="헬피 로고" width={110} height={28} />
+    <div className="w-full bg-[#FAF8F7] flex justify-center py-8 sm:py-16 px-4 sm:px-8">
+      <div className="w-full max-w-5xl flex flex-col gap-8 sm:gap-12">
+        <div className="flex w-full flex-col gap-6 sm:hidden">
+          {/* 로고 + SNS (모바일) */}
+          <div className="flex w-full items-center justify-between">
+            <Image
+              src={logoFooter}
+              alt="헬피 로고"
+              width={110}
+              height={28}
+              className="w-24 h-auto"
+            />
 
             <div className="flex gap-3">
               <a
                 href="https://instagram.com/your_helpie"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="헬피 인스타그램으로 이동"
               >
                 <Image
                   src={instagramFooter}
-                  alt="인스타 아이콘"
+                  alt="Instagram"
                   width={24}
                   height={24}
-                  className="cursor-pointer hover:opacity-80 transition"
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
                 />
               </a>
-
               <a
                 href="https://twitter.com/your_helpie"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="헬피 트위터로 이동"
               >
                 <Image
                   src={twitterFooter}
-                  alt="트위터 아이콘"
+                  alt="Twitter"
                   width={24}
                   height={24}
-                  className="cursor-pointer hover:opacity-80 transition"
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
                 />
               </a>
-
               <a
                 href="https://blog.naver.com/your_helpie"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="헬피 블로그로 이동"
               >
                 <Image
                   src={blogFooter}
-                  alt="블로그 아이콘"
+                  alt="Blog"
                   width={24}
                   height={24}
-                  className="cursor-pointer hover:opacity-80 transition"
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
                 />
               </a>
             </div>
           </div>
 
-          {/* 메뉴 섹션 */}
-          <div className="flex gap-24">
+          {/* 메뉴 (모바일) */}
+          <div className="flex w-full flex-col gap-6">
             {/* About */}
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 text-grayScale-500">About</h3>
@@ -106,7 +85,114 @@ export default function Footer() {
               </Link>
             </div>
 
-            {/* 탐색 */}
+            {/* 탐색 & 고객센터 2열 */}
+            <div className="flex flex-row gap-8">
+              <div className="flex flex-col gap-4 flex-1">
+                <h3 className="text-h3 text-grayScale-500">탐색</h3>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/matching"
+                    className="text-h3-regular text-black hover:underline"
+                  >
+                    소모임
+                  </Link>
+                  <Link
+                    href="/community"
+                    className="text-h3-regular text-black hover:underline"
+                  >
+                    커뮤니티
+                  </Link>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4 flex-1">
+                <h3 className="text-h3 text-grayScale-500">고객센터</h3>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/cs"
+                    className="text-h3-regular text-black hover:underline"
+                  >
+                    공지사항
+                  </Link>
+                  <Link
+                    href="/cs"
+                    className="text-h3-regular text-black hover:underline"
+                  >
+                    문의하기
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= 상단 : PC 전용 ================= */}
+        <div className="hidden sm:flex w-full flex-row justify-between">
+          {/* 왼쪽 : 로고 + SNS(세로 정렬) */}
+          <div className="flex flex-col gap-4">
+            <Image
+              src={logoFooter}
+              alt="헬피 로고"
+              width={110}
+              height={28}
+              className="w-28 h-auto"
+            />
+
+            <div className="flex gap-3">
+              <a
+                href="https://instagram.com/your_helpie"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src={instagramFooter}
+                  alt="Instagram"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
+                />
+              </a>
+              <a
+                href="https://twitter.com/your_helpie"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src={twitterFooter}
+                  alt="Twitter"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
+                />
+              </a>
+              <a
+                href="https://blog.naver.com/your_helpie"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src={blogFooter}
+                  alt="Blog"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 cursor-pointer hover:opacity-80"
+                />
+              </a>
+            </div>
+          </div>
+
+          {/* 오른쪽 : About / 탐색 / 고객센터 3컬럼 */}
+          <div className="flex flex-row gap-12 sm:gap-24">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-h3 text-grayScale-500">About</h3>
+              <Link
+                href="/about"
+                className="text-h3-regular text-black hover:underline"
+              >
+                헬피란 무엇인가요?
+              </Link>
+            </div>
+
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 text-grayScale-500">탐색</h3>
               <div className="flex flex-col gap-3">
@@ -125,7 +211,6 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* 고객센터 */}
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 text-grayScale-500">고객센터</h3>
               <div className="flex flex-col gap-3">
@@ -146,54 +231,24 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* 하단 영역 */}
-        <div className="flex justify-between items-center pt-8 border-t border-grayScale-200">
+        <div
+          className="
+            w-full
+            flex flex-col-reverse sm:flex-row
+            items-start sm:items-center
+            justify-start sm:justify-between
+            gap-4 sm:gap-0
+            pt-6 sm:pt-8
+          "
+        >
           <p className="text-h3-sb text-black">2025 helpie</p>
 
-          <div className="flex items-center gap-4">
-            {/* 언어 선택 - 커스텀 드롭다운 */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsOpen((prev) => !prev)}
-                className="text-h3-regular text-black bg-transparent cursor-pointer px-3 py-1 rounded-lg hover:bg-gray-100 transition flex items-center"
-              >
-                {selectedLabel}
-              </button>
-
-              {isOpen && (
-                <div className="absolute bottom-full left-0 mb-2 bg-white shadow-md rounded-2xl border border-grayScale-200 w-40 overflow-hidden z-50">
-                  {languages.map((lang, index) => (
-                    <button
-                      key={lang.value}
-                      type="button"
-                      onClick={() => handleSelect(lang.value)}
-                      className={`w-full text-left px-4 py-3 text-h3-regular hover:bg-gray-50 ${
-                        selectedLang === lang.value ? "font-semibold" : ""
-                      } ${index !== 0 ? "border-t border-grayScale-200" : ""}`}
-                    >
-                      {lang.display}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <span className="text-grayScale-300">|</span>
-
-            <button
-              type="button"
-              className="text-h3-regular text-black hover:underline"
-            >
+          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2 sm:gap-4">
+            <button type="button" className="hover:underline">
               이용약관
             </button>
-
             <span className="text-grayScale-300">|</span>
-
-            <button
-              type="button"
-              className="text-h3-regular text-black hover:underline"
-            >
+            <button type="button" className="hover:underline">
               개인정보 처리방침
             </button>
           </div>

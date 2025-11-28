@@ -218,7 +218,7 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-row flex-wrap gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {allMeetings.map((meeting) => {
           const dday = calculateDday(meeting.meetingDate);
           const categoryColor = categoryColors[meeting.category];
@@ -227,15 +227,15 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
           return (
             <div
               key={meeting.id}
-              className="w-[180px] rounded-2xl flex flex-col cursor-pointer"
+              className="w-full rounded-2xl flex flex-col cursor-pointer"
               onClick={() => handleCardClick(meeting.id)}
             >
-              <div className="relative w-[180px] h-[130px] overflow-hidden rounded-2xl">
+              <div className="relative w-full h-[120px] md:h-[130px] overflow-hidden rounded-2xl">
                 <Image
                   src={meeting.thumbnail && typeof meeting.thumbnail === 'string' && meeting.thumbnail.trim() !== '' ? meeting.thumbnail : noImage}
                   alt={meeting.title}
                   fill
-                  sizes="180px"
+
                   className="object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -277,17 +277,17 @@ export default function MatchingCards({ country, category, searchKeyword }: Matc
               </div>
 
               {/* 텍스트 영역 */}
-              <div className="flex flex-col gap-1 px-2 mt-2">
-                <div className="flex items-center gap-2 text-caption1-regular text-grayScale-500">
+              <div className="flex flex-col gap-1 mt-2 px-1">
+                <div className="flex items-center gap-1 text-mcaption1 sm:text-caption1-regular text-grayScale-500">
                   {/* 카테고리 배지 */}
-                  <div className={`${categoryColor} text-white px-2 py-1 rounded-full text-caption1-b whitespace-nowrap flex-shrink-0`}>
+                  <div className={`${categoryColor} text-white px-2 py-0.5 sm:px-2 sm:py-[3px] rounded-full text-mcaption1-sb sm:text-caption1-b whitespace-nowrap flex-shrink-0`}>
                     {categoryDisplay}
                   </div>
                   <span className="whitespace-nowrap">{meeting.cityName}</span>
                   <span className="whitespace-nowrap">{meeting.maxMember}명</span>
                 </div>
-                <h3 className="text-body2 text-black line-clamp-1 break-words">{meeting.title}</h3>
-                <p className="text-body3-regular text-grayScale-600 line-clamp-2 break-words">
+                <h3 className="text-body3 sm:text-body2 text-black line-clamp-1 break-words">{meeting.title}</h3>
+                <p className="text-mcaption1 sm:text-body3-regular text-grayScale-600 line-clamp-2 break-words">
                   {meeting.description}
                 </p>
               </div>

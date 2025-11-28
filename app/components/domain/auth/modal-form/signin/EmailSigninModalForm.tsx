@@ -127,8 +127,8 @@ export default function EmailSigninModalForm() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-white rounded-[30px] p-8 w-full max-w-[540px] mx-4">
+    <div className="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-50">
+      <div className="bg-white rounded-t-[30px] sm:rounded-[30px] p-8 w-full sm:max-w-[540px] sm:mx-4 animate-slide-up">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">

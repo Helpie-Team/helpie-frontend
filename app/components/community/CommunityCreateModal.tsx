@@ -1,17 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useCreateCommunityPostMutation } from "@/app/hooks/community/useCommunity";
 import type { CommunityPostCategory } from "@/app/api/types/community/community";
-import type { StaticImageData } from "next/image";
-import {
-  ChevronDown,
-  Image as ImageIcon,
-  X
-} from "lucide-react";
-import freeIcon from "@/public/icons/freeIcon.png"
-import infoIcon from "@/public/icons/InfoIcon.png"
+import { ChevronDown, Image as ImageIcon, X } from "lucide-react";
+import freeIcon from "@/public/icons/freeIcon.png";
+import infoIcon from "@/public/icons/InfoIcon.png";
 
 interface CommunityCreateModalProps {
   isOpen: boolean;
@@ -25,7 +20,7 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];
 interface CategoryOption {
   value: CommunityPostCategory;
   label: string;
-  icon:  StaticImageData;
+  icon: StaticImageData;
 }
 
 export function CommunityCreateModal({
@@ -141,31 +136,44 @@ export function CommunityCreateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="flex h-[590px] w-[540px] p-6 gap-6 flex-col overflow-hidden rounded-[30px] bg-white">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+      onClick={onClose}
+    >
+      {/* 모달 박스 */}
+      <div
+        className="
+          w-full max-w-[540px]
+          rounded-[30px] bg-white
+          p-6 sm:p-8
+          flex flex-col gap-6
+          max-h-[90vh] overflow-y-auto
+        "
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-h2-sb  text-black">포스트</h2>
+          <h2 className="text-h2-sb text-black">포스트</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-black h-8 w-8 items-center justify-center"
+            className="flex h-8 w-8 items-center justify-center text-black"
           >
-              <X className="h-6 w-6"/>
+            <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Body */}
         <form
           onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-4"
+          className="flex w-full flex-col gap-4"
         >
           {/* 카테고리 선택 */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
-              className="flex h-12 w-full items-center justify-between rounded-lg border border-grayScale-200 p-3 text-left"
+              className="flex h-12 w-full items-center justify-between rounded-lg border border-grayScale-200 px-3 text-left"
             >
               <span className={category ? "text-black" : "text-gray-300"}>
                 {category
@@ -189,11 +197,11 @@ export function CommunityCreateModal({
                     className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-gray-50"
                   >
                     <Image
-                        src={opt.icon}
-                        alt={`${opt.label} 아이콘`}
-                        width={16}
-                        height={16}
-                      />
+                      src={opt.icon}
+                      alt={`${opt.label} 아이콘`}
+                      width={16}
+                      height={16}
+                    />
                     <span>{opt.label}</span>
                   </button>
                 ))}
@@ -209,7 +217,7 @@ export function CommunityCreateModal({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="타이틀을 작성해주세요."
               maxLength={20}
-              className="h-12 w-full border-none px-0 text-sm text-black placeholder-gray-400 text-h3
+              className="h-12 w-full border-none px-0 text-h3 text-black placeholder-gray-400
                          focus:outline-none focus:ring-0"
             />
           </div>
@@ -222,14 +230,14 @@ export function CommunityCreateModal({
               placeholder="나누고 싶은 이야기를 들려주세요!"
               rows={5}
               maxLength={1000}
-              className="w-full h-[309px]  border-none text-h3 text-black resize-none
+              className="h-[260px] w-full resize-none border-none text-h3 text-black
                          placeholder-gray-400 focus:outline-none focus:ring-0"
             />
           </div>
 
           {/* 이미지 미리보기 */}
           {images.length > 0 && (
-            <div className="mt-4">
+            <div className="mt-2">
               <div className="relative w-full overflow-hidden rounded-lg">
                 <Image
                   src={URL.createObjectURL(images[currentImageIndex])}
@@ -260,7 +268,7 @@ export function CommunityCreateModal({
                   </>
                 )}
 
-                {/* 삭제 버튼 */}
+                {/* 이미지 삭제 버튼 */}
                 <button
                   type="button"
                   onClick={() => removeImage(currentImageIndex)}
@@ -297,7 +305,12 @@ export function CommunityCreateModal({
               disabled={
                 loading || !category || !title.trim() || !content.trim()
               }
-              className="rounded-full bg-key-100 px-6 py-2 text-grayScale-400 transition-colors hover:bg-key-100 disabled:cursor-not-allowed disabled:bg-gray-100"
+              className={`rounded-full px-6 py-2 text-h3
+                ${
+                  loading || !category || !title.trim() || !content.trim()
+                    ? "bg-gray-100 text-grayScale-400 cursor-not-allowed"
+                    : "bg-key-100 text-white hover:bg-key-100/90"
+                }`}
             >
               {loading ? "포스트하는 중..." : "포스트하기"}
             </button>

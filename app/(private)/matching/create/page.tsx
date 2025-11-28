@@ -1,3 +1,4 @@
+// app/(private)/matching/create/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -11,7 +12,7 @@ import {
 } from "@/app/components/matching/MatchingInput";
 import { DateTimePicker } from "@/app/components/matching/DateTimePicker";
 import { useCreateMatching } from "@/app/hooks/matching/useMatching";
-import type { Interest } from "@/app/api/types/matching/matching"; // ✅ payload 타입 맞추려고만 사용
+import type { Interest } from "@/app/api/types/matching/matching";
 
 // 카테고리 ID를 백엔드 Category enum으로 매핑
 const CATEGORY_TO_STRING: Record<string, string> = {
@@ -51,7 +52,6 @@ export default function Page() {
     setValidationError(null);
 
     try {
-      // meetingDate와 meetingTime을 결합하여 ISO 문자열로 변환
       if (!formData.meetingDate || !formData.meetingTime) {
         throw new Error("모임 일시를 입력해주세요.");
       }
@@ -60,10 +60,8 @@ export default function Page() {
       const [hours, minutes] = formData.meetingTime.split(":");
       meetingDateTime.setHours(parseInt(hours), parseInt(minutes));
 
-      // ✅ 태그는 지금은 화면용이기 때문에 백엔드 interest 에는 아무것도 안 보냄
       const interests: Interest[] = [];
 
-      // 카테고리는 기존처럼 대분류에서 1개 선택
       const categoryKey = formData.categories[0];
       const categoryString = CATEGORY_TO_STRING[categoryKey];
 
@@ -73,12 +71,11 @@ export default function Page() {
         maxMember: formData.maxParticipants,
         cityId: formData.cityId,
         category: categoryString,
-        interest: interests, // 현재는 빈 배열
+        interest: interests,
         meetingDate: meetingDateTime.toISOString(),
         chatRoomId: 0,
       };
 
-      // API 호출 (mutation hook 사용)
       createMatching(
         {
           payload,
@@ -117,166 +114,193 @@ export default function Page() {
     formData.meetingDate !== undefined &&
     formData.meetingTime.length > 0 &&
     formData.maxParticipants >= 3 &&
-    formData.categories.length >= 1; // ✅ 태그는 필수 아님
+    formData.categories.length >= 1;
 
   return (
-    <div className="flex flex-col items-center justify-center w-[1000px] mx-auto gap-8 pt-8 pb-90">
-      <div className="w-full h-[149px] flex flex-col gap-6 border-b border-grayScale-100 ">
-        <button type="button" onClick={() => router.push("/matching")}>
-          <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
-        </button>
-        <div className="flex flex-col gap-2">
-          <p className="text-caption1-regular text-grayScale-400">
-            메인 &gt; 소모임
-          </p>
+    // 바깥에서 가운데 정렬 + PC에서 최대 1000px
+    <div className="w-full flex justify-center">
+      <div className="w-full max-w-[375px] sm:max-w-[1000px] px-4 sm:px-0 pt-8 pb-24 flex flex-col gap-8">
+        {/* ===== 모바일 헤더 (375px 시안용) ===== */}
+        <div className="w-full border-b border-grayScale-100 pb-4 sm:hidden">
           <div className="flex items-center justify-between">
-            <h1 className="text-head">소모임 만들기</h1>
+            {/* 왼쪽 : 뒤로가기 + 타이틀 */}
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => router.push("/matching")}>
+                <Image src={arrow_left} alt="뒤로가기" width={24} height={24} />
+              </button>
+              <h1 className="text-body1-sb">소모임 만들기</h1>
+            </div>
+
+            {/* 오른쪽 : 만들기 버튼 */}
             <button
               type="submit"
               onClick={handleSubmit}
               disabled={!isFormValid || isPending}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
+              className={`h-[38px] px-4 rounded-full font-medium text-body2-medium transition-all ${
                 isFormValid && !isPending
                   ? "bg-key-100 text-white hover:bg-key-200"
                   : "bg-grayScale-100 text-grayScale-400 cursor-not-allowed"
               }`}
             >
-              {isPending ? "등록 중..." : "등록하기"}
+              {isPending ? "등록 중..." : "만들기"}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* 에러 메시지 */}
-      {(validationError || mutationError) && (
-        <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-body2 text-red-600">
-            {validationError ||
-              (mutationError instanceof Error
-                ? mutationError.message
-                : "소모임 생성에 실패했습니다.")}
-          </p>
+        {/* ===== PC 헤더 (현재 디자인 유지) ===== */}
+        <div className="w-full h-[149px] flex-col gap-6 border-b border-grayScale-100 hidden sm:flex">
+          <button type="button" onClick={() => router.push("/matching")}>
+            <Image src={arrow_left} alt="뒤로가기" width={40} height={40} />
+          </button>
+          <div className="flex flex-col gap-2">
+            <p className="text-caption1-regular text-grayScale-400">
+              메인 &gt; 소모임
+            </p>
+            <div className="flex items-center justify-between">
+              <h1 className="text-head">소모임 만들기</h1>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={!isFormValid || isPending}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                  isFormValid && !isPending
+                    ? "bg-key-100 text-white hover:bg-key-200"
+                    : "bg-grayScale-100 text-grayScale-400 cursor-not-allowed"
+                }`}
+              >
+                {isPending ? "등록 중..." : "등록하기"}
+              </button>
+            </div>
+          </div>
         </div>
-      )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="w-full h-[1200px] flex flex-col py-[1px] gap-10"
-      >
-        {/* 소모임 명 */}
-        <MatchingInput
-          type="text"
-          label="소모임 명"
-          required
-          value={formData.name}
-          onChange={(value) =>
-            setFormData({ ...formData, name: value as string })
-          }
-          placeholder="소모임 이름을 입력해주세요."
-          maxLength={13}
-          showCharCount
-        />
+        {/* 에러 메시지 */}
+        {(validationError || mutationError) && (
+          <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-body2 text-red-600">
+              {validationError ||
+                (mutationError instanceof Error
+                  ? mutationError.message
+                  : "소모임 생성에 실패했습니다.")}
+            </p>
+          </div>
+        )}
 
-        {/* 소모임 설명 */}
-        <MatchingInput
-          type="textarea"
-          label="소모임 설명"
-          required
-          value={formData.description}
-          onChange={(value) =>
-            setFormData({ ...formData, description: value as string })
-          }
-          placeholder="간단한 설명을 입력해주세요."
-          maxLength={500}
-          minLength={20}
-          showCharCount
-        />
+        {/* 폼 */}
+        <form
+          onSubmit={handleSubmit}
+          className="w-full flex flex-col py-[1px] gap-10"
+        >
+          <MatchingInput
+            type="text"
+            label="소모임 명"
+            required
+            value={formData.name}
+            onChange={(value) =>
+              setFormData({ ...formData, name: value as string })
+            }
+            placeholder="소모임 이름을 입력해주세요."
+            maxLength={13}
+            showCharCount
+          />
 
-        {/* 지역 설정 */}
-        <MatchingInput
-          type="search"
-          label="지역 설정"
-          required
-          value={formData.location}
-          onChange={(data) => {
-            if (
-              typeof data === "object" &&
-              "cityId" in data &&
-              "cityName" in data
-            ) {
+          <MatchingInput
+            type="textarea"
+            label="소모임 설명"
+            required
+            value={formData.description}
+            onChange={(value) =>
+              setFormData({ ...formData, description: value as string })
+            }
+            placeholder="간단한 설명을 입력해주세요."
+            maxLength={500}
+            minLength={20}
+            showCharCount
+          />
+
+          <MatchingInput
+            type="search"
+            label="지역설정"
+            required
+            value={formData.location}
+            onChange={(data) => {
+              if (
+                typeof data === "object" &&
+                "cityId" in data &&
+                "cityName" in data
+              ) {
+                setFormData({
+                  ...formData,
+                  location: data.cityName as string,
+                  cityId: data.cityId as number,
+                });
+              }
+            }}
+            placeholder="도시를 검색하세요."
+          />
+
+          <DateTimePicker
+            label="모임 일시"
+            required
+            dateValue={formData.meetingDate}
+            timeValue={formData.meetingTime}
+            onDateChange={(date) =>
+              setFormData({ ...formData, meetingDate: date })
+            }
+            onTimeChange={(time) =>
+              setFormData({ ...formData, meetingTime: time })
+            }
+          />
+
+          <MatchingInput
+            type="number"
+            label="모임인원"
+            required
+            value={formData.maxParticipants}
+            min={3}
+            onChange={(value) => {
+              const num = Number(value);
+              if (isNaN(num)) return;
               setFormData({
                 ...formData,
-                location: data.cityName as string,
-                cityId: data.cityId as number,
+                maxParticipants: num < 3 ? 3 : num,
               });
+            }}
+            placeholder="숫자만 입력해주세요."
+          />
+
+          <MatchingInput
+            type="tags"
+            label="카테고리 설정"
+            required
+            selectedTags={formData.categories}
+            onChange={(tags) =>
+              setFormData({ ...formData, categories: tags as string[] })
             }
-          }}
-          placeholder="도시를 검색하세요."
-        />
+            options={CATEGORY_OPTIONS}
+          />
 
-        {/* 모임 일시 */}
-        <DateTimePicker
-          label="모임 일시"
-          required
-          dateValue={formData.meetingDate}
-          timeValue={formData.meetingTime}
-          onDateChange={(date) =>
-            setFormData({ ...formData, meetingDate: date })
-          }
-          onTimeChange={(time) =>
-            setFormData({ ...formData, meetingTime: time })
-          }
-        />
+          <MatchingInput
+            type="tag-input"
+            label="태그"
+            tags={formData.interests}
+            onChange={(interest) =>
+              setFormData({ ...formData, interests: interest as string[] })
+            }
+            placeholder="태그 내용 입력 후 엔터 혹은 스페이스바"
+            maxTags={10}
+          />
 
-        {/* 모임인원 */}
-        <MatchingInput
-          type="number"
-          label="모임인원"
-          required
-          value={formData.maxParticipants}
-          onChange={(value) =>
-            setFormData({
-              ...formData,
-              maxParticipants: value as number,
-            })
-          }
-          placeholder="숫자만 입력해 주세요."
-        />
-
-        {/* 카테고리 설정 */}
-        <MatchingInput
-          type="tags"
-          label="카테고리 설정"
-          required
-          selectedTags={formData.categories}
-          onChange={(tags) =>
-            setFormData({ ...formData, categories: tags as string[] })
-          }
-          options={CATEGORY_OPTIONS}
-        />
-
-        {/* 소모임 태그 (화면에만 보이는 텍스트 태그) */}
-        <MatchingInput
-          type="tag-input"
-          label="소모임 태그"
-          tags={formData.interests}
-          onChange={(interest) =>
-            setFormData({ ...formData, interests: interest as string[] })
-          }
-          placeholder="표시할 태그를 입력해 주세요."
-          maxTags={10}
-        />
-
-        {/* 사진추가 */}
-        <MatchingInput
-          type="image"
-          images={formData.images}
-          onChange={(images) =>
-            setFormData({ ...formData, images: images as File[] })
-          }
-          maxImages={3}
-        />
-      </form>
+          <MatchingInput
+            type="image"
+            images={formData.images}
+            onChange={(images) =>
+              setFormData({ ...formData, images: images as File[] })
+            }
+            maxImages={3}
+          />
+        </form>
+      </div>
     </div>
   );
 }

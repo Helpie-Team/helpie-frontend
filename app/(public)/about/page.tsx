@@ -36,7 +36,7 @@ export default function AboutPage() {
     return (
         <>
             {/* Hero Section - 메인 이미지와 텍스트 */}
-            <section className="relative w-screen h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
+            <section className="relative w-screen h-[516px] sm:h-[797px] overflow-hidden -mx-[calc((100vw-100%)/2)]">
                 {/* 배경 이미지 */}
                 <Image
                     src={aboutImageMap.cover}
@@ -91,7 +91,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.6 }}
                 variants={fadeInUp}
             >
-                <div className="max-w-4xl mx-auto px-4">
+                <div className="max-w-4xl mx-auto px-2 sm:px-4">
                     <div className="mb-8">
                         <Image src={aboutImageMap.hepie} alt="helpie width4" width={942} height={142} className="justify-center items-center mb-4 mx-auto"/>
                     </div>
@@ -99,8 +99,8 @@ export default function AboutPage() {
             </motion.section>
 
             {/* Our Mission 섹션 */}
-            <section className="w-[942px] h-[471.22px] gap-10">
-                <div className=" mx-auto">
+            <section className="w-full max-w-6xl mx-auto px-6 sm:px-4 py-8">
+                <div className="mx-auto">
                     <motion.h2
                         className="text-3xl font-bold text-center mb-12"
                         initial="hidden"
@@ -111,10 +111,10 @@ export default function AboutPage() {
                     >
                         Our Mission
                     </motion.h2>
-                    <div className="flex flex-row gap-3">
+                    <div className="flex flex-col sm:flex-row gap-6 sm:gap-3 justify-center items-center sm:items-stretch">
                         {/* 함께 나누기 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -146,7 +146,7 @@ export default function AboutPage() {
 
                         {/* 삶을 전하기 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -178,7 +178,7 @@ export default function AboutPage() {
 
                         {/* 세 번째 카드 */}
                         <motion.div
-                            className="bg-white w-[306px] h-[393.22px] rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
+                            className="bg-white w-full max-w-[320px] sm:max-w-[306px] h-auto rounded-[20px] border border-grayScale-200 overflow-hidden shadow-sm"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
@@ -225,20 +225,20 @@ export default function AboutPage() {
                         Our Service
                     </motion.h2>
 
-                    <div className="w-full h-[540px] flex flex-col gap-13">
+                    <div className="w-full h-auto sm:h-[540px] flex flex-col gap-8 sm:gap-13">
                         {/* 소모임 서비스 */}
                         <motion.div
-                            className="w-full h-[244px] flex flex-row items-center gap-8"
+                            className="w-full h-auto sm:h-[244px] flex flex-col sm:flex-row items-center gap-8"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
                             transition={{ duration: 0.6 }}
                             variants={slideInLeft}
                         >
-                            <div className="flex-1 h-[244px] flex justify-center flex-col">
-                                <div className="flex items-start text-start flex-col gap-16">
-                                        <Image src={people} alt="사람아이콘" width={60} height={60}/>
-                                        <div className='w-[461px] flex flex-col gap-4'>
+                            <div className="flex-1 h-auto sm:h-[244px] flex justify-center flex-col order-2 sm:order-1">
+                                <div className="flex items-start text-start flex-col gap-4 sm:gap-16">
+                                        <Image src={people} alt="사람아이콘" width={60} height={60} className="hidden sm:block"/>
+                                        <div className='w-full max-w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">소모임</h3>
                                                 <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/matching')} />
@@ -252,7 +252,7 @@ export default function AboutPage() {
                                 </div>
                             </div>
                             <motion.div
-                                className="flex-1 flex justify-end"
+                                className="flex-1 flex justify-center sm:justify-end order-1 sm:order-2"
                                 variants={slideInRight}
                                 transition={{ duration: 0.6, delay: 0.2 }}
                             >
@@ -261,28 +261,27 @@ export default function AboutPage() {
                                     alt="소모임 서비스"
                                     width={461}
                                     height={244}
-                                    className="rounded-lg object-cover"
-
+                                    className="rounded-lg object-cover w-full max-w-[461px] h-auto"
                                 />
                             </motion.div>
                         </motion.div>
 
                         {/* 커뮤니티 서비스 */}
                         <motion.div
-                            className="w-full h-[244px] flex flex-row items-center gap-8"
+                            className="w-full h-auto sm:h-[244px] flex flex-col sm:flex-row items-center gap-8"
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
                             variants={slideInLeft}
                         >
-                            <div className=" h-[244px] flex justify-center flex-col">
-                                <div className="flex items-start text-start flex-col gap-20">
-                                        <Image src={community} alt="지구 아이콘" width={60} height={60}/>
-                                        <div className='w-[461px] flex flex-col gap-4'>
+                            <div className="flex-1 h-auto sm:h-[244px] flex justify-center flex-col order-2 sm:order-1">
+                                <div className="flex items-start text-start flex-col gap-4 sm:gap-20">
+                                        <Image src={community} alt="지구 아이콘" width={60} height={60} className="hidden sm:block"/>
+                                        <div className='w-full max-w-[461px] flex flex-col gap-4'>
                                             <div className="flex flex-row items-center gap-3">
                                                 <h3 className="text-2xl font-bold">커뮤니티</h3>
-                                                <span className="px-3 py-1 rounded-full bg-grayScale-100 text-grayScale-400 text-sm">준비중</span>
+                                                <ExternalLink className="w-5 h-5 text-gray-400 cursor-pointer" onClick={() => router.push('/community')} />
                                             </div>
                                             <p className="text-gray-600 text-h3 mb-0">
                                                 관심 있는 주제나 지역의 사람들과 일상을 자유롭게 소통해요.<br />
@@ -292,7 +291,7 @@ export default function AboutPage() {
                                 </div>
                             </div>
                             <motion.div
-                                className="flex-1 flex justify-end"
+                                className="flex-1 flex justify-center sm:justify-end order-1 sm:order-2"
                                 variants={slideInRight}
                                 transition={{ duration: 0.6, delay: 0.4 }}
                             >
@@ -301,7 +300,7 @@ export default function AboutPage() {
                                     alt="커뮤티니 서비스"
                                     width={461}
                                     height={244}
-                                    className="rounded-lg object-cover"
+                                    className="rounded-lg object-cover w-full max-w-[461px] h-auto"
                                 />
                             </motion.div>
                         </motion.div>

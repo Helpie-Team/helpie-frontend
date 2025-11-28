@@ -1,137 +1,281 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { X, Goal, Megaphone, Headset, Users, Globe } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { X, Goal, Megaphone, Headset, Users, Globe, MessageCircle, ArrowRight, LucideIcon } from 'lucide-react';
+import { useMyProfileInfo } from '@/app/hooks/my-page/useMyProfileInfo';
+import { logout } from '@/app/api/auth/auth';
+import { getRefreshToken, clearTokens } from '@/app/lib/utils/token';
+import DefaultProfileImage from '@/public/images/profile_icon.png';
 
 interface HamburgerMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  anchorRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose, anchorRef }) => {
+interface MenuItem {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+const MENU_SECTIONS: MenuSection[] = [
+  {
+    title: 'About',
+    items: [
+      {
+        href: '/about',
+        icon: Goal,
+        label: 'helpie란?',
+      },
+    ],
+  },
+  {
+    title: '탐색',
+    items: [
+      {
+        href: '/matching',
+        icon: Users,
+        label: '소모임',
+      },
+      {
+        href: '/community',
+        icon: Globe,
+        label: '커뮤니티',
+      },
+      {
+        href: '/chat',
+        icon: MessageCircle,
+        label: '채팅',
+      },
+    ],
+  },
+  {
+    title: '고객센터',
+    items: [
+      {
+        href: '/cs',
+        icon: Megaphone,
+        label: '공지사항',
+      },
+      {
+        href: '/cs',
+        icon: Headset,
+        label: '문의하기',
+      },
+    ],
+  },
+];
+
+const CHAT_HREF = '/chat';
+const MY_PAGE_HREF = '/my-page';
+
+const MENU_ITEM_LINK_CLASS = 'flex items-center gap-3 py-2 hover:bg-gray-50 rounded-lg transition-colors -mx-2 px-2';
+const ICON_WRAPPER_CLASS = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
+const ICON_CLASS = 'text-key-200';
+const SECTION_TITLE_CLASS = 'text-xs font-medium text-gray-500 mb-3';
+const SECTION_CLASS = 'mb-6';
+
+const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose }) => {
+  const router = useRouter();
+  const { data: profile } = useMyProfileInfo(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        anchorRef?.current &&
-        !anchorRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
     };
 
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
       }
     };
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
       document.addEventListener('keydown', handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose, anchorRef]);
+  }, [isOpen, onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+    try {
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        await logout(refreshToken);
+      } else {
+        clearTokens();
+      }
+      onClose();
+      router.replace('/');
+      router.refresh();
+    } catch (err) {
+      console.error('로그아웃 실패:', err);
+      clearTokens();
+      onClose();
+      router.replace('/');
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const getProfileImageUrl = () => {
+    return profile?.imageUrl && profile.imageUrl !== 'NO_IMAGE' ? profile.imageUrl : DefaultProfileImage;
+  };
+
+  const getFilteredMenuSections = (): MenuSection[] => {
+    if (isMobile) {
+      return MENU_SECTIONS;
+    }
+
+    return MENU_SECTIONS.map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.href !== CHAT_HREF),
+    }));
+  };
+
+  const renderMenuItem = (item: MenuItem) => {
+    const IconComponent = item.icon;
+    return (
+      <Link
+        key={item.href + item.label}
+        href={item.href}
+        onClick={onClose}
+        className={MENU_ITEM_LINK_CLASS}
+      >
+        <div className={ICON_WRAPPER_CLASS}>
+          <IconComponent size={20} className={ICON_CLASS} />
+        </div>
+        <span className="text-sm font-semibold text-gray-900">{item.label}</span>
+      </Link>
+    );
+  };
+
+  const renderProfileSection = () => {
+    if (!isMobile) {
+      return null;
+    }
+
+    return (
+      <Link
+        href={MY_PAGE_HREF}
+        onClick={onClose}
+        className="w-full flex items-center gap-3 py-3 mb-4 hover:bg-gray-50 rounded-lg transition-colors -mx-2 px-2"
+      >
+        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+          <Image
+            src={getProfileImageUrl()}
+            alt="profile"
+            width={40}
+            height={40}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-semibold text-gray-900 truncate">{profile?.username || '사용자'}</span>
+          </div>
+          <div className="text-xs text-gray-500 truncate">{profile?.email || ''}</div>
+        </div>
+        <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+      </Link>
+    );
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div
-      ref={menuRef}
-      className="absolute top-[68px] right-[3rem] bg-white rounded-xl shadow-lg z-50 w-[321px]  overflow-hidden flex flex-col">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
-        <h2 className="text-base font-bold text-gray-900">메뉴</h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="메뉴 닫기"
-        >
-          <X size={24} className="text-gray-600" />
-        </button>
-      </div>
-
-      {/* 메뉴 내용 */}
-      <div className="overflow-y-auto px-5 py-3 flex-1">
-        {/* 주요 메뉴 아이콘 */}
-        <div className="flex gap-4 mb-6">
-          <Link
-            href="/matching"
-            className="flex flex-col items-center gap-2"
+    <>
+      <div
+        className="fixed inset-0 bg-black/70 z-40 sm:hidden animate-fade-in"
+        onClick={handleBackdropClick}
+      />
+      <div
+        ref={menuRef}
+        className="fixed sm:absolute top-0 sm:top-[68px] right-0 sm:right-[3rem] h-full sm:h-auto bg-white sm:rounded-xl shadow-lg z-50 w-[85%] sm:w-[321px] max-w-[400px] sm:max-w-none overflow-hidden flex flex-col animate-slide-in-right sm:animate-none"
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
+          <h2 className="text-base font-bold text-gray-900">모두보기</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="메뉴 닫기"
           >
-            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
-              <Users size={24} className="text-key-200" />
-            </div>
-            <span className="text-xs font-semibold text-gray-900">소모임</span>
-          </Link>
-
-          <Link
-            href="/community"
-            className="flex flex-col gap-2"
-          >
-            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
-              <Globe size={24} className="text-key-200" />
-            </div>
-            <span className="text-xs font-semibold text-gray-900">커뮤니티</span>
-          </Link>
+            <X size={24} className="text-gray-600" />
+          </button>
         </div>
 
-        {/* 구분선 */}
-        <div className="h-px bg-gray-200 mb-6" />
+        <div className="overflow-y-auto px-5 py-4 flex-1">
+          {renderProfileSection()}
 
-        {/* About 섹션 */}
-        <div className="mb-6">
-          <h3 className="text-xs font-medium text-gray-500 mb-3">About</h3>
-          <Link
-            href="/about"
-            className="flex items-center gap-3 py-2"
-          >
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <Goal size={24} className="text-gray-400" />
+          {isMobile && <div className="h-px bg-gray-200 mb-4" />}
+
+          {getFilteredMenuSections().map((section) => (
+            <div key={section.title} className={SECTION_CLASS}>
+              <h3 className={SECTION_TITLE_CLASS}>{section.title}</h3>
+              <div className={section.items.length > 1 ? 'flex flex-col gap-1' : ''}>
+                {section.items.map(renderMenuItem)}
+              </div>
             </div>
-            <span className="text-xs font-semibold text-gray-900">helpie란?</span>
-          </Link>
+          ))}
         </div>
 
-        {/* 고객센터 섹션 */}
-        <div className="mb-6">
-          <h3 className="text-xs font-medium text-gray-500 mb-3">고객센터</h3>
-          <div className="flex flex-col gap-1">
-            <Link
-              href="/cs"
-              className="flex items-center gap-3 py-2"
-            >
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                <Megaphone size={24} className="text-gray-400" />
-              </div>
-              <span className="text-xs font-semibold text-gray-900">공지사항</span>
-            </Link>
-
-            <Link
-              href="/cs"
-              className="flex items-center gap-3 py-2"
-            >
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                <Headset size={24} className="text-gray-400" />
-              </div>
-              <span className="text-xs font-semibold text-gray-900">문의하기</span>
-            </Link>
-          </div>
+        <div className="flex items-center justify-center px-5 py-4 border-t border-gray-200 flex-shrink-0">
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-[109px] flex items-center justify-center gap-2 py-3 bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700 rounded-3xl transition-colors disabled:opacity-50"
+          >
+            <span>{isLoggingOut ? '로그아웃 중...' : '로그아웃'}</span>
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default HamburgerMenu;
-

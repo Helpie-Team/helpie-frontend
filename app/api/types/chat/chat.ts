@@ -7,6 +7,9 @@ export interface ChatRoom {
   isActive: boolean;
   createdAt: string;
   profileImageUrl?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  lastMessageSender?: string;
 }
 
 export interface ChatRoomDetail {
@@ -21,6 +24,9 @@ export interface ChatRoomDetail {
   profileImageUrl?: string;
   location?: string;
   category?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  lastMessageSender?: string;
 }
 
 export interface ChatMessage {

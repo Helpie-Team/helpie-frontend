@@ -37,6 +37,7 @@ interface MatchingInputProps {
   maxLength?: number;
   minLength?: number;
   showCharCount?: boolean;
+  min?:number;
   max?: number;
   selectedTags?: string[];
   tags?: string[];
@@ -204,11 +205,12 @@ const SearchInput: React.FC<MatchingInputProps> = ({ value = '', onChange, place
 };
 
 // 숫자 입력
-const NumberInput: React.FC<MatchingInputProps> = ({ value = 0, onChange, placeholder }) => (
+const NumberInput: React.FC<MatchingInputProps> = ({ value = 0, onChange, placeholder,min }) => (
   <div>
     <input
       type="number"
-      value={value || ''}
+      min={min}
+      value={value as number}
       onChange={(e) => onChange?.(parseInt(e.target.value) || 0)}
       placeholder={placeholder}
       className={INPUT_CLASS}
@@ -218,39 +220,69 @@ const NumberInput: React.FC<MatchingInputProps> = ({ value = 0, onChange, placeh
 );
 
 // 카테고리 태그
-const TagsInput: React.FC<MatchingInputProps> = ({ selectedTags = [], onChange, options = CATEGORY_OPTIONS }) => {
+const TagsInput: React.FC<MatchingInputProps> = ({
+  selectedTags = [],
+  onChange,
+  options = CATEGORY_OPTIONS,
+}) => {
   const selectTag = (tagId: string) => {
     onChange?.([tagId]);
   };
 
   return (
-    <div className="flex flex-wrap gap-3">
-      {options.map((option) => {
-        const isSelected = selectedTags.includes(option.id);
-        return (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => selectTag(option.id)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-full border transition-all text-body2-medium ${
-              isSelected
-                ? 'bg-white text-black border-key-100'
-                : 'bg-white text-grayScale-600 border-grayScale-200 hover:border-key-100'
-            }`}
-          >
-            {/* 라디오 버튼 아이콘 */}
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-              isSelected ? 'bg-key-100' : 'bg-key-300 border border-grayScale-filter'
-            }`}>
-              <div className="w-2 h-2 rounded-full bg-white" />
-            </div>
-            {option.label}
-          </button>
-        );
-      })}
+    <div className="w-full">
+      {/* 모바일: 가로 스크롤 / PC: 기존처럼 보이게 */}
+      <div
+        className="
+          flex gap-3
+          overflow-x-auto sm:overflow-visible
+          pb-2 sm:pb-0
+          -mx-4 px-4 sm:mx-0 sm:px-0
+        "
+      >
+        {options.map((option) => {
+          const isSelected = selectedTags.includes(option.id);
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => selectTag(option.id)}
+              className={`
+                flex items-center gap-2
+                px-6 py-3
+                rounded-full border
+                transition-all text-body2-medium
+                flex-shrink-0 whitespace-nowrap
+                ${
+                  isSelected
+                    ? "bg-white text-black border-key-100"
+                    : "bg-white text-grayScale-600 border-grayScale-200 hover:border-key-100"
+                }
+              `}
+            >
+              {/* 라디오 버튼 아이콘 */}
+              <div
+                className={`
+                  w-5 h-5 rounded-full flex items-center justify-center
+                  ${
+                    isSelected
+                      ? "bg-key-100"
+                      : "bg-key-300 border border-grayScale-filter"
+                  }
+                `}
+              >
+                <div className="w-2 h-2 rounded-full bg-white" />
+              </div>
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
+
+
 
 // 태그 입력
 const TagInputComponent: React.FC<MatchingInputProps> = ({ tags = [], onChange, placeholder, maxTags = 10 }) => {
@@ -275,7 +307,7 @@ const TagInputComponent: React.FC<MatchingInputProps> = ({ tags = [], onChange, 
       {/* Input 창처럼 보이는 wrapper */}
       <div className="w-full px-4 py-3 border border-grayScale-200 rounded-xl focus-within:outline-none flex flex-wrap items-center gap-2">
         {tags.map((tag, index) => (
-          <div key={index} className="flex items-center gap-1 px-2 py-1 bg-key-100 text-white rounded-md">
+          <div key={index} className="flex items-center gap-1 px-2 py-1 bg-key-100 text-white rounded-sm">
             <span className="text-body2-medium"># {tag}</span>
             <button type="button" onClick={() => removeTag(index)} className="text-white hover:opacity-80 font-bold text-lg leading-none">×</button>
           </div>

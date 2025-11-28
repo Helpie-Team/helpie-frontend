@@ -2,6 +2,7 @@ import apiClient from '../../axios/instance';
 import {
   CreateReviewRequest,
   CreateReviewResponse,
+ReviewCheckResponse,
 } from '../../types/review/review';
 import { ApiError, AxiosErrorResponse } from '../../types/axios';
 
@@ -45,3 +46,23 @@ export async function createReview(
     throw error;
   }
 }
+
+/**
+ * 리뷰 작성 가능여부 확인
+ * @param groupId - 그룹 ID
+ * @returns ReviewCheckResponse
+ */
+export const getReviewCheck = async (
+  groupId: number
+): Promise<ReviewCheckResponse> => {
+  try {
+    const { data } = await apiClient.get<ReviewCheckResponse>(`/review/check/${groupId}`);
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      const axiosError = error as ApiError<AxiosErrorResponse>;
+      throw axiosError;
+    }
+    throw error;
+  }
+};

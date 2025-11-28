@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { Pencil } from 'lucide-react';
 
 import { useMyProfileInfo, MY_PROFILE_INFO_QUERY_KEY } from '@/app/hooks/my-page/useMyProfileInfo';
 import {
@@ -354,9 +355,9 @@ const MyProfile = () => {
   };
 
    return (
-     <div className="flex w-full flex-col items-center gap-14">
-       <div className="flex w-full flex-col gap-8">
-         <h2 className="self-start text-[28px] font-semibold text-grayScale-title">나의 프로필</h2>
+     <div className="flex w-full flex-col items-center gap-8 sm:gap-14">
+       <div className="flex w-full flex-col gap-6 sm:gap-8">
+         <h2 className="hidden sm:block self-start text-[28px] font-semibold text-grayScale-title">나의 프로필</h2>
  
         <input
           ref={fileInputRef}
@@ -372,15 +373,18 @@ const MyProfile = () => {
           imageUrl={imageUrl}
           onUploadClick={handleAvatarClick}
           onResetClick={handleAvatarReset}
+          onEditNickname={handleOpenNicknameModal}
           isMutating={uploadProfileImageMutation.isPending || resetProfileImageMutation.isPending}
         />
  
          <div className="flex w-full flex-col gap-4">
-           <ProfileSummaryCard
-            nickname={currentUsername}
-            email={email}
-            onEditNickname={handleOpenNicknameModal}
-          />
+           <div className="hidden sm:block">
+             <ProfileSummaryCard
+              nickname={currentUsername}
+              email={email}
+              onEditNickname={handleOpenNicknameModal}
+            />
+           </div>
 
           {shouldShowCallout ? (
             <ProfileCallout />
@@ -454,6 +458,7 @@ const ProfileAvatar = ({
   imageUrl,
   onUploadClick,
   onResetClick,
+  onEditNickname,
   isMutating,
 }: {
   name: string;
@@ -461,10 +466,11 @@ const ProfileAvatar = ({
   imageUrl: string | null;
   onUploadClick: () => void;
   onResetClick: () => void;
+  onEditNickname?: () => void;
   isMutating: boolean;
 }) => (
-  <div className="flex flex-col items-center gap-4">
-    <div className="relative flex h-[120px] w-[120px] items-center justify-center">
+  <div className="flex flex-col items-center gap-3 sm:gap-4">
+    <div className="relative flex h-[100px] w-[100px] sm:h-[120px] sm:w-[120px] items-center justify-center">
       <button
         type="button"
         onClick={onUploadClick}
@@ -501,7 +507,19 @@ const ProfileAvatar = ({
     </div>
 
     <div className="flex flex-col items-center gap-1 text-center">
-      <p className="text-body1 text-grayScale-title">{name}</p>
+      <div className="flex items-center gap-1.5">
+        <p className="text-body1 text-grayScale-title">{name}</p>
+        {onEditNickname && (
+          <button
+            type="button"
+            onClick={onEditNickname}
+            className="p-0.5 hover:opacity-70 transition-opacity sm:hidden"
+            aria-label="별명 수정"
+          >
+            <Pencil className="w-3.5 h-3.5 text-grayScale-500" />
+          </button>
+        )}
+      </div>
       <p className="text-body2 text-grayScale-500">{email}</p>
     </div>
   </div>
@@ -516,7 +534,7 @@ const ProfileSummaryCard = ({
   email: string;
   onEditNickname: () => void;
 }) => (
-  <div className="flex w-full flex-col gap-4 rounded-[24px] bg-[#FAF8F7] p-6 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
+  <div className="flex w-full flex-col gap-4 rounded-[24px] bg-[#FAF8F7] p-4 sm:p-6 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
     <SummaryRow label="별명" value={nickname} showEdit onEdit={onEditNickname} />
     <SummaryRow label="이메일" value={email} />
   </div>
@@ -533,22 +551,21 @@ const SummaryRow = ({
   showEdit?: boolean;
   onEdit?: () => void;
 }) => (
-  <div className='flex flex-row justify-between items-center'>
-    <div className="flex flex-row gap-2">
-    <ProfileInfoRow label={`${label}`}>
-      <span className="text-body1 text-grayScale-title">{value}</span>
+  <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0'>
+    <div className="flex flex-row gap-2 flex-1">
+      <ProfileInfoRow label={`${label}`}>
+        <span className="text-body1 text-grayScale-title">{value}</span>
       </ProfileInfoRow>
-      </div>
+    </div>
     {showEdit && (
       <button
         type="button"
-        className="h-9 rounded-full border border-grayScale-300 px-4 text-body2 text-grayScale-500 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
+        className="h-9 rounded-full border border-grayScale-300 px-4 text-body2 text-grayScale-500 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)] self-end sm:self-auto"
         onClick={onEdit}
       >
         변경
       </button>
     )}
-  
   </div>
 );
 
@@ -567,46 +584,60 @@ const ProfileDetailCard = ({
   interests: string[];
   onEditSurveyBasicInfo: () => void;
 }) => (
-  <div className="flex flex-col  gap-4 rounded-[24px] bg-[#FAF8F7] p-6 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
-    <div className='flex flex-row justify-between items-center'>
-      <div className="flex flex-row gap-2">
-      <ProfileInfoRow label="거주도시">
-        <span className="text-body1 text-grayScale-title">{city}</span>
-        </ProfileInfoRow>
-      </div>
+  <div className="flex flex-col gap-4">
+    <div className="flex items-center justify-between sm:hidden">
+      <h3 className="text-base font-semibold text-grayScale-title">추가프로필</h3>
       <button
         type="button"
-        className="h-9 rounded-full border border-grayScale-300 px-4 text-body2 text-grayScale-500 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)]"
         onClick={onEditSurveyBasicInfo}
+        className="p-1 hover:opacity-70 transition-opacity"
+        aria-label="추가프로필 수정"
       >
-        변경
+        <Pencil className="w-4 h-4 text-grayScale-500" />
       </button>
     </div>
+    <div className="flex flex-col gap-4 rounded-[24px] bg-[#FAF8F7] p-4 sm:p-6 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
+      <div className="hidden sm:flex flex-row justify-between items-center gap-2">
+        <ProfileInfoRow label="거주도시">
+          <span className="text-body1 text-grayScale-title">{city}</span>
+        </ProfileInfoRow>
+        <button
+          type="button"
+          className="h-9 rounded-full border border-grayScale-300 px-4 text-body2 text-grayScale-500 transition hover:border-[var(--color-key-100)] hover:text-[var(--color-key-100)] ml-4"
+          onClick={onEditSurveyBasicInfo}
+        >
+          변경
+        </button>
+      </div>
+      <div className="sm:hidden">
+        <ProfileInfoRow label="거주도시">
+          <span className="text-body1 text-grayScale-title">{city}</span>
+        </ProfileInfoRow>
+      </div>
 
-    
-      <ProfileInfoRow label="성별 · 나이">
-            <span className="text-body2 text-grayScale-700">{gender} · {ageGroup}</span>
-      </ProfileInfoRow>
-      <ProfileInfoRow label="사용 언어">
-        <span className="text-body2 text-grayScale-700">{languages}</span>
-      </ProfileInfoRow>
-      <ProfileInfoRow label="관심사" align="start">
-        <div className="flex flex-wrap justify-end gap-2">
-          {interests.length > 0 ? (
-            interests.map((interest) => (
-              <span
-                key={interest}
-                className="inline-block rounded-full bg-white px-3 py-1.5 text-body3 text-grayScale-700 border-1 border-grayScale-200"
-              >
-                {interest}
-              </span>
-            ))
-          ) : (
-            <span className="text-body2 text-grayScale-400">미등록</span>
-          )}
-        </div>
-      </ProfileInfoRow>
-    
+    <ProfileInfoRow label="성별 · 나이">
+      <span className="text-body2 text-grayScale-700">{gender} · {ageGroup}</span>
+    </ProfileInfoRow>
+    <ProfileInfoRow label="사용 언어">
+      <span className="text-body2 text-grayScale-700">{languages}</span>
+    </ProfileInfoRow>
+    <ProfileInfoRow label="관심사" align="start">
+      <div className="flex flex-wrap justify-end sm:justify-start gap-1 sm:gap-2 max-w-[200px] sm:max-w-none sm:w-full">
+        {interests.length > 0 ? (
+          interests.map((interest) => (
+            <span
+              key={interest}
+              className="inline-block rounded-full bg-white px-3 py-1.5 text-body3 text-grayScale-700 border-1 border-grayScale-200"
+            >
+              {interest}
+            </span>
+          ))
+        ) : (
+          <span className="text-body2 text-grayScale-400">미등록</span>
+        )}
+      </div>
+    </ProfileInfoRow>
+    </div>
   </div>
 );
 
@@ -704,7 +735,7 @@ const WithdrawInfoModal = ({ onClose }: { onClose: () => void }) => {
           </p>
         </div>
 
-        <div className="mt-6 rounded-2xl bg-[#FFF2EC] px-5 py-4 text-left">
+        <div className="mt-6 rounded-2xl bg-[#d0b7ab] px-5 py-4 text-left">
           <p className="text-caption1 text-grayScale-500 mb-2">관리자 이메일 주소</p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2 text-body2 text-grayScale-title">

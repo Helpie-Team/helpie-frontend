@@ -39,11 +39,7 @@ class ChatWebSocket {
       // /ws/native 경로가 포함되어 있으면 /ws/chat으로 변경 (네이티브 WebSocket 사용 방지)
       if (socketUrl.includes('/ws/native')) {
         socketUrl = socketUrl.replace('/ws/native', '/ws/chat');
-        console.log(`[WebSocket] /ws/native 경로 감지, /ws/chat으로 변경: ${socketUrl}`);
-      } else {
-        console.log(`[WebSocket] 환경 변수에서 WebSocket URL 사용: ${socketUrl}`);
-      }
-      
+      }       
       // SockJS 사용을 위해 ws://, wss://를 http://, https://로 변환
       socketUrl = socketUrl.replace(/^wss:\/\//, 'https://').replace(/^ws:\/\//, 'http://');
       
@@ -72,8 +68,6 @@ class ChatWebSocket {
     // /api/v1을 제거하고 WebSocket 엔드포인트 추가
     const wsUrl = httpBaseUrl.replace(/\/api\/v1$/, '') + '/ws/chat';
     
-    console.log(`[WebSocket] SockJS 연결 시도: ${wsUrl}`);
-    
     return wsUrl;
   }
 
@@ -91,7 +85,6 @@ class ChatWebSocket {
 
   connect(roomId: number): void {
     if (this.client?.connected && this.roomId === roomId) {
-      console.log(`[WebSocket] 이미 연결되어 있음: room ${roomId}`);
       return; // 이미 연결되어 있음
     }
 
@@ -112,7 +105,6 @@ class ChatWebSocket {
       this.tokenChangeHandler = () => {
         const currentToken = this.getAuthToken();
         if (!currentToken && this.client?.connected) {
-          console.log('[WebSocket] 토큰이 제거되어 연결을 해제합니다.');
           this.disconnect();
         }
       };
@@ -137,7 +129,6 @@ class ChatWebSocket {
         onConnect: () => {
           this.reconnectAttempts = 0;
           useChatStore.getState().setIsConnected(true);
-          console.log(`[WebSocket] STOMP 연결 성공: room ${roomId}`);
 
           // 순서: 3. 메시지 구독 먼저
           this.subscribeToMessages(roomId);
@@ -147,13 +138,11 @@ class ChatWebSocket {
         },
         onStompError: (frame) => {
           const errorMessage = frame.headers['message'] || 'STOMP 연결 오류';
-          console.error('[WebSocket] STOMP 오류:', errorMessage, frame);
           this.errorHandlers.forEach((handler) => handler(errorMessage));
           useChatStore.getState().setIsConnected(false);
         },
         onWebSocketError: (event) => {
           const errorMessage = this.getErrorMessage(event);
-          console.error('[WebSocket] WebSocket 오류:', errorMessage, event);
           
           // CORS 오류나 복구 불가능한 오류인지 확인
           const isCorsError = errorMessage.includes('CORS') || 
@@ -161,7 +150,6 @@ class ChatWebSocket {
                              this.isFatalError(event);
           
           if (isCorsError) {
-            console.error('[WebSocket] 복구 불가능한 오류 감지 (CORS), 재연결 중단');
             this.hasFatalError = true;
             // 재연결 타이머 취소
             if (this.reconnectTimer) {
@@ -206,14 +194,12 @@ class ChatWebSocket {
       // 연결 활성화
       this.client.activate();
     } catch (error) {
-      console.error('[WebSocket] 연결 생성 실패:', error);
       this.attemptReconnect(roomId);
     }
   }
 
   private subscribeToMessages(roomId: number): void {
     if (!this.client?.connected) {
-      console.error('[WebSocket] STOMP 클라이언트가 연결되지 않았습니다.');
       return;
     }
 
@@ -225,15 +211,8 @@ class ChatWebSocket {
     // 메시지 구독: /topic/chatroom/{chatRoomId}
     const destination = `/topic/chatroom/${roomId}`;
     this.subscription = this.client.subscribe(destination, (message: IMessage) => {
-      console.log('[WebSocket] 구독 메시지 수신:', {
-        destination: message.headers.destination,
-        body: message.body,
-        headers: message.headers,
-      });
-      
       try {
         const rawMessage = JSON.parse(message.body);
-        console.log('[WebSocket] 원본 메시지:', rawMessage);
 
         // 서버 메시지 형식에 따라 ChatMessage로 변환
         // 기존 형식: { chatId, senderId, message, date, time, img }
@@ -258,7 +237,6 @@ class ChatWebSocket {
           };
         }
 
-        console.log('[WebSocket] 변환된 메시지:', chatMessage);
         
         // 중복 메시지 체크 (optimistic update로 추가한 메시지와 중복 방지)
         // 내용과 시간을 기반으로 중복 체크 (시간 허용 오차: 5초)
@@ -275,7 +253,6 @@ class ChatWebSocket {
             chatMessage.senderId === pendingMessage.senderId &&
             timeDiff < 5000
           ) {
-            console.log('[WebSocket] 중복 메시지 감지, 임시 메시지 교체:', key);
             // 서버에서 받은 메시지로 임시 메시지 교체
             this.pendingMessages.delete(key);
             
@@ -296,9 +273,7 @@ class ChatWebSocket {
             
             if (!isDuplicate) {
               store.setMessages(roomId, [...filteredMessages, chatMessage]);
-              console.log('[WebSocket] 임시 메시지 교체 완료');
             } else {
-              console.log('[WebSocket] 중복 메시지 감지, 교체하지 않음');
               // 중복이어도 임시 메시지는 제거하고 서버 메시지 유지
               store.setMessages(roomId, filteredMessages);
             }
@@ -308,7 +283,6 @@ class ChatWebSocket {
         }
         
         if (!foundPending) {
-          console.log('[WebSocket] 새로운 메시지 추가');
           
           // 중복 메시지 체크: 같은 senderId와 같은 내용의 메시지가 이미 있는지 확인
           const store = useChatStore.getState();
@@ -333,26 +307,21 @@ class ChatWebSocket {
             this.messageHandlers.forEach((handler) => handler(chatMessage));
             useChatStore.getState().addMessage(roomId, chatMessage);
           } else {
-            console.log('[WebSocket] 중복 메시지 감지, 추가하지 않음:', chatMessage);
           }
         }
       } catch (error) {
-        console.error('[WebSocket] 메시지 파싱 실패:', error, message.body);
       }
     });
 
-    console.log(`[WebSocket] 구독 완료: ${destination}`);
   }
 
   private sendJoinNotification(roomId: number): void {
     if (!this.client?.connected) {
-      console.error('[WebSocket] STOMP 클라이언트가 연결되지 않았습니다.');
       return;
     }
 
     // 사용자 정보 확인
     if (!this.profileInfo) {
-      console.error('[WebSocket] 사용자 정보를 찾을 수 없습니다.');
       return;
     }
 
@@ -365,7 +334,6 @@ class ChatWebSocket {
       body: JSON.stringify(enterMessage),
     });
 
-    console.log(`[WebSocket] 입장 알림 전송: ${destination}`, enterMessage);
   }
 
   private sendLeaveNotification(roomId: number): void {
@@ -387,13 +355,11 @@ class ChatWebSocket {
       body: JSON.stringify(leaveMessage),
     });
 
-    console.log(`[WebSocket] 퇴장 알림 전송: ${destination}`, leaveMessage);
   }
 
   private attemptReconnect(roomId: number): void {
     // 수동 연결 해제이거나 치명적 오류인 경우 재연결 시도하지 않음
     if (this.isManualDisconnect) {
-      console.log('[WebSocket] 수동 연결 해제로 인해 재연결을 시도하지 않습니다.');
       return;
     }
 
@@ -403,7 +369,6 @@ class ChatWebSocket {
     }
 
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('[WebSocket] 최대 재연결 시도 횟수에 도달했습니다.');
       return;
     }
 
@@ -411,10 +376,8 @@ class ChatWebSocket {
     this.reconnectTimer = setTimeout(() => {
       // 재연결 시도 전에 다시 한 번 확인
       if (this.isManualDisconnect || this.hasFatalError) {
-        console.log('[WebSocket] 재연결 시도 중 연결 해제 또는 치명적 오류 감지, 재연결 취소');
         return;
       }
-      console.log(`[WebSocket] 재연결 시도 (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
       this.connect(roomId);
     }, this.reconnectDelay * this.reconnectAttempts);
   }
@@ -510,8 +473,6 @@ class ChatWebSocket {
       destination,
       body: JSON.stringify(messagePayload),
     });
-
-    console.log(`[WebSocket] 메시지 전송: ${destination}`, messagePayload);
   }
 
   onMessage(handler: MessageHandler): () => void {

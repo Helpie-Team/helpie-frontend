@@ -146,12 +146,6 @@ const Alert: React.FC<AlertProps> = ({ isOpen, onClose, anchorRef }) => {
         </button>
         <div className="flex items-center gap-3">
           <button
-            onClick={handleDeleteAll}
-            className="text-sm text-gray-600 hover:text-gray-800"
-          >
-            모두 지우기
-          </button>
-          <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
             title="닫기"
@@ -170,6 +164,12 @@ const Alert: React.FC<AlertProps> = ({ isOpen, onClose, anchorRef }) => {
           </div>
         ) : (
           <div className="space-y-0">
+                      <button
+            onClick={handleDeleteAll}
+            className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer ml-[80%]"
+          >
+            모두 지우기
+          </button>
             {notifications.map((notification) => (
               <div
                 key={notification.id}
