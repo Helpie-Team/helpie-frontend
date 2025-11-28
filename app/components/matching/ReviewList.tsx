@@ -9,9 +9,13 @@ import { ReviewItem } from "@/app/api/types/review/review";
 
 export default function ReviewList() {
   const [page, setPage] = useState(0);
-  const { data: reviewListData, isLoading, error } = usePublicReviewList({ page });
+  const { data: reviewListData, isLoading, error } = usePublicReviewList({
+    page,
+  });
   const [sortOption, setSortOption] = useState<"latest" | "rating">("latest");
-  const [expandedReviews, setExpandedReviews] = useState<Record<number, boolean>>({});
+  const [expandedReviews, setExpandedReviews] = useState<
+    Record<number, boolean>
+  >({});
   const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
 
   // 페이지 데이터가 로드되면 누적 (중복 제거)
@@ -20,16 +24,18 @@ export default function ReviewList() {
       if (page === 0) {
         setAllReviews(reviewListData.content);
       } else {
-        setAllReviews(prev => {
-          const existingIds = new Set(prev.map(r => r.reviewId));
-          const newReviews = reviewListData.content.filter(r => !existingIds.has(r.reviewId));
+        setAllReviews((prev) => {
+          const existingIds = new Set(prev.map((r) => r.reviewId));
+          const newReviews = reviewListData.content.filter(
+            (r) => !existingIds.has(r.reviewId),
+          );
           return [...prev, ...newReviews];
         });
       }
     }
   }, [reviewListData, page]);
 
-  // 정렬 옵션 변경 시: 데이터 비우지 말고, 순서만 바꾸도록 옵션만 변경
+  // 정렬 옵션 변경
   const handleSortChange = (option: "latest" | "rating") => {
     setSortOption(option);
   };
@@ -38,12 +44,11 @@ export default function ReviewList() {
   const reviewData = [...allReviews].sort((a, b) => {
     switch (sortOption) {
       case "latest":
-        // 최신순: 날짜 내림차순
         return (
-          new Date(b.meetingDate).getTime() - new Date(a.meetingDate).getTime()
+          new Date(b.meetingDate).getTime() -
+          new Date(a.meetingDate).getTime()
         );
       case "rating":
-        // 별점순: 별점 내림차순
         return b.rate - a.rate;
       default:
         return 0;
@@ -52,37 +57,35 @@ export default function ReviewList() {
 
   const handleLoadMore = () => {
     if (reviewListData && !reviewListData.last) {
-      setPage(prev => prev + 1);
+      setPage((prev) => prev + 1);
     }
   };
 
-  // 날짜 포맷팅 함수
+  // 날짜 포맷팅
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}.${String(date.getDate()).padStart(2, "0")} 참여`;
   };
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map(star => (
-          <span
-            key={star}
-            className={`text-lg ${
-              star <= rating ? "text-key-200" : "text-grayScale-200"
-            }`}
-          >
-            ★
-          </span>
-        ))}
-      </div>
-    );
-  };
+  const renderStars = (rating: number) => (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          className={`text-lg ${
+            star <= rating ? "text-key-200" : "text-grayScale-200"
+          }`}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
 
-  // 로딩 상태 (첫 페이지만)
+  // 로딩 상태 (첫 페이지)
   if (isLoading && page === 0 && allReviews.length === 0) {
     return (
       <div className="w-full flex items-center justify-center py-20">
@@ -104,7 +107,7 @@ export default function ReviewList() {
     );
   }
 
-  // 데이터가 없는 경우
+  // 데이터 없음
   if (!reviewData || reviewData.length === 0) {
     return (
       <div className="w-full flex items-center justify-center py-20">
@@ -117,15 +120,24 @@ export default function ReviewList() {
 
   return (
     <div className="w-full flex flex-col gap-8">
-      <div className="flex items-start gap-4">
-        <Image src={chatIcon} alt="채팅 아이콘" width={40} height={38} />
+      {/* ✅ PC / 태블릿 헤더 */}
+      <div className="hidden md:flex items-start gap-4">
+        <Image
+          src={chatIcon}
+          alt="채팅 아이콘"
+          width={40}
+          height={38}
+          className="flex"
+        />
         <div className="flex-1 flex flex-col gap-2">
           <h2 className="text-h1 text-black">소모임 참여 후기</h2>
           <div className="flex flex-row justify-between items-center">
             <p className="text-body1 text-grayScale-700">
               HELPie 회원들이 직접 남긴 생생한 소모임 후기를 만나보세요.
             </p>
-            <div className="flex gap-2 text-body1">
+
+            {/* 정렬 버튼 (PC) */}
+            <div className="flex gap-4 text-body1">
               <button
                 onClick={() => handleSortChange("latest")}
                 className={
@@ -144,18 +156,40 @@ export default function ReviewList() {
                     : "text-grayScale-500"
                 }
               >
-                별점순
+                좋아요순
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <hr className="border-grayScale-100" />
+      {/* 모바일 헤더 : 정렬 버튼만 노출 */}
+      <div className="flex md:hidden justify-start gap-3 text-body1 px-1">
+        <button
+          onClick={() => handleSortChange("latest")}
+          className={
+            sortOption === "latest" ? "text-black" : "text-grayScale-500"
+          }
+        >
+          최신순
+        </button>
+        <span className="w-px h-4 bg-grayScale-200" />
+        <button
+          onClick={() => handleSortChange("rating")}
+          className={
+            sortOption === "rating" ? "text-black" : "text-grayScale-500"
+          }
+        >
+          좋아요순
+        </button>
+      </div>
+
+      {/* 구분선 (PC 전용) */}
+      <hr className="hidden md:block border-grayScale-100" />
 
       {/* 리뷰 리스트 */}
       <div className="flex flex-col gap-6">
-        {reviewData.map(review => (
+        {reviewData.map((review) => (
           <div
             key={review.reviewId}
             className="border-b border-grayScale-100 pb-6"
@@ -183,16 +217,23 @@ export default function ReviewList() {
                   {review.reviewerName}
                 </h3>
 
-                {/* 소모임 제목 & 날짜 & 별점 */}
-                <div className="flex items-center gap-3">
-                  <span className="text-body3-regular text-grayScale-600">
-                    {review.groupTitle}
-                  </span>
-                  <span className="text-caption1-regular text-grayScale-500">
-                    {formatDate(review.meetingDate)}
-                  </span>
-                  {renderStars(review.rate)}
-                </div>
+{/* 소모임 제목 & 날짜 & 별점 */}
+<div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-3">
+  {/* 제목 + 날짜 묶음 (모바일/PC 모두 한 줄) */}
+  <div className="flex items-center gap-2">
+    <span className="text-body3-regular text-grayScale-600 line-clamp-1 md:line-clamp-none">
+      {review.groupTitle}
+    </span>
+    <span className="text-caption1-regular text-grayScale-500">
+      {formatDate(review.meetingDate)}
+    </span>
+  </div>
+
+  {/* ⭐ 별점 : 모바일에서는 아래 줄, PC에선 옆으로 */}
+  <div className="mt-1 md:mt-0 md:ml-3">
+    {renderStars(review.rate)}
+  </div>
+</div>
 
                 {/* 리뷰 텍스트 */}
                 <p className="text-body2-regular text-black">
@@ -207,7 +248,7 @@ export default function ReviewList() {
                 {review.description.length > 100 && (
                   <button
                     onClick={() => {
-                      setExpandedReviews(prev => ({
+                      setExpandedReviews((prev) => ({
                         ...prev,
                         [review.reviewId]: !prev[review.reviewId],
                       }));

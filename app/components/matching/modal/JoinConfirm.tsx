@@ -31,7 +31,7 @@ export default function JoinConfirm({isOpen, onClose, onConfirm}: JoinConfirmPro
       >
         <div
           id="모달 내부"
-          className="w-[540px] h-[245px] bg-white rounded-[30px] px-6 py-8 flex flex-col gap-5"
+          className="w-[90%] max-w-[540px] h-[245px] bg-white rounded-[30px] px-6 py-8 flex flex-col gap-5"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 헤더 - 뒤로가기 버튼 */}

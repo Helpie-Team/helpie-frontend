@@ -24,7 +24,6 @@ import {
 import { MyBookmarkItem } from "@/app/api/types/my-page/group";
 import { useQueryClient } from "@tanstack/react-query";
 
-// 카테고리별 색상 매핑
 const categoryColors: Record<GroupCategory, string> = {
   ALL: "bg-grayScale-500",
   HOBBY: "bg-[#7BAF6E]",
@@ -34,7 +33,6 @@ const categoryColors: Record<GroupCategory, string> = {
   SOCIAL: "bg-[#4A90E2]",
 };
 
-// 카테고리 한글 표시
 const categoryDisplayNames: Record<GroupCategory, string> = {
   ALL: "전체",
   HOBBY: "문화·취미",
@@ -45,36 +43,48 @@ const categoryDisplayNames: Record<GroupCategory, string> = {
 };
 
 interface RecommendCarouselProps {
-  forceRender?: boolean; // 잠금 상태에서도 캐러셀 렌더링 강제
+  forceRender?: boolean;
 }
 
 export default function RecommendCarousel({
   forceRender = false,
 }: RecommendCarouselProps = {}) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { data: recommendData } = useRecommendedGroups(0);
   const [likedGroups, setLikedGroups] = useState<Set<number>>(new Set());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false); // 🔹 모바일 여부
 
+  const { data: recommendData } = useRecommendedGroups(0);
   const queryClient = useQueryClient();
   const toggleMarkMutation = useToggleGroupMark();
 
-  // 로그인한 유저의 관심 목록 가져오기 (하트 초기 상태용)
-  const bookmarkQuery = useMyBookmarkInfo({
-    size: 100,
-    enabled: isLoggedIn,
-  });
+  // 🔹 모바일 여부 체크
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 767px)");
 
-  // 클라이언트에서만 로그인 상태 확인
+    const update = () => setIsMobile(mq.matches);
+    update();
+
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  // 로그인 여부
   useEffect(() => {
     if (typeof window === "undefined") return;
     const token = sessionStorage.getItem("accessToken");
     setIsLoggedIn(!!token);
   }, []);
 
-  // 북마크 목록이 바뀔 때마다 likedGroups 초기화
+  // 로그인 유저 북마크
+  const bookmarkQuery = useMyBookmarkInfo({
+    size: 100,
+    enabled: isLoggedIn,
+  });
+
   useEffect(() => {
     if (!bookmarkQuery.data) return;
 
@@ -92,7 +102,7 @@ export default function RecommendCarousel({
     setLikedGroups(idSet);
   }, [bookmarkQuery.data]);
 
-  // 더미 데이터 (forceRender일 때 사용)
+  // 더미 데이터
   const dummyImages = [seoul, shanghai, tokyo, travel_image, london];
   const dummyData = Array(5)
     .fill(null)
@@ -116,13 +126,10 @@ export default function RecommendCarousel({
       ? dummyData
       : recommendData?.page?.content || [];
 
-  // 한 번에 보여줄 카드 개수
   const cardsPerView = 4;
 
-  // 잠김 여부 확인
   const isLocked = recommendData?.isLocked && !forceRender;
 
-  // 잠김 상태일 때 더미 데이터 표시
   const displayData =
     isLocked || (forceRender && meetingData.length === 0)
       ? dummyData
@@ -141,7 +148,6 @@ export default function RecommendCarousel({
     e.stopPropagation();
     if (!isLoggedIn) return;
 
-    // forceRender + 더미 데이터일 때는 관심 토글 안함
     const isDummyData =
       forceRender &&
       (!recommendData?.page?.content ||
@@ -151,10 +157,8 @@ export default function RecommendCarousel({
 
     if (isDummyData || isLocked) return;
 
-    // 이전 상태 백업 (롤백용)
     const prevLiked = new Set(likedGroups);
 
-    // 낙관적 토글
     setLikedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(groupId)) next.delete(groupId);
@@ -162,26 +166,22 @@ export default function RecommendCarousel({
       return next;
     });
 
-    // 서버 요청
     toggleMarkMutation.mutate(groupId, {
       onSuccess: () => {
-        // 마이페이지 관심 탭 최신화
         queryClient.invalidateQueries({
           queryKey: MY_BOOKMARK_INFO_QUERY_KEY,
         });
       },
       onError: (err) => {
         console.error("관심 소모임 토글 중 오류:", err);
-        // 실패 시 롤백
         setLikedGroups(prevLiked);
       },
     });
   };
 
   const handleCardClick = (groupId: number) => {
-    if (isLocked) return; // 잠금 상태일 때는 클릭 막기
+    if (isLocked) return;
 
-    // 더미 데이터인지 확인 (더미 데이터는 id가 0-4 범위)
     const isDummyData =
       forceRender &&
       (!recommendData?.page?.content ||
@@ -189,7 +189,7 @@ export default function RecommendCarousel({
       groupId >= 0 &&
       groupId <= 4;
 
-    if (isDummyData) return; // 더미 데이터일 때는 클릭 막기
+    if (isDummyData) return;
 
     setSelectedGroupId(groupId);
     setIsJoinModalOpen(true);
@@ -204,24 +204,35 @@ export default function RecommendCarousel({
     <div className="w-full flex flex-col gap-4">
       <h2 className="text-h1 text-black">헬피가 당신에게 추천하는 소모임</h2>
 
-      {/* 피그마 스타일 캐러셀 컨테이너 */}
-      <div className="relative mt-1 w-full h-[244px] ">
+      {/* 캐러셀 컨테이너 */}
+      <div className="relative mt-1 w-full h-[244px]">
         <div className="w-full h-full rounded-[15px] bg-white overflow-hidden">
           {/* 실제 캐러셀 영역 */}
-          <div className="overflow-hidden w-full h-full">
+          <div
+            className={
+              isMobile
+                ? "w-full h-full overflow-x-auto overflow-y-hidden -mx-4 px-4" // 🔹 모바일 : 가로 스크롤
+                : "w-full h-full overflow-hidden" // PC : 기존처럼
+            }
+          >
             <div
-              className={`flex gap-3 h-full items-center transition-transform duration-300 ease-in-out ${
+              className={`flex gap-3 h-full items-center ${
                 isLocked ? "opacity-40 blur-[1px] pointer-events-none" : ""
-              }`}
-              style={{
-                transform: `translateX(-${currentIndex * (231 + 12)}px)`, // 카드 너비 + gap
-              }}
+              } ${isMobile ? "flex-nowrap" : "transition-transform duration-300 ease-in-out"}`}
+              style={
+                !isMobile
+                  ? {
+                      transform: `translateX(-${
+                        currentIndex * (231 + 12)
+                      }px)`,
+                    }
+                  : undefined
+              }
             >
               {displayData.map((meeting) => {
                 const categoryColor = categoryColors[meeting.category];
                 const categoryDisplay = categoryDisplayNames[meeting.category];
 
-                // 더미 데이터인지 확인
                 const isDummyData =
                   forceRender &&
                   (!recommendData?.page?.content ||
@@ -257,7 +268,6 @@ export default function RecommendCarousel({
                           className="object-cover"
                         />
 
-                        {/* 하트 버튼 (로그인 상태에서만 표시) */}
                         {isLoggedIn && !isDummyData && (
                           <button
                             title="찜하기"
@@ -329,8 +339,8 @@ export default function RecommendCarousel({
           )}
         </div>
 
-        {/* 이전 버튼 */}
-        {currentIndex > 0 && (
+        {/* 🔹 네비게이션 버튼 - PC에서만 */}
+        {!isMobile && currentIndex > 0 && (
           <button
             title="이전"
             onClick={handlePrev}
@@ -345,25 +355,25 @@ export default function RecommendCarousel({
           </button>
         )}
 
-        {/* 다음 버튼 */}
-        <button
-          title="다음"
-          onClick={handleNext}
-          disabled={
-            isLocked ||
-            currentIndex >= Math.max(0, displayData.length - cardsPerView)
-          }
-          className="absolute right-[-50px] top-1/2 -translate-y-1/2
+        {!isMobile && (
+          <button
+            title="다음"
+            onClick={handleNext}
+            disabled={
+              isLocked ||
+              currentIndex >= Math.max(0, displayData.length - cardsPerView)
+            }
+            className="absolute right-[-50px] top-1/2 -translate-y-1/2
           flex h-9 w-9 items-center justify-center
           rounded-full bg-black/5 border border-black/5 shadow-sm
           hover:bg-black/10 transition-colors"
-          type="button"
-        >
-          <span className="text-[20px] leading-none text-black">›</span>
-        </button>
+            type="button"
+          >
+            <span className="text-[20px] leading-none text-black">›</span>
+          </button>
+        )}
       </div>
 
-      {/* JoinModal */}
       {selectedGroupId && (
         <JoinModal
           isOpen={isJoinModalOpen}

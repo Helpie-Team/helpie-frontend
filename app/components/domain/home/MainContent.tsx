@@ -39,8 +39,8 @@ const MainContent = () => {
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col bg-white">
-      <section className="relative isolate w-full overflow-hidden">
+    <main className="flex w-full flex-col bg-white">
+      <section className="relative isolate w-full overflow-hidden h-[70vh] md:h-[80vh]">
         <div className="absolute inset-0 -z-10">
           <Image
             src={MainContentImage}

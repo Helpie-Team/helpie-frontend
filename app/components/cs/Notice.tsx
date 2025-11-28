@@ -5,65 +5,73 @@ interface NoticeItem {
   title: string;
   date: string;
   views: number;
+  isNew?: boolean;
 }
 
 const mockNoticeData: NoticeItem[] = [
   {
     id: 1,
-    title: "[공지] 오프라인 모임 시 개인정보 공유 및 금전 거래 주의",
-    date: "2025-11-25",
-    views: 156,
+    title: "[공지] HELPie 소모임 이용 가이드",
+    date: "2025-11-26",
+    views: 100,
+    isNew: true,
   },
   {
     id: 2,
-    title: "[안내] HELPie 소모임 이용 가이드",
-    date: "2025-11-24",
-    views: 243,
+    title: "[공지] 후기 작성 시 유의사항",
+    date: "2025-11-26",
+    views: 100,
+    isNew: true,
   },
   {
     id: 3,
+    title: "[공지] 금전거래 및 사기 피해 주의 안내",
+    date: "2025-11-26",
+    views: 100,
+    isNew: true,
+  },
+  {
+    id: 4,
+    title: "[공지] HELPie 커뮤니티 운영정책 안내",
+    date: "2020-02-05",
+    views: 100,
+  },
+  {
+    id: 5,
     title: "[공지] 운영진 계정 및 공식 채널 안내",
-    date: "2025-11-23",
-    views: 189,
+    date: "2025-11-26",
+    views: 100,
   },
 ];
 
 export default function Notice() {
-  // 한달 이내인지 체크하는 함수
-  const isWithinOneMonth = (dateString: string) => {
-    const noticeDate = new Date(dateString);
-    const currentDate = new Date();
-    const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
-    return noticeDate >= oneMonthAgo;
-  };
-
   return (
     <div className="w-full">
-      {/* 공지사항 목록 */}
-      <div className="w-full">
-        {mockNoticeData.map((notice) => (
-          <div
-            key={notice.id}
-            className="flex items-center justify-between py-4 border-b border-grayScale-100 hover:bg-grayScale-50 cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-body1 text-grayScale-800">
-                {notice.title}
-                {isWithinOneMonth(notice.date) && (
-                  <span className="ml-2 text-sm text-key-100">
-                    NEW
-                  </span>
-                )}
+      {mockNoticeData.map((notice) => (
+        <div
+          key={notice.id}
+          className="py-4 border-b border-grayScale-100 hover:bg-grayScale-50 cursor-pointer"
+        >
+          {/* 제목 + NEW 라인 */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-base md:text-body1 text-grayScale-800 font-normal leading-relaxed">
+              {notice.title}
+            </h3>
+            {notice.isNew && (
+              <span className="text-xs text-key-100 font-medium flex-shrink-0">
+                NEW
               </span>
-            </div>
-            <div className="flex items-center gap-4 text-caption text-grayScale-500">
-              <span>관리자</span>
-              <span>{notice.date}</span>
-              <span>조회수 {notice.views}</span>
-            </div>
+            )}
           </div>
-        ))}
-      </div>
+
+          {/* 메타 정보 라인 */}
+          <div className="mt-1 flex items-center gap-2 md:gap-4 text-xs md:text-caption text-grayScale-500">
+            <span>관리자</span>
+            <span>{notice.date}</span>
+            <span>조회수 {notice.views}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
