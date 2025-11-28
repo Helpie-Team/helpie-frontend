@@ -36,8 +36,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   }
 
   return (
-    <div className={`flex mb-4 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
-      <div className={`flex items-start gap-2 ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} max-w-[75%]`}>
+    <div className={`flex mb-3 sm:mb-4 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+      <div className={`flex items-start gap-2 ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} max-w-[85%] sm:max-w-[75%]`}>
         {/* 아바타 (상대방 메시지만 표시) */}
         {!isMyMessage && (
           message.senderProfileImage && message.senderProfileImage !== 'NO_IMAGE' ? (

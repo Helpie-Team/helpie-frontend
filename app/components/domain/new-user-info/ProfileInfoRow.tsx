@@ -10,11 +10,13 @@ interface ProfileInfoRowProps {
 
 export function ProfileInfoRow({ label, children, align = 'center' }: ProfileInfoRowProps) {
   return (
-    <div className={`flex gap-7 ${align === 'start' ? 'items-start' : 'items-center'}`}>
-      <span className={`w-[91px] text-body2 text-grayScale-700 ${align === 'start' ? 'pt-1' : ''}`}>
+    <div className={`flex flex-row justify-between sm:justify-start items-center gap-2 sm:gap-7 ${align === 'start' ? 'items-start' : 'items-center'}`}>
+      <span className={`text-body2 text-grayScale-700 ${align === 'start' ? 'pt-1' : ''} flex-shrink-0`}>
         {label}
       </span>
-      {children}
+      <div className="text-right sm:text-left">
+        {children}
+      </div>
     </div>
   );
 }

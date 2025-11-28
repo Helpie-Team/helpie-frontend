@@ -33,8 +33,9 @@ export default function ChatPage() {
   }, [pathname]);
 
   return (
-    <div className="flex h-[755px] px-[14rem] translate-y-[10rem] bg-white flex-row gap-4 justify-center  ">
-      <div className={`w-[270px] border border-gray-200 flex flex-col bg-white rounded-[0.8rem] ${!isLoadingRooms && chatRooms.length === 0 ? 'hidden' : ''}`}>
+    <div className="flex h-[calc(100vh-80px)] sm:h-[755px] px-0 sm:px-[14rem] translate-y-0 sm:translate-y-[10rem] bg-white flex-row gap-4 justify-center">
+      {/* 채팅방 목록 - 모바일에서는 전체 화면, 데스크톱에서는 사이드바 */}
+      <div className={`w-full sm:w-[270px] border-0 sm:border border-gray-200 flex flex-col bg-white rounded-0 sm:rounded-[0.8rem] ${!isLoadingRooms && chatRooms.length === 0 ? 'hidden' : ''} ${roomId ? 'hidden sm:flex' : ''}`}>
         <div className="flex-1 overflow-y-auto">
           <Suspense fallback={<div className="p-4 text-center text-gray-500">로딩 중...</div>}>
             <ChatRoomList />
@@ -42,7 +43,8 @@ export default function ChatPage() {
         </div>
       </div>
 
-      <div className={`flex bg-gray-50 ${!isLoadingRooms && chatRooms.length === 0 ? 'w-full ' : 'w-[672px]'} justify-center rounded-[0.8rem] border-[0.1px] border-gray-200`}>
+      {/* 채팅방 또는 빈 상태 - 모바일에서는 전체 화면, 데스크톱에서는 메인 영역 */}
+      <div className={`flex bg-gray-50 ${!isLoadingRooms && chatRooms.length === 0 ? 'w-full' : 'w-full sm:w-[672px]'} justify-center rounded-0 sm:rounded-[0.8rem] border-0 sm:border-[0.1px] border-gray-200 ${roomId ? 'flex' : 'hidden sm:flex'}`}>
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">

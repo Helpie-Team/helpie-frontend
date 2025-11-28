@@ -62,37 +62,35 @@ export default function ChatRoomItem({ room }: ChatRoomItemProps) {
   return (
     <div
       onClick={handleClick}
-      className={`flex items-start gap-3 p-4 border-b border-gray-200 cursor-pointer transition-colors ${
+      className={`flex items-start gap-3 p-3 sm:p-4 border-b border-gray-200 cursor-pointer transition-colors ${
         isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
       }`}
     >
       {/* 아바타 */}
-      <div className=" rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center   ">
+      <div className="rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center">
         <Image
           src={room.profileImageUrl && room.profileImageUrl !== 'NO_IMAGE' ? room.profileImageUrl : DefaultProfileImage}
           alt={room.title}
-          width={25}
-          height={25}
-          className="rounded-full"
+          width={48}
+          height={48}
+          className="rounded-full w-12 h-12 sm:w-[48px] sm:h-[48px] object-cover"
         />
       </div>
 
       {/* 채팅방 정보 */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-medium text-gray-900 truncate">{displayTitle}</h3>
-            <span className="text-sm text-gray-500">{room.currentParticipants}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="text-sm sm:text-base font-medium text-gray-900 truncate">{displayTitle}</h3>
+            <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">{room.currentParticipants}</span>
           </div>
-          <span className="text-xs text-gray-400 whitespace-nowrap ml-2">{formattedDate}</span>
+          <span className="text-xs text-gray-400 whitespace-nowrap ml-2 flex-shrink-0">{formattedDate}</span>
         </div>
         
         {/* 미리보기 (최대 2줄) */}
-        
-          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-            {previewText}
-          </p>
-        
+        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
+          {previewText}
+        </p>
       </div>
     </div>
   );

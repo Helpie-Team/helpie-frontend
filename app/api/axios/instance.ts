@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { TokenRefreshResponse } from '../types/axios';
-import { syncAuthCookie, setTokens, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
+import { syncAuthCookie, setTokens, updateAccessToken, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 if (!apiBaseUrl) {
@@ -78,20 +78,13 @@ apiClient.interceptors.response.use(
 
           const { accessToken, refreshToken: newRefreshToken } = response.data;
           
-          // accessToken 저장
-          setSessionValue('accessToken', accessToken);
-          
           // refreshToken이 응답에 포함되어 있으면 업데이트 (만료 3일 전인 경우)
           if (newRefreshToken) {
             setSessionValue('refreshToken', newRefreshToken);
             setTokens(accessToken, newRefreshToken);
           } else {
             // refreshToken이 없으면 기존 refreshToken 유지하고 accessToken만 업데이트
-            syncAuthCookie(true);
-            // 토큰 변경 이벤트 발생 (다른 컴포넌트들이 토큰 변경을 감지할 수 있도록)
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new Event(TOKEN_CHANGE_EVENT));
-            }
+            updateAccessToken(accessToken);
           }
 
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;

@@ -106,7 +106,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ profileImageUrl, onProfileClick }) 
       <HamburgerMenu 
         isOpen={isHamburgerMenuOpen} 
         onClose={handleCloseHamburgerMenu}
-        anchorRef={hamburgerButtonRef}
       />
       <Alert isOpen={isAlertOpen} onClose={handleCloseAlert} anchorRef={alertButtonRef} />
     </>

@@ -56,19 +56,19 @@ const MyOption = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-10">
+    <div className="flex w-full flex-col gap-6 sm:gap-10">
       <header>
-        <h2 className="text-[28px] font-semibold text-grayScale-title">설정</h2>
+        <h2 className="hidden sm:block text-[28px] font-semibold text-grayScale-title">설정</h2>
       </header>
 
-      <section className="flex w-full flex-col gap-5">
+      <section className="flex w-full flex-col gap-4 sm:gap-5">
         <SettingCard>
-          <div className="flex items-center justify-between">
-            <span className="text-body1 text-grayScale-title">언어설정</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <span className="text-sm sm:text-body1 text-grayScale-title">언어설정</span>
             <LanguageSegmentedControl value={language} onChange={setLanguage} />
           </div>
         </SettingCard>
-        <h3 className="text-[20px] font-medium text-grayScale-title mb-4">기본 알림</h3>
+        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title mb-3 sm:mb-4">기본 알림</h3>
         <SettingCard>
           <div className="mb-4">  
             <ToggleRow
@@ -94,7 +94,7 @@ const MyOption = () => {
           </div>
         </SettingCard>
 
-        <h3 className="text-[20px] font-medium text-grayScale-title mb-4 ">부가설정</h3>
+        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title mb-3 sm:mb-4">부가설정</h3>
         <SettingCard>
           <div>
             <ToggleRow
@@ -118,7 +118,7 @@ const MyOption = () => {
 };
 
 const SettingCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-[24px] bg-[#FBF7F4] px-6 py-5 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
+  <div className="rounded-[24px] bg-[#FBF7F4] px-4 sm:px-6 py-4 sm:py-5 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
     {children}
   </div>
 );
@@ -133,7 +133,7 @@ const LanguageSegmentedControl = ({
   const isEnglish = value === 'English';
 
   return (
-    <div className="relative flex h-10 w-[200px] items-center rounded-full bg-white p-1 shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)]">
+    <div className="relative flex h-9 sm:h-10 w-full sm:w-[200px] items-center rounded-full bg-white p-1 shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)]">
       <div
         className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-[#212121] transition-transform duration-300 ease-in-out ${
           isEnglish ? 'translate-x-[calc(100%+8px)]' : 'translate-x-0'
@@ -141,7 +141,7 @@ const LanguageSegmentedControl = ({
       />
       <button
         type="button"
-        className={`relative z-[1] flex-1 rounded-full px-1 py-1 text-sm transition-colors duration-200 ${
+        className={`relative z-[1] flex-1 rounded-full px-1 py-1 text-xs sm:text-sm transition-colors duration-200 ${
           isEnglish ? 'text-grayScale-500' : 'text-white'
         }`}
         onClick={() => onChange('한국어')}
@@ -150,7 +150,7 @@ const LanguageSegmentedControl = ({
       </button>
       <button
         type="button"
-        className={`relative z-[1] flex-1 rounded-full py-1 text-sm transition-colors duration-200 ${
+        className={`relative z-[1] flex-1 rounded-full py-1 text-xs sm:text-sm transition-colors duration-200 ${
           isEnglish ? 'text-white' : 'text-grayScale-500'
         }`}
         onClick={() => onChange('English')}
@@ -173,7 +173,7 @@ const ToggleRow = ({
   disabled?: boolean;
 }) => (
   <div className="flex items-center justify-between py-2">
-    <span className={`text-body1 ${disabled ? 'text-grayScale-400' : 'text-grayScale-title'}`}>{label}</span>
+    <span className={`text-sm sm:text-body1 ${disabled ? 'text-grayScale-400' : 'text-grayScale-title'}`}>{label}</span>
     <ToggleSwitch value={value} onChange={onChange} disabled={disabled} />
   </div>
 );
