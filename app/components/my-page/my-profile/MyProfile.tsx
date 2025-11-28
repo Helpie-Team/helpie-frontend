@@ -616,10 +616,10 @@ const ProfileDetailCard = ({
       </div>
 
     <ProfileInfoRow label="성별 · 나이">
-      <span className="text-body2 text-grayScale-700">{gender} · {ageGroup}</span>
+      <span className="text-body1 text-grayScale-title">{gender} · {ageGroup}</span>
     </ProfileInfoRow>
     <ProfileInfoRow label="사용 언어">
-      <span className="text-body2 text-grayScale-700">{languages}</span>
+      <span className="text-body1 text-grayScale-title">{languages}</span>
     </ProfileInfoRow>
     <ProfileInfoRow label="관심사" align="start">
       <div className="flex flex-wrap justify-end sm:justify-start gap-1 sm:gap-2 max-w-[200px] sm:max-w-none sm:w-full">
