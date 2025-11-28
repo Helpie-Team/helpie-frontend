@@ -185,7 +185,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
     <div
       id="모달 외부"
       onClick={handleBackdropClick}
-      className="fixed top-0 left-0 w-full h-full bg-black/70 flex justify-center items-center z-50"
+      className="fixed inset-0 top-0 left-0 w-full h-full bg-black/70 flex justify-center items-end md:items-center z-50"
     >
       <div
         id="모달 내부"
@@ -216,24 +216,27 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
         {/* 이미지  */}
         <div className="flex gap-4">
           <div className="w-full h-80 bg-gray-200 rounded-2xl overflow-hidden">
+            <div className="relative w-full aspet-[21/10]">
             <Image
               src={groupData.thumbnail && typeof groupData.thumbnail === 'string' && groupData.thumbnail.trim() !== '' ? groupData.thumbnail : noImage}
               alt={groupData.title}
               width={672}
               height={320}
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-[320px] object-cover"
+              sizes="(min-width: 768px) 672px, 100vw"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = noImage.src;
               }}
             />
+            </div>
           </div>
         </div>
 
         {/* 모임 정보 */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-row gap-3 items-center">
-          <h1 className="text-h1 ">{groupData.title}</h1>
+          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
+          <h1 className="text-h3-sb md:text-h1 ">{groupData.title}</h1>
 
           {/* 아이콘 정보 */}
           <div className="flex items-center gap-3 text-body3 text-grayScale-500">
@@ -258,7 +261,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
           </div>
 
           {/* 날짜/시간 */}
-          <div className="flex items-center gap-3 text-h3-regular text-grayScale-600">
+          <div className="flex items-center gap-3 text-caption1-b md:text-h3-regular text-grayScale-600">
             <Clock className="w-5 h-5" />
             <span>{new Date(groupData.meetingDate).toLocaleString('ko-KR', {
               year: 'numeric',
@@ -272,7 +275,7 @@ export default function JoinModal({ isOpen, onClose, groupId }: JoinModalProps) 
           </div>
 
           {/* 설명 */}
-          <p className="text-h3-regular text-grayScale-600 whitespace-pre-line">
+          <p className="text-body3-regular md:text-h3-regular text-grayScale-600 whitespace-pre-line">
             {groupData.description}
           </p>
 

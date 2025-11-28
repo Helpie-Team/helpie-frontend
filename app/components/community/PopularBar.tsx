@@ -52,7 +52,7 @@ export function PopularBar() {
 
   return (
     <aside className="w-[260px]">
-      <div className="sticky top-8 flex flex-col rounded-3xl border border-gray-100 bg-white px-5 py-4 shadow-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
+      <div className="sticky top-8 hidden md:flex flex-col rounded-3xl border border-gray-100 bg-white px-5 py-4 shadow-sm max-h-[calc(100vh-4rem)] overflow-y-auto">
         {/* 헤더 */}
         <h3 className="mb-3 text-sm font-semibold text-gray-900 flex-shrink-0">
           실시간 인기글
