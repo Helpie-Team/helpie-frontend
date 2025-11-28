@@ -30,7 +30,7 @@ export default function MatchingBody({
   ];
 
   return (
-    <div className="w-full flex flex-col gap-12">
+    <div className="w-full flex flex-col gap-4 md:gap-12">
       {/* 탭 메뉴 */}
       <div className="flex w-full">
         {tabs.map((tab) => (
@@ -39,9 +39,9 @@ export default function MatchingBody({
             onClick={() => setActiveTab(tab.id)}
             className={`
               flex-1 md:w-[490px]
-              px-5 pb-3
-              text-body1-sb md:text-h2
-              border-b-2 transition-colors
+              py-5
+              text-body1 md:text-h2
+              border-b-2 gap-1 transition-colors
               ${
                 activeTab === tab.id
                   ? "text-key-100 border-key-100"
@@ -56,7 +56,7 @@ export default function MatchingBody({
 
       {/* 탭 콘텐츠 */}
       {activeTab === "browse" ? (
-        // 🔹 모바일: 위아래, PC: 좌우
+        // 모바일: 위아래, PC: 좌우
         <div className="flex flex-col md:flex-row gap-6">
           {/* 왼쪽(PC) / 위쪽(모바일) : 카테고리 필터 */}
           {!isSearchMode && (
