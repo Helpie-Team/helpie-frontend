@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
-import { ChevronUp } from "lucide-react";
+
 import logoFooter from "@/public/logoFooter.png";
 import instagramFooter from "@/public/icons/instagramFooter.png";
 import twitterFooter from "@/public/icons/twitterFooter.png";
@@ -15,43 +13,7 @@ export default function Footer() {
   const pathname = usePathname();
   const isUserInfoPage = pathname === "/new-user-info";
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState<"ko" | "en">("ko");
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
   if (isUserInfoPage) return null;
-
-  const languages = [
-    { label: "한국어", value: "ko" },
-    { label: "English", value: "en" },
-  ];
-
-  const selectedLabel =
-    languages.find((lang) => lang.value === selectedLang)?.label ?? "한국어";
-
-  const handleSelect = (value: "ko" | "en") => {
-    setSelectedLang(value);
-    setIsOpen(false);
-  };
 
   return (
     <div className="w-full bg-[#FAF8F7] flex justify-center py-8 md:py-16 px-4 md:px-8">
@@ -270,7 +232,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ================= 하단 공통 : 2025 + 언어/약관 ================= */}
         <div
           className="
             w-full
@@ -281,44 +242,9 @@ export default function Footer() {
             pt-6 md:pt-8
           "
         >
-          {/* 왼쪽(모바일에서는 아래) */}
           <p className="text-h3-sb text-black">2025 helpie</p>
 
-          {/* 오른쪽 : 언어 + 약관 */}
           <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-2 md:gap-4">
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center py-1 cursor-pointer hover:opacity-80"
-              >
-                <span>{selectedLabel}</span>
-                {isOpen ?<ChevronUp className="text-grayScale-600" />: <ChevronDown className="text-grayScale-600" />}
-              </button>
-
-              {isOpen && (
-                <div className="absolute bottom-full left-0 mb-2 bg-white shadow-md rounded-2xl border border-grayScale-200 w-32 md:w-40 overflow-hidden z-50">
-                  {languages.map((lang, idx) => (
-                    <button
-                      key={lang.value}
-                      type="button"
-                      onClick={() =>
-                        handleSelect(lang.value as "ko" | "en")
-                      }
-                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 ${
-                        selectedLang === lang.value ? "font-semibold" : ""
-                      } ${
-                        idx !== 0 ? "border-t border-grayScale-200" : ""
-                      }`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <span className="text-grayScale-300">|</span>
             <button type="button" className="hover:underline">
               이용약관
             </button>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import MatchingFilter from '@/app/components/matching/MatchingFilter';
-import MatchingCards from '@/app/components/matching/MatchingCards';
-import ReviewList from '@/app/components/matching/ReviewList';
-import { GroupCategory } from '@/app/api/types/matching/matching';
+import MatchingFilter from "@/app/components/matching/MatchingFilter";
+import MatchingCards from "@/app/components/matching/MatchingCards";
+import ReviewList from "@/app/components/matching/ReviewList";
+import { GroupCategory } from "@/app/api/types/matching/matching";
 
 interface MatchingBodyProps {
-  country: string;                     // 'ALL' | 'KOREA' | 'JAPAN' ... 이런 값들
+  country: string; // 'ALL' | 'KOREA' | 'JAPAN' ...
   category: GroupCategory;
   onCategoryChange: (category: GroupCategory) => void;
   searchKeyword?: string;
@@ -32,16 +32,22 @@ export default function MatchingBody({
   return (
     <div className="w-full flex flex-col gap-12">
       {/* 탭 메뉴 */}
-      <div className="flex">
+      <div className="flex w-full">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`w-[490px] px-5 pb-3 text-h2 border-b-2 transition-colors ${
-              activeTab === tab.id
-                ? "text-key-100 border-key-100"
-                : "text-grayScale-600 border-grayScale-200"
-            }`}
+            className={`
+              flex-1 md:w-[490px]
+              px-5 pb-3
+              text-body1-sb md:text-h2
+              border-b-2 transition-colors
+              ${
+                activeTab === tab.id
+                  ? "text-key-100 border-key-100"
+                  : "text-grayScale-600 border-grayScale-200"
+              }
+            `}
           >
             {tab.label}
           </button>
@@ -50,20 +56,24 @@ export default function MatchingBody({
 
       {/* 탭 콘텐츠 */}
       {activeTab === "browse" ? (
-        <div className="flex gap-6">
-          {/* 🔹 검색 중이 아닐 때만 카테고리 필터 보이게 */}
+        // 🔹 모바일: 위아래, PC: 좌우
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* 왼쪽(PC) / 위쪽(모바일) : 카테고리 필터 */}
           {!isSearchMode && (
-            <MatchingFilter
-              selectedCategory={category}
-              onCategoryChange={onCategoryChange}
-            />
+            <div className="w-full md:w-[260px] shrink-0">
+              <MatchingFilter
+                selectedCategory={category}
+                onCategoryChange={onCategoryChange}
+              />
+            </div>
           )}
 
+          {/* 오른쪽(PC) / 아래쪽(모바일) : 카드 리스트 */}
           <div className="flex-1">
             <MatchingCards
-              country={country}                      // ✅ 그대로 전달 (ALL 포함)
-              category={category}                    // 검색 모드에서 쓰느냐는 MatchingCards 쪽에서 분기
-              searchKeyword={searchKeyword}          // 검색어 있으면 내부에서 /public/search 쓰도록
+              country={country}
+              category={category}
+              searchKeyword={searchKeyword}
             />
           </div>
         </div>
