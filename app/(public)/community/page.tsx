@@ -15,7 +15,7 @@ import { PopularBar } from "../../components/community/PopularBar";
 import { CommunityCreateModal } from "@/app/components/community/CommunityCreateModal";
 import { PostImageCarousel } from "@/app/components/community/PostImageCarousel";
 import { LoadingSpinner } from "@/app/components/common/LoadingSpinner";
-import { ThumbsUp, MessageCircle } from "lucide-react";
+import { ThumbsUp } from "lucide-react";
 
 export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
@@ -169,49 +169,54 @@ export default function Page() {
       {/* 상단 헤더 영역 */}
       <div className="flex flex-col items-center h-[136px] gap-6 border-b border-grayScale-200 w-full max-w-[1000px]">
         <div className="flex items-center justify-between w-full h-11">
-          <div className="flex h-[43px] w-full sm:w-[531px] items-center gap-4 text-[28px] sm:text-[32px] font-semibold leading-none text-black">
-            <div className="relative" ref={dropdownRef}>
-              <div
-                className="flex cursor-pointer items-center gap-2"
-                onClick={() => setIsDropdownOpen((prev) => !prev)}
-              >
-                <p>{selectedCategory}</p>
-                <Image
-                  src="/icons/down.png"
-                  alt="dropdown"
-                  width={34}
-                  height={34}
-                  className={`transition-transform ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
+        <div className="flex h-[43px] w-full sm:w-[531px] items-center gap-4 text-[16px] sm:text-[32px] font-semibold leading-none text-black">
+  {/* 👉 모바일에서만 보이는 '커뮤니티' (왼쪽) */}
+  <p className="block sm:hidden">커뮤니티</p>
 
-              {/* 드롭다운 */}
-              {isDropdownOpen && (
-                <div className="absolute top-[calc(100%+16px)] left-0 z-50 w-[200px] overflow-hidden rounded-lg border border-grayScale-200 bg-white shadow-lg">
-                  {category.map((categoryItem, index) => (
-                    <div
-                      key={categoryItem.name}
-                      className={`cursor-pointer px-6 py-4 text-body1-regular ${
-                        categoryItem.name === selectedCategory
-                          ? "font-semibold text-grayScale-700"
-                          : "text-grayScale-500"
-                      } ${
-                        index !== category.length - 1
-                          ? "border-b border-grayScale-100"
-                          : ""
-                      } hover:bg-grayScale-50`}
-                      onClick={() => handleCategorySelect(categoryItem.name)}
-                    >
-                      {categoryItem.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <p className="hidden sm:block">커뮤니티</p>
+  <div className="relative" ref={dropdownRef}>
+    <div
+      className="flex cursor-pointer items-center gap-2"
+      onClick={() => setIsDropdownOpen((prev) => !prev)}
+    >
+      <p>{selectedCategory}</p>
+      <Image
+        src="/icons/down.png"
+        alt="dropdown"
+        width={34}
+        height={34}
+        className={`transition-transform ${
+          isDropdownOpen ? "rotate-180" : ""
+        }`}
+      />
+    </div>
+
+    {/* 드롭다운 */}
+    {isDropdownOpen && (
+      <div className="absolute top-[calc(100%+16px)] left-0 z-50 w-[200px] overflow-hidden rounded-lg border border-grayScale-200 bg-white shadow-lg">
+        {category.map((categoryItem, index) => (
+          <div
+            key={categoryItem.name}
+            className={`cursor-pointer px-6 py-4 text-body1-regular ${
+              categoryItem.name === selectedCategory
+                ? "font-semibold text-grayScale-700"
+                : "text-grayScale-500"
+            } ${
+              index !== category.length - 1
+                ? "border-b border-grayScale-100"
+                : ""
+            } hover:bg-grayScale-50`}
+            onClick={() => handleCategorySelect(categoryItem.name)}
+          >
+            {categoryItem.name}
           </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {/* 👉 데스크탑에서만 보이는 '커뮤니티' (오른쪽) */}
+  <p className="hidden sm:block">커뮤니티</p>
+</div>
 
           {/* 게시글 작성 버튼 */}
           {isLoggedIn && (
@@ -224,7 +229,7 @@ export default function Page() {
           )}
         </div>
 
-        {/* 🔎 검색창 */}
+        {/* 검색창 */}
         <div className="relative w-full max-w-[1000px]">
           <input
             type="text"
@@ -350,12 +355,12 @@ export default function Page() {
                         {post.likesCount}
                       </span>
                     </button>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <MessageCircle className="w-6 h-6 text-grayScale-700" />
                       <span className="text-grayScale-700">
                         {post.commentsCount}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

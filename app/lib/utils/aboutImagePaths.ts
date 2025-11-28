@@ -21,7 +21,9 @@ export const aboutImagePaths = [
   '/images/about/check_icon.png',
   '/images/about/helpieDes.png',
   '/images/about/draft.png',
-  '/images/about.ourCharacter.png'
+  '/images/about/ourCharacter.png',
+  '/images/about/mbrand.png',
+  '/images/about/pcbrand.png'
   
 ] as const;
 
@@ -46,7 +48,9 @@ export const aboutImageMap = {
   checkIcon: '/images/about/check_icon.png',
   hepie: '/images/about/helpieDes.png',
   draft: '/images/about/draft.png',
-  character: '/images/about/ourCharacter.png'
+  character: '/images/about/ourCharacter.png',
+  mbrand:'/images/about/mbrand.png',
+  pcbrand:'/images/about/pcbrand.png'
 
 } as const;
 

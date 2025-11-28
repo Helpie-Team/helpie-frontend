@@ -44,7 +44,7 @@ interface SubPagesLayoutProps {
 export default function SubPagesLayout({ children }: SubPagesLayoutProps) {
   return (
     
-    <main className="flex min-h-screen flex-col items-center justify-center px-0 md:px-8 lg:px-16">
+    <main className="flex min-h-screen flex-col items-center justify-center ">
       {children}
     </main>
   );

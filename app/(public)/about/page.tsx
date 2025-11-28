@@ -93,7 +93,8 @@ export default function AboutPage() {
             >
                 <div className="max-w-4xl mx-auto px-2 sm:px-4">
                     <div className="mb-8">
-                        <Image src={aboutImageMap.hepie} alt="helpie width4" width={942} height={142} className="justify-center items-center mb-4 mx-auto"/>
+                        <Image src={aboutImageMap.mbrand} alt="helpie m" width={942} height={142} className="block sm:hidden justify-center items-center mb-4 mx-auto"/>
+                        <Image src={aboutImageMap.pcbrand} alt="helpie pc" width={942} height={142} className="hidden sm:block justify-center items-center mb-4 mx-auto"/>
                     </div>
                 </div>
             </motion.section>
