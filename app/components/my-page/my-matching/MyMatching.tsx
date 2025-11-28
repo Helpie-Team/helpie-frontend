@@ -267,13 +267,13 @@ const MyMatching = () => {
   };
 
   return (
-    <div className="flex w-full flex-col gap-8">
+    <div className="flex w-full flex-col gap-6 sm:gap-8">
       <header>
-        <h2 className="text-[28px] font-semibold text-grayScale-title">나의 소모임</h2>
+        <h2 className="hidden sm:block text-[28px] font-semibold text-grayScale-title">나의 소모임</h2>
       </header>
 
       <nav className="border-b border-grayScale-100">
-        <div className="relative mx-auto flex max-w-[720px] justify-between text-center text-body1 text-grayScale-500">
+        <div className="relative mx-auto flex max-w-[720px] justify-between text-center text-sm sm:text-body1 text-grayScale-500">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -500,15 +500,15 @@ const GroupCard = ({
   };
 
   return (
-    <div className="rounded-[24px] bg-white px-6 py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
-      <div className="flex flex-col gap-4">
+    <div className="rounded-[24px] bg-white px-4 sm:px-6 py-4 sm:py-5 shadow-[0_12px_40px_rgba(42,30,16,0.08)]">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div className="flex items-start justify-between text-caption1-regular text-grayScale-500">
           <span>{headLabel}</span>
-          <span>{rightLabel}</span>
+          <span className="text-xs sm:text-caption1-regular">{rightLabel}</span>
         </div>
 
-        <div className="flex gap-4">
-          <div className="relative h-[92px] w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200">
+        <div className="flex gap-3 sm:gap-4">
+          <div className="relative h-[80px] w-[80px] sm:h-[92px] sm:w-[92px] overflow-hidden rounded-[20px] bg-grayScale-200 flex-shrink-0">
             <Image
               src={group.thumbnailUrl ?? PlaceholderGroupImage}
               alt={group.title || 'group-thumbnail'}
@@ -518,34 +518,32 @@ const GroupCard = ({
             />
           </div>
 
-          <div className="flex flex-1 flex-col gap-2">
+          <div className="flex flex-1 flex-col gap-2 min-w-0">
             <div>
-              <p className="text-body1 text-grayScale-title">{group.title ?? '이름'}</p>
-              <p className="text-body2 text-grayScale-500">{group.description ?? '본문'}</p>
+              <p className="text-sm sm:text-body1 text-grayScale-title truncate">{group.title ?? '이름'}</p>
+              <p className="text-xs sm:text-body2 text-grayScale-500 line-clamp-2">{group.description ?? '본문'}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-caption1-regular text-grayScale-500">
-            <MapPin className="w-4 h-4" />
-              <span>{locationText}</span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-caption1-regular text-grayScale-500">
+              <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="truncate">{locationText}</span>
               <SeparatorDot />
               <span className="flex items-center gap-1">
-                <span aria-hidden="true"></span>
-                <Users className="w-4 h-4" />
+                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                 {memberText}
               </span>
               <SeparatorDot />
-              <Tag className="w-4 h-4" />
-              <span>{categoryText}</span>
+              <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="truncate">{categoryText}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3 pt-2">
-          {/* 채팅방 이동 버튼 */}
+        <div className="flex gap-2 sm:gap-3 pt-2">
           <button
             type="button"
             onClick={handleChatRoomNavigation}
             disabled={isNavigatingToChat}
-            className="flex-1 rounded-full border border-grayScale-300 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-100 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex-1 rounded-full border border-grayScale-300 py-2 text-xs sm:text-body2 text-grayScale-title transition hover:bg-grayScale-100 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isNavigatingToChat ? '이동 중...' : '채팅방 이동'}
           </button>
@@ -553,7 +551,7 @@ const GroupCard = ({
           {isPAST ? (
             <button
               type="button"
-              className="flex-1 rounded-full py-2 text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90"
+              className="flex-1 rounded-full py-2 text-xs sm:text-body2 transition cursor-pointer bg-key-100 text-white hover:opacity-90"
               onClick={handleReviewSubmit}
             >
               후기 작성하기
@@ -561,7 +559,7 @@ const GroupCard = ({
           ) : (
             <button
               type="button"
-              className="flex-1 rounded-full bg-grayScale-100 py-2 text-body2 text-grayScale-title transition hover:bg-grayScale-200 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex-1 rounded-full bg-grayScale-100 py-2 text-xs sm:text-body2 text-grayScale-title transition hover:bg-grayScale-200 disabled:cursor-not-allowed disabled:opacity-70"
               onClick={onCancel}
               disabled={!onCancel || isCancelling || !actionGroupId}
             >
@@ -611,10 +609,10 @@ const BookmarkCard = ({
 
   return (
     <div
-      className="w-[180px] rounded-2xl flex flex-col cursor-pointer"
+      className="w-full sm:w-[180px] rounded-2xl flex flex-col cursor-pointer"
       onClick={() => router.push(`/matching?groupId=${bookmark.id}`)}
     >
-      <div className="relative w-[180px] h-[130px] overflow-hidden rounded-2xl">
+      <div className="relative w-full sm:w-[180px] h-[130px] overflow-hidden rounded-2xl">
         <Image
           src={bookmark.thumbnailUrl && typeof bookmark.thumbnailUrl === 'string' && bookmark.thumbnailUrl.trim() !== '' ? bookmark.thumbnailUrl : noImage}
           alt={bookmark.title || 'bookmark-thumbnail'}
