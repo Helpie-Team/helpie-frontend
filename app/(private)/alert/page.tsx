@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import ArrowLeft from '@/public/icons/arrow_left.svg';
+import ArrowLeft from '@/public/icons/arrow_left.png';
 import CloseIcon from '@/public/icons/close_icon.svg';
 import {
   useNotificationList,
@@ -144,7 +144,7 @@ export default function AlertPage() {
         </div>
       </div>
 
-      <div className="px-16 py-4">
+      <div className="px-14 py-4">
         {isLoading ? (
           <div className="text-center text-gray-500 py-8">로딩 중...</div>
         ) : notifications.length === 0 ? (
