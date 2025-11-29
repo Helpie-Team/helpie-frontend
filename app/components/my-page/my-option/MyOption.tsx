@@ -68,7 +68,7 @@ const MyOption = () => {
             <LanguageSegmentedControl value={language} onChange={setLanguage} />
           </div>
         </SettingCard>
-        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title mb-3 sm:mb-4">기본 알림</h3>
+        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title">기본 알림</h3>
         <SettingCard>
           <div className="mb-4">  
             <ToggleRow
@@ -94,7 +94,7 @@ const MyOption = () => {
           </div>
         </SettingCard>
 
-        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title mb-3 sm:mb-4">부가설정</h3>
+        <h3 className="text-base sm:text-[20px] font-medium text-grayScale-title">부가설정</h3>
         <SettingCard>
           <div>
             <ToggleRow
@@ -118,7 +118,7 @@ const MyOption = () => {
 };
 
 const SettingCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-[24px] bg-[#FBF7F4] px-4 sm:px-6 py-4 sm:py-5 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
+  <div className="rounded-[24px] bg-[#FAF8F7] px-4 sm:px-6 py-4 sm:py-5 shadow-[0_20px_60px_rgba(42,30,16,0.08)]">
     {children}
   </div>
 );

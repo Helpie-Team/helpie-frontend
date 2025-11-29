@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ArrowRightIcon from '@/public/icons/arrow_left.svg';
 import MainContentImage from '@/public/images/main_image.png';
+import MainContentMobileImage from '@/public/images/main_image_mobile.png';
 import { useModalStore } from '@/app/lib/stores/modalStore';
 import { isAuthenticated, TOKEN_CHANGE_EVENT } from '@/app/lib/utils/token';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ const MainContent = () => {
   const { openModal } = useModalStore();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const updateAuthState = () => setIsLoggedIn(isAuthenticated());
     updateAuthState();
@@ -30,6 +31,14 @@ const MainContent = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+  }, []);
+  
   const handleSignupClick = () => {
     openModal('signup');
   };
@@ -43,7 +52,7 @@ const MainContent = () => {
       <section className="relative isolate w-full overflow-hidden h-[70vh] md:h-[80vh]">
         <div className="absolute inset-0 -z-10">
           <Image
-            src={MainContentImage}
+            src={isMobile ?   MainContentMobileImage : MainContentImage}
             alt="HELPIe 메인 배경"
             fill
             priority

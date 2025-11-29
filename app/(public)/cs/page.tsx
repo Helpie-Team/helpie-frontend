@@ -1,18 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Notice from "@/app/components/cs/Notice";
 import Promotion from "@/app/components/cs/Promotion";
 import Inquiry from "@/app/components/cs/Inquiry";
 import arrow_left from "@/public/icons/arrow_left.png";
 
-export default function Page() {
+function CSContent() {
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState<"notice" | "inquiry">("notice");
   const [activeTab, setActiveTab] = useState<"notice" | "promotion">("notice");
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
 
+  useEffect(() => {
+    if (tab === 'inquiry') {
+      setActiveMenu('inquiry');
+    }
+  }, [tab]);
+  
   const sidebarMenus = [
     { id: "notice" as const, label: "공지사항" },
     { id: "inquiry" as const, label: "문의" },
@@ -31,6 +39,7 @@ export default function Page() {
           <button
             onClick={() => router.back()}
             className="flex items-center justify-center"
+            title="뒤로가기"
           >
             <Image src={arrow_left} alt="뒤로가기" width={24} height={24} />
           </button>
@@ -187,5 +196,17 @@ export default function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-500">로딩 중...</div>
+      </div>
+    }>
+      <CSContent />
+    </Suspense>
   );
 }

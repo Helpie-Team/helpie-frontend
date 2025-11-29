@@ -16,7 +16,6 @@ import { usePathname } from 'next/navigation';
 import AuthButtons from './AuthButtons';
 import UserMenu from './UserMenu';
 import HamburgerMenu from './HamburgerMenu';
-import Alert from './Alert';
 import { useUnreadCount, UNREAD_COUNT_QUERY_KEY } from '@/app/hooks/notification/useNotification';
 import { notificationWebSocket } from '@/app/lib/websocket/notificationWebSocket';
 import { useUserStore } from '@/app/lib/stores/userStore';
@@ -28,9 +27,7 @@ const Header = () => {
   const queryClient = useQueryClient();
   const [hasToken, setHasToken] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileAlertOpen, setIsMobileAlertOpen] = useState(false);
   const hamburgerButtonRef = useRef<HTMLButtonElement>(null);
-  const alertButtonRef = useRef<HTMLButtonElement>(null);
   const { userInfo } = useUserStore();
   const { data: unreadCount = 0 } = useUnreadCount();
 
@@ -97,14 +94,6 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const handleMobileAlertClick = () => {
-    setIsMobileAlertOpen(true);
-  };
-
-  const handleCloseMobileAlert = () => {
-    setIsMobileAlertOpen(false);
-  };
-
   return (
     <>
       <header className="relative flex flex-row justify-between items-center">
@@ -134,10 +123,8 @@ const Header = () => {
                   <>
                     {isLoggedIn ? (
                       <>
-                        <button
-                          ref={alertButtonRef}
-                          type="button"
-                          onClick={handleMobileAlertClick}
+                        <Link
+                          href="/alert"
                           className="relative p-2 cursor-pointer"
                           aria-label="알림"
                         >
@@ -147,7 +134,7 @@ const Header = () => {
                               {unreadCount > 99 ? '99+' : unreadCount}
                             </span>
                           )}
-                        </button>
+                        </Link>
                         <button
                           ref={hamburgerButtonRef}
                           type="button"
@@ -198,15 +185,6 @@ const Header = () => {
         isOpen={isMobileMenuOpen} 
         onClose={handleCloseMobileMenu}
       />
-      
-      {/* 모바일 알림 */}
-      {isLoggedIn && (
-        <Alert 
-          isOpen={isMobileAlertOpen} 
-          onClose={handleCloseMobileAlert} 
-          anchorRef={alertButtonRef} 
-        />
-      )}
       
       <Modal />
     </>

@@ -66,7 +66,7 @@ const MENU_SECTIONS: MenuSection[] = [
         label: '공지사항',
       },
       {
-        href: '/cs',
+        href: '/cs?tab=inquiry',
         icon: Headset,
         label: '문의하기',
       },
@@ -92,7 +92,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkMobile();
