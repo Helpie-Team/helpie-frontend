@@ -27,10 +27,17 @@ HELPie는 전 세계 해외 생활자들이 서로의 경험과 정보를 나누
 
 ## 👥 팀원 소개
 
-| 이름 | 역할 | 주요 담당 기능 |
-|------|------|----------------|
-| **김민희** | Frontend Developer | 소모임 시스템, 서비스 소개 페이지, 커뮤니티 게시판, 고객센터 |
-| **박지원** | Frontend Developer | 실시간 채팅, 알림 시스템, 로그인/회원가입, 마이페이지 |
+| 역할 | 이름 | GitHub |
+|------|------|--------|
+| **PM** | 조인서 | - |
+| **Designer** | 최은주 | - |
+| **Designer** | 장한길 | - |
+| **Frontend** | [김민희](https://github.com/mini-chip) | [@mini-chip](https://github.com/mini-chip) |
+| **Frontend** | [박지원](https://github.com/PJW980921) | [@PJW980921](https://github.com/PJW980921) |
+| **Backend** | [배준오](https://github.com/Junobee25) | [@Junobee25](https://github.com/Junobee25) |
+| **Backend** | [임지우](https://github.com/dnwldla) | [@dnwldla](https://github.com/dnwldla) |
+| **Backend** | [전우선](https://github.com/wooxexn) | [@wooxexn](https://github.com/wooxexn) |      
+
 
 <br>
 
@@ -106,8 +113,59 @@ HELPie는 전 세계 해외 생활자들이 서로의 경험과 정보를 나누
 
 <br>
 
+## ⚡ 빠른 시작
+
+### 📋 사전 요구사항
+
+- **Node.js** 18.0 이상
+- **npm** (Node.js와 함께 설치됨)
+
+### 🚀 로컬 개발 환경 설정
+
+1. **저장소 클론**
+```bash
+git clone https://github.com/Helpie-Team/helpie-frontend.git
+cd helpie-frontend
+```
+
+2. **의존성 설치**
+```bash
+npm install
+```
+
+3. **환경변수 설정**
+```bash
+# 프로젝트 루트에 .env.local 파일을 생성하세요
+cp ENV_SETUP.md .env.local.example
+```
+환경변수 설정에 대한 자세한 내용은 [ENV_SETUP.md](./ENV_SETUP.md)를 참고하세요.
+
+4. **개발 서버 실행**
+```bash
+npm run dev
+```
+브라우저에서 [http://localhost:3000](http://localhost:3000)로 접속하여 애플리케이션을 확인할 수 있습니다.
+
+### 📜 사용 가능한 스크립트
+
+```bash
+# 개발 서버 실행 (포트: 3000)
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm run start
+
+```
+
+
+<br>
+
 ## 🛠 기술스택
 
+### Frontend
 <table>
 <tr>
  <td align="center">프레임워크</td>
@@ -173,6 +231,46 @@ HELPie는 전 세계 해외 생활자들이 서로의 경험과 정보를 나누
 </tr>
 </table>
 
+### Backend
+<table>
+<tr>
+ <td align="center">언어</td>
+ <td>
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>&nbsp
+ </td>
+</tr>
+<tr>
+ <td align="center">프레임워크</td>
+ <td>
+  <img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white"/>&nbsp
+ </td>
+</tr>
+<tr>
+ <td align="center">데이터베이스</td>
+ <td>
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/>&nbsp
+ </td>
+</tr>
+<tr>
+ <td align="center">서버</td>
+ <td>
+  <img src="https://img.shields.io/badge/Naver%20Cloud-03C75A?style=for-the-badge&logo=naver&logoColor=white"/>&nbsp
+ </td>
+</tr>
+<tr>
+ <td align="center">파일 스토리지</td>
+ <td>
+  <img src="https://img.shields.io/badge/Object%20Storage-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white"/>&nbsp
+ </td>
+</tr>
+<tr>
+ <td align="center">아키텍처</td>
+ <td>
+  <img src="https://img.shields.io/badge/MVC-FF6B6B?style=for-the-badge&logoColor=white"/>&nbsp
+ </td>
+</tr>
+</table>
+
 <br>
 
 
@@ -233,6 +331,65 @@ helpie-frontend/
 └── 📄 README.md                     # 프로젝트 문서
 ```
 
+<br>
 
+## 🧪 테스트 계정
+
+개발 및 테스트를 위한 계정 정보입니다.
+
+### 계정 정보
+- **비밀번호**: `test1234!` (모든 계정 공통)
+
+### 계정 분류
+
+| 계정 유형 | 이메일 범위 | 설명 | 용도 |
+|----------|-----------|------|------|
+| **소모임 가입자** | test1@naver.com<br/>~ test5@naver.com | 설문조사 완료 + 소모임 가입 | 소모임 관련 기능 테스트 |
+| **일반 사용자** | test6@naver.com<br/>~ test10@naver.com | 설문조사만 완료 | 기본 기능 테스트 |
+| **신규 사용자** | test11@naver.com<br/>~ test15@naver.com | 설문조사 미완료 | 온보딩 프로세스 테스트 |
+
+### 사용 가이드
+- **소모임 기능 테스트**: test1~5 계정 사용
+- **기본 기능 테스트**: test6~10 계정 사용
+- **신규 사용자 플로우 테스트**: test11~15 계정 사용
+
+<br>
+
+## 🔄 사용자 요청 흐름도
+
+### 접근 권한별 이용 가능 기능
+
+| 사용자 상태 | 홈 | 소개 | 커뮤니티<br/>(읽기) | 소모임<br/>목록 | 맞춤<br/>추천 | 소모임<br/>생성/가입 | 채팅 | 알림 | 마이페이지 |
+|------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| **비로그인** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **로그인 (설문 전)** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **로그인 (설문 후)** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### 주요 사용자 시나리오
+
+#### 🆕 신규 사용자 (첫 방문)
+1. **Helpie 홈페이지 접속** → 서비스 소개 확인
+2. **로그인/회원가입** → Google/Kakao 소셜 로그인 또는 이메일 가입
+3. **5단계 설문조사** → 개인 맞춤형 프로필 설정
+4. **맞춤 소모임 추천** → AI 기반 관심사/지역별 추천
+5. **소모임 가입** → 관심있는 소모임 신청
+6. **실시간 채팅 참여** → 소모임원들과 소통
+
+#### 👥 기존 사용자 (소모임 활동)
+1. **로그인** → 메인 대시보드 접속
+2. **알림 확인** → 새로운 메시지 알림 
+3. **소모임 관리** → 참여중인 소모임 채팅, 새로운 소모임 탐색
+4. **커뮤니티 활동** → 정보공유, 자유게시판 참여
+5. **후기 작성** → 참여한 소모임 후기 및 평점 남기기
+
+#### 🔍 방문자 (정보 탐색)
+1. **서비스 소개** → Helpie 기능 및 혜택 확인
+2. **소모임 열람** → 현재 모집 중인 소모임 열람
+2. **커뮤니티 열람** → 다른 사용자들의 글 읽기
+3. **회원가입 결정** → 더 많은 기능 이용을 위한 가입
+
+<br>
+
+## 🏗️ 시스템 아키텍처
 
 
